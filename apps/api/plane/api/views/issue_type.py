@@ -19,24 +19,26 @@ from .base import BaseAPIView
 class IssueTypeListCreateAPIEndpoint(BaseAPIView):
     """Issue Type List and Create Endpoint"""
 
-    serializer_class = ProjectIssueTypeDetailSerializer
-    model = ProjectIssueType
+    serializer_class = IssueTypeSerializer
+    model = IssueType
     permission_classes = [ProjectEntityPermission]
     use_read_replica = True
 
     def get_queryset(self):
+        # Get issue types that are associated with this project
+        project_issue_types = ProjectIssueType.objects.filter(
+            project__workspace__slug=self.kwargs.get("slug"),
+            project_id=self.kwargs.get("project_id"),
+            project__project_projectmember__member=self.request.user,
+            project__project_projectmember__is_active=True,
+            project__archived_at__isnull=True,
+        ).values_list("issue_type_id", flat=True)
+
         return (
-            ProjectIssueType.objects.filter(
-                project__workspace__slug=self.kwargs.get("slug")
+            IssueType.objects.filter(
+                id__in=project_issue_types,
+                workspace__slug=self.kwargs.get("slug")
             )
-            .filter(project_id=self.kwargs.get("project_id"))
-            .filter(
-                project__project_projectmember__member=self.request.user,
-                project__project_projectmember__is_active=True,
-            )
-            .filter(project__archived_at__isnull=True)
-            .select_related("issue_type")
-            .select_related("project")
             .distinct()
         )
 
@@ -62,8 +64,16 @@ class IssueTypeListCreateAPIEndpoint(BaseAPIView):
                 )
             else:
                 # Create new workspace-level type
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.info(f"Creating IssueTypeSerializer with data: {request.data}")
+
                 type_serializer = IssueTypeSerializer(data=request.data)
+                logger.info(f"Serializer fields: {type_serializer.fields.keys()}")
+                logger.info(f"Calling is_valid()...")
+
                 if type_serializer.is_valid():
+                    logger.info(f"Validation passed!")
                     # Check for duplicate external ID
                     if (
                         request.data.get("external_id")
@@ -105,14 +115,9 @@ class IssueTypeListCreateAPIEndpoint(BaseAPIView):
 
             if project_type_serializer.is_valid():
                 project_type_serializer.save(project_id=project_id)
-                # Return detailed response
-                project_issue_type = ProjectIssueType.objects.get(
-                    pk=project_type_serializer.data["id"]
-                )
-                response_serializer = ProjectIssueTypeDetailSerializer(
-                    project_issue_type
-                )
-                return Response(response_serializer.data, status=status.HTTP_200_OK)
+                # Return the IssueType object to match business API
+                response_serializer = IssueTypeSerializer(issue_type)
+                return Response(response_serializer.data, status=status.HTTP_201_CREATED)
             return Response(
                 project_type_serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
@@ -139,7 +144,7 @@ class IssueTypeListCreateAPIEndpoint(BaseAPIView):
         return self.paginate(
             request=request,
             queryset=(self.get_queryset()),
-            on_results=lambda types: ProjectIssueTypeDetailSerializer(
+            on_results=lambda types: IssueTypeSerializer(
                 types, many=True, fields=self.fields, expand=self.expand
             ).data,
         )
@@ -148,24 +153,26 @@ class IssueTypeListCreateAPIEndpoint(BaseAPIView):
 class IssueTypeDetailAPIEndpoint(BaseAPIView):
     """Issue Type Detail Endpoint"""
 
-    serializer_class = ProjectIssueTypeDetailSerializer
-    model = ProjectIssueType
+    serializer_class = IssueTypeSerializer
+    model = IssueType
     permission_classes = [ProjectEntityPermission]
     use_read_replica = True
 
     def get_queryset(self):
+        # Get issue types that are associated with this project
+        project_issue_types = ProjectIssueType.objects.filter(
+            project__workspace__slug=self.kwargs.get("slug"),
+            project_id=self.kwargs.get("project_id"),
+            project__project_projectmember__member=self.request.user,
+            project__project_projectmember__is_active=True,
+            project__archived_at__isnull=True,
+        ).values_list("issue_type_id", flat=True)
+
         return (
-            ProjectIssueType.objects.filter(
-                project__workspace__slug=self.kwargs.get("slug")
+            IssueType.objects.filter(
+                id__in=project_issue_types,
+                workspace__slug=self.kwargs.get("slug")
             )
-            .filter(project_id=self.kwargs.get("project_id"))
-            .filter(
-                project__project_projectmember__member=self.request.user,
-                project__project_projectmember__is_active=True,
-            )
-            .filter(project__archived_at__isnull=True)
-            .select_related("issue_type")
-            .select_related("project")
             .distinct()
         )
 
@@ -174,7 +181,7 @@ class IssueTypeDetailAPIEndpoint(BaseAPIView):
 
         Retrieve details of a specific work item type associated with a project.
         """
-        serializer = ProjectIssueTypeDetailSerializer(
+        serializer = IssueTypeSerializer(
             self.get_queryset().get(pk=type_id),
             fields=self.fields,
             expand=self.expand,
@@ -187,8 +194,12 @@ class IssueTypeDetailAPIEndpoint(BaseAPIView):
         Remove a work item type association from a project.
         Default types and types with existing work items cannot be deleted.
         """
+        # Get the issue type
+        issue_type = self.get_queryset().get(pk=type_id)
+
+        # Find the project-issue type association
         project_type = ProjectIssueType.objects.get(
-            pk=type_id, project_id=project_id, project__workspace__slug=slug
+            issue_type_id=type_id, project_id=project_id, project__workspace__slug=slug
         )
 
         if project_type.is_default:
@@ -199,7 +210,7 @@ class IssueTypeDetailAPIEndpoint(BaseAPIView):
 
         # Check for any issues with this type
         issue_exist = Issue.objects.filter(
-            project_id=project_id, type=project_type.issue_type
+            project_id=project_id, type=issue_type
         ).exists()
 
         if issue_exist:
@@ -210,49 +221,65 @@ class IssueTypeDetailAPIEndpoint(BaseAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # Delete the association (not the issue type itself)
         project_type.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request, slug, project_id, type_id):
         """Update issue type
 
-        Update properties of a work item type association.
-        Can update default status, level, and other project-specific settings.
+        Update properties of a work item type.
+        Can update name, description, logo_props, and other type settings.
         """
-        project_type = ProjectIssueType.objects.get(
-            project__workspace__slug=slug, project_id=project_id, pk=type_id
+        # Get the issue type
+        issue_type = self.get_queryset().get(pk=type_id)
+
+        # Find the project-issue type association for is_default handling
+        try:
+            project_type = ProjectIssueType.objects.get(
+                issue_type_id=type_id, project_id=project_id, project__workspace__slug=slug
+            )
+        except ProjectIssueType.DoesNotExist:
+            return Response(
+                {"error": "Issue type not found for this project"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Update the IssueType
+        type_serializer = IssueTypeSerializer(
+            issue_type,
+            data=request.data,
+            partial=True,
         )
 
-        # Update project-level settings
-        serializer = ProjectIssueTypeSerializer(
-            project_type, data=request.data, partial=True, context={"project_id": project_id}
-        )
+        if type_serializer.is_valid():
+            type_serializer.save()
 
-        if serializer.is_valid():
-            serializer.save()
-
-            # If updating the underlying issue type
-            if "name" in request.data or "description" in request.data or "logo_props" in request.data:
-                issue_type = project_type.issue_type
-                type_serializer = IssueTypeSerializer(
-                    issue_type,
-                    data={
-                        k: v
-                        for k, v in request.data.items()
-                        if k in ["name", "description", "logo_props", "is_active", "level"]
-                    },
+            # Handle is_default at project level if provided
+            if "is_default" in request.data:
+                project_serializer = ProjectIssueTypeSerializer(
+                    project_type,
+                    data={"is_default": request.data["is_default"]},
                     partial=True,
+                    context={"project_id": project_id}
                 )
-                if type_serializer.is_valid():
-                    type_serializer.save()
-                else:
-                    return Response(
-                        type_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-                    )
+                if project_serializer.is_valid():
+                    project_serializer.save()
 
-            # Return detailed response
-            project_issue_type = ProjectIssueType.objects.get(pk=type_id)
-            response_serializer = ProjectIssueTypeDetailSerializer(project_issue_type)
+            # Handle level at project level if provided
+            if "level" in request.data:
+                project_serializer = ProjectIssueTypeSerializer(
+                    project_type,
+                    data={"level": request.data["level"]},
+                    partial=True,
+                    context={"project_id": project_id}
+                )
+                if project_serializer.is_valid():
+                    project_serializer.save()
+
+            # Return updated IssueType
+            updated_issue_type = IssueType.objects.get(pk=type_id)
+            response_serializer = IssueTypeSerializer(updated_issue_type)
             return Response(response_serializer.data, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(type_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

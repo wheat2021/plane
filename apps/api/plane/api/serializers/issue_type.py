@@ -12,16 +12,34 @@ class IssueTypeSerializer(BaseSerializer):
     Each workspace can have multiple issue types with unique names.
     """
 
+    workspace = serializers.UUIDField(read_only=True)
+
     class Meta:
         model = IssueType
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "description",
+            "logo_props",
+            "is_epic",
+            "is_default",
+            "is_active",
+            "level",
+            "external_source",
+            "external_id",
+            "created_by",
+            "updated_by",
+            "created_at",
+            "updated_at",
+            "deleted_at",
+            "workspace",
+        ]
         read_only_fields = [
             "id",
             "created_by",
             "updated_by",
             "created_at",
             "updated_at",
-            "workspace",
             "deleted_at",
         ]
 
@@ -73,6 +91,7 @@ class ProjectIssueTypeSerializer(BaseSerializer):
             "created_at",
             "updated_at",
             "project",
+            "workspace",
             "deleted_at",
         ]
 
