@@ -28,6 +28,14 @@ tags:
   - Proxy 服务 Caddyfile 配置
   - 完整的解决步骤和验证方法
 
+### ⚙️ 配置管理
+
+- **[环境变量配置说明](./环境变量配置说明.md)** - 环境变量完整指南
+  - 运行时配置 vs 构建时配置
+  - 各服务环境变量清单
+  - 常见配置场景
+  - 调试和验证方法
+
 ## 🎯 文档使用指南
 
 ### 按场景查找
@@ -63,7 +71,11 @@ tags:
 docs/
 ├── README.md                    # 本文档索引
 ├── Docker构建问题修复指南.md    # 详细的问题修复文档
-└── Docker快速参考.md            # 快速命令参考手册
+├── Docker快速参考.md            # 快速命令参考手册
+├── 环境变量配置说明.md          # 环境变量配置指南
+├── CHANGES.md                   # 变更记录
+├── verify-setup.sh              # 环境验证脚本
+└── restart-services.sh          # 服务重启脚本
 ```
 
 ## 🔍 关键概念
@@ -134,6 +146,21 @@ docker exec -i plane-db psql -U plane plane < backup.sql
 
 # 清理系统（⚠️ 谨慎使用）
 docker system prune -a
+```
+
+### 环境变量修改
+
+```bash
+# 修改后端环境变量（重启生效）
+vim apps/api/.env
+bash docs/restart-services.sh --backend
+
+# 修改前端环境变量（需要重新构建）
+vim apps/web/.env
+bash docs/restart-services.sh --frontend
+
+# 查看详细说明
+cat docs/环境变量配置说明.md
 ```
 
 ## 📚 相关资源
