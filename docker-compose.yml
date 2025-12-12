@@ -104,6 +104,16 @@ services:
       args:
         DOCKER_BUILDKIT: 1
     restart: always
+    environment:
+      API_BASE_URL: http://api:8000
+      LIVE_SERVER_SECRET_KEY: ${LIVE_SERVER_SECRET_KEY:-secret-key}
+      REDIS_URL: redis://plane-redis:6379/
+      REDIS_HOST: plane-redis
+      REDIS_PORT: 6379
+      PORT: 3000
+    depends_on:
+      - api
+      - plane-redis
 
   plane-db:
     container_name: plane-db
@@ -164,6 +174,8 @@ services:
     environment:
       FILE_SIZE_LIMIT: ${FILE_SIZE_LIMIT:-5242880}
       BUCKET_NAME: ${AWS_S3_BUCKET_NAME:-uploads}
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-0.0.0.0/0}
     depends_on:
       - web
       - api
