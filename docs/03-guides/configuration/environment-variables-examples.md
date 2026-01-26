@@ -1,10 +1,13 @@
 ---
 title: 环境变量修改实战示例
-date: 2025-12-12
-tags:
-  - examples
-  - configuration
-  - howto
+description: Plane 项目环境变量修改的实用场景和步骤指南,可直接复制使用
+category: guides/configuration
+tags: [configuration, examples, howto, deployment]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
 ---
 
 # 环境变量修改实战示例

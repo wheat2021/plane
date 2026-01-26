@@ -1,3 +1,15 @@
+---
+title: Plane 核心数据模型
+description: Plane 项目基于 Django 的核心数据结构与实体关系分析,包括 ER 图和数据模型详解
+category: architecture
+tags: [architecture, data-model, django, database, entity-relationship]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
+---
+
 # Plane 核心数据模型分析笔记
 
 本技术笔记旨在帮助开发者快速掌握 Plane (基于 Django) 的核心数据结构与实体关系。

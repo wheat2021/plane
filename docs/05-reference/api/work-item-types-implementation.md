@@ -1,3 +1,15 @@
+---
+title: Work Item Types 后端 API 实现总结
+description: Plane 项目工作项类型功能的完整后端 API 实现记录和总结
+category: reference/api
+tags: [api, implementation, work-item-types, development-notes]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
+---
+
 # Work Item Types 后端 API 实现总结
 
 **实施日期：** 2025-12-12

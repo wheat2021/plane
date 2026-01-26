@@ -1,5 +1,17 @@
 ---
 title: 环境变量配置说明
+description: Plane 项目环境变量完整参考手册,包括运行时配置和构建时配置的说明
+category: reference/configuration
+tags: [configuration, environment, docker, deployment]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
+---
+
+---
+title: 环境变量配置说明
 date: 2025-12-12
 tags:
   - configuration

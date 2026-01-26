@@ -1,3 +1,15 @@
+---
+title: Plane 核心组件架构
+description: Plane 项目的核心组件、外部依赖、系统初始化和运行机制详解,包括开发模式和生产部署模式对比
+category: architecture
+tags: [architecture, components, microservices, docker, docker-compose]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
+---
+
 # Plane 核心组件架构
 
 本文档详细说明了 Plane 项目的核心组件、外部依赖以及系统的初始化和运行机制，并对比了开发模式和生产部署模式之间的差异。

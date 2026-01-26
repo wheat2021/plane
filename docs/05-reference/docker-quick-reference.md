@@ -1,12 +1,15 @@
 ---
 title: Docker 快速参考指南
-date: 2025-12-12
-tags:
-  - docker
-  - quickstart
-  - cheatsheet
-category: DevOps
+description: Plane 项目 Docker 环境的常用命令和快速故障排查方法速查手册
+category: reference
+tags: [docker, quickstart, cheatsheet, reference]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
 ---
+
 
 # Docker 快速参考指南
 

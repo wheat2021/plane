@@ -1,3 +1,15 @@
+---
+title: Proxy 组件技术文档
+description: Plane 系统的统一入口和反向代理层技术文档,基于 Caddy 2 实现的高性能 HTTP/HTTPS 反向代理
+category: architecture
+tags: [architecture, proxy, caddy, reverse-proxy, networking]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
+---
+
 # Proxy 组件技术文档
 
 ## 1. 概述

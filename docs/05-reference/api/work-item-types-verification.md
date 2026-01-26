@@ -1,3 +1,15 @@
+---
+title: Work Item Types 后端 API 验证报告
+description: Plane 社区版工作项类型功能的后端 API 实现情况验证文档
+category: reference/api
+tags: [api, verification, work-item-types, development-notes]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
+---
+
 # Work Item Types 后端 API 验证报告
 
 **验证日期：** 2025-12-12

@@ -1,3 +1,15 @@
+---
+title: MinIO 远程访问问题修复
+description: 解决 Plane 项目中 MinIO 对象存储远程访问连接失败的问题
+category: operations/troubleshooting
+tags: [troubleshooting, minio, storage, networking, deployment]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
+---
+
 # MinIO 远程访问问题修复
 
 ## 问题描述

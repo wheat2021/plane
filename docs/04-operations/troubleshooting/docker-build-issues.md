@@ -1,14 +1,15 @@
 ---
 title: Docker Compose 构建问题修复指南
-date: 2025-12-12
-tags:
-  - docker
-  - troubleshooting
-  - deployment
-  - build-fix
-category: DevOps
-status: completed
+description: Plane 项目 Docker Compose 构建过程中常见问题的完整分析和解决方案
+category: operations/troubleshooting
+tags: [troubleshooting, docker, docker-compose, build-fix, deployment]
+author: Claude Code Assistant
+created: 2025-12-12
+updated: 2025-12-30
+version: 1.0.0
+status: active
 ---
+
 
 # Docker Compose 构建问题修复指南
 
