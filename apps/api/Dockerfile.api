@@ -3,8 +3,14 @@ FROM python:3.12.10-alpine
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV PIP_DISABLE_PIP_VERSION_CHECK=1 
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV INSTANCE_CHANGELOG_URL=https://sites.plane.so/pages/691ef037bcfe416a902e48cb55f59891/
+
+# pip mirror configuration (can be overridden via build args)
+ARG PIP_INDEX_URL=https://pypi.org/simple/
+ARG PIP_TRUSTED_HOST=
+ENV PIP_INDEX_URL=${PIP_INDEX_URL}
+ENV PIP_TRUSTED_HOST=${PIP_TRUSTED_HOST}
 
 # Update system packages for security
 RUN apk update && apk upgrade
@@ -30,13 +36,13 @@ RUN apk add --no-cache --virtual .build-deps \
     "make" \
     "postgresql-dev" \
     "libc-dev" \
-    "linux-headers" \
-    && \
-    pip install -r requirements.txt --compile --no-cache-dir \
-    && \
-    apk del .build-deps \
-    && \
-    rm -rf /var/cache/apk/*
+    "linux-headers"
+
+# Install Python dependencies with pip cache for bandwidth saving
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements.txt --compile
+
+RUN apk del .build-deps && rm -rf /var/cache/apk/*
 
 
 # Add in Django deps and generate Django's static files

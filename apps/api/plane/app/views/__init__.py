@@ -78,6 +78,7 @@ from .workspace.module import WorkspaceModulesEndpoint
 from .workspace.cycle import WorkspaceCyclesEndpoint
 from .workspace.quick_link import QuickLinkViewSet
 from .workspace.sticky import WorkspaceStickyViewSet
+from .workspace.issue_type import WorkspaceIssueTypesEndpoint
 
 from .state.base import StateViewSet, IntakeStateEndpoint
 from .view.base import (
