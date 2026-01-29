@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 分支策略
+
+本仓库是从上游 Plane 仓库 fork 而来，采用以下分支管理策略：
+
+- **`itemtype`** 分支：本地开发分支，包含自定义功能（如工作项类型下拉框、Docker 优化等）
+- **`preview`** 分支：上游主分支，用于同步上游更新
+- **不创建 PR**：`itemtype` 分支不会合并到主分支，保持独立以便从上游同步
+- 提交代码时直接推送到 `itemtype` 分支：`git push origin itemtype`
+
 ## Project Overview
 
 Plane is an open-source project management platform (issues, cycles, modules, views, pages, analytics). It's a monorepo with a Django REST backend and React Router frontend apps.
