@@ -25,8 +25,12 @@ export type TIssueIdentifierWithDetails = TIssueIdentifierBaseProps & {
 export type TIssueIdentifierProps = TIssueIdentifierFromStore | TIssueIdentifierWithDetails;
 
 export type TIssueTypeIdentifier = {
-  issueTypeId: string;
+  issueTypeId: string | null | undefined;
+  issueId?: string;
+  projectId?: string;
+  workspaceSlug?: string;
   size?: TIssueIdentifierSize;
+  disabled?: boolean;
 };
 
 export type TIdentifierTextProps = {

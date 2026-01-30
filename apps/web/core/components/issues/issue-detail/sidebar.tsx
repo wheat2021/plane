@@ -14,11 +14,13 @@ import {
   UserCirclePropertyIcon,
   EstimatePropertyIcon,
   ParentPropertyIcon,
+  DropdownPropertyIcon,
 } from "@plane/propel/icons";
 import { cn, getDate, renderFormattedPayloadDate, shouldHighlightIssueDueDate } from "@plane/utils";
 // components
 import { DateDropdown } from "@/components/dropdowns/date";
 import { EstimateDropdown } from "@/components/dropdowns/estimate";
+import { IssueTypeDropdown } from "@/components/dropdowns/issue-type";
 import { ButtonAvatars } from "@/components/dropdowns/member/avatar";
 import { MemberDropdown } from "@/components/dropdowns/member/dropdown";
 import { PriorityDropdown } from "@/components/dropdowns/priority";
@@ -85,7 +87,9 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
             <SidebarPropertyListItem icon={StatePropertyIcon} label={t("common.state")}>
               <StateDropdown
                 value={issue?.state_id}
-                onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { state_id: val })}
+                onChange={(val) => {
+                  void issueOperations.update(workspaceSlug, projectId, issueId, { state_id: val });
+                }}
                 projectId={projectId?.toString() ?? ""}
                 disabled={!isEditable}
                 buttonVariant="transparent-with-text"
@@ -97,10 +101,29 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               />
             </SidebarPropertyListItem>
 
+            <SidebarPropertyListItem icon={DropdownPropertyIcon} label={t("work_item_type")}>
+              <IssueTypeDropdown
+                value={issue?.type_id}
+                onChange={(val) => {
+                  void issueOperations.update(workspaceSlug, projectId, issueId, { type_id: val });
+                }}
+                workspaceSlug={workspaceSlug}
+                disabled={!isEditable}
+                buttonVariant="transparent-with-text"
+                className="group w-full grow"
+                buttonContainerClassName="w-full text-left h-7.5"
+                buttonClassName={`text-body-xs-regular ${issue?.type_id ? "" : "text-placeholder"}`}
+                dropdownArrow
+                dropdownArrowClassName="h-3.5 w-3.5 hidden group-hover:inline"
+              />
+            </SidebarPropertyListItem>
+
             <SidebarPropertyListItem icon={MembersPropertyIcon} label={t("common.assignees")}>
               <MemberDropdown
                 value={issue?.assignee_ids ?? undefined}
-                onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { assignee_ids: val })}
+                onChange={(val) => {
+                  void issueOperations.update(workspaceSlug, projectId, issueId, { assignee_ids: val });
+                }}
                 disabled={!isEditable}
                 projectId={projectId?.toString() ?? ""}
                 placeholder={t("issue.add.assignee")}
@@ -118,7 +141,9 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
             <SidebarPropertyListItem icon={PriorityPropertyIcon} label={t("common.priority")}>
               <PriorityDropdown
                 value={issue?.priority}
-                onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { priority: val })}
+                onChange={(val) => {
+                  void issueOperations.update(workspaceSlug, projectId, issueId, { priority: val });
+                }}
                 disabled={!isEditable}
                 buttonVariant="transparent-with-text"
                 className="w-full h-7.5 grow rounded-sm"
@@ -140,11 +165,11 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               <DateDropdown
                 placeholder={t("issue.add.start_date")}
                 value={issue.start_date}
-                onChange={(val) =>
-                  issueOperations.update(workspaceSlug, projectId, issueId, {
+                onChange={(val) => {
+                  void issueOperations.update(workspaceSlug, projectId, issueId, {
                     start_date: val ? renderFormattedPayloadDate(val) : null,
-                  })
-                }
+                  });
+                }}
                 maxDate={maxDate ?? undefined}
                 disabled={!isEditable}
                 buttonVariant="transparent-with-text"
@@ -161,11 +186,11 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                 <DateDropdown
                   placeholder={t("issue.add.due_date")}
                   value={issue.target_date}
-                  onChange={(val) =>
-                    issueOperations.update(workspaceSlug, projectId, issueId, {
+                  onChange={(val) => {
+                    void issueOperations.update(workspaceSlug, projectId, issueId, {
                       target_date: val ? renderFormattedPayloadDate(val) : null,
-                    })
-                  }
+                    });
+                  }}
                   minDate={minDate ?? undefined}
                   disabled={!isEditable}
                   buttonVariant="transparent-with-text"
@@ -186,9 +211,9 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               <SidebarPropertyListItem icon={EstimatePropertyIcon} label={t("common.estimate")}>
                 <EstimateDropdown
                   value={issue?.estimate_point ?? undefined}
-                  onChange={(val: string | undefined) =>
-                    issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val })
-                  }
+                  onChange={(val: string | undefined) => {
+                    void issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val });
+                  }}
                   projectId={projectId}
                   disabled={!isEditable}
                   buttonVariant="transparent-with-text"

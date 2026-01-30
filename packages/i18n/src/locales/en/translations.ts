@@ -5,6 +5,7 @@ export default {
   error: "Error",
   success: "Success",
   warning: "Warning",
+  work_item_type: "Work item type",
   info: "Info",
   close: "Close",
   yes: "Yes",

@@ -38,6 +38,7 @@ from plane.db.models import (
     IssueDescriptionVersion,
     ProjectMember,
     EstimatePoint,
+    IssueType,
 )
 from plane.utils.content_validator import (
     validate_html_content,
@@ -82,6 +83,9 @@ class IssueCreateSerializer(BaseSerializer):
     )
     parent_id = serializers.PrimaryKeyRelatedField(
         source="parent", queryset=Issue.objects.all(), required=False, allow_null=True
+    )
+    type_id = serializers.PrimaryKeyRelatedField(
+        source="type", queryset=IssueType.objects.all(), required=False, allow_null=True
     )
     label_ids = serializers.ListField(
         child=serializers.PrimaryKeyRelatedField(queryset=Label.objects.all()),
@@ -756,6 +760,9 @@ class IssueIntakeSerializer(DynamicBaseSerializer):
 class IssueSerializer(DynamicBaseSerializer):
     # ids
     cycle_id = serializers.PrimaryKeyRelatedField(read_only=True)
+    type_id = serializers.PrimaryKeyRelatedField(
+        source="type", queryset=IssueType.objects.all(), required=False, allow_null=True
+    )
     module_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
 
     # Many to many
@@ -783,6 +790,7 @@ class IssueSerializer(DynamicBaseSerializer):
             "project_id",
             "parent_id",
             "cycle_id",
+            "type_id",
             "module_ids",
             "label_ids",
             "assignee_ids",
@@ -796,7 +804,19 @@ class IssueSerializer(DynamicBaseSerializer):
             "is_draft",
             "archived_at",
         ]
-        read_only_fields = fields
+        read_only_fields = [
+            "id",
+            "cycle_id",
+            "sequence_id",
+            "project_id",
+            "sub_issues_count",
+            "created_at",
+            "updated_at",
+            "created_by",
+            "updated_by",
+            "attachment_count",
+            "link_count",
+        ]
 
     def validate(self, data):
         if (

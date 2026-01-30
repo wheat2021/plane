@@ -1,10 +1,14 @@
 import { observer } from "mobx-react";
 // plane imports
 import type { TIssueIdentifierProps, TIssueTypeIdentifier } from "@plane/types";
+// components
+import { IssueTypeDropdown } from "@/components/dropdowns/issue-type";
+import { getIssueTypeIcon } from "@/components/dropdowns/issue-type-icon";
+import { IdentifierText } from "@/components/issues/issue-detail/identifier-text";
 // hooks
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
+import { useIssueType } from "@/hooks/store/use-issue-type";
 import { useProject } from "@/hooks/store/use-project";
-import { IdentifierText } from "@/components/issues/issue-detail/identifier-text";
 
 export const IssueIdentifier = observer(function IssueIdentifier(props: TIssueIdentifierProps) {
   const { projectId, variant, size, displayProperties, enableClickToCopyIdentifier = false } = props;
@@ -19,12 +23,15 @@ export const IssueIdentifier = observer(function IssueIdentifier(props: TIssueId
   const issue = isUsingStoreData ? getIssueById(props.issueId) : null;
   const projectIdentifier = isUsingStoreData ? getProjectIdentifierById(projectId) : props.projectIdentifier;
   const issueSequenceId = isUsingStoreData ? issue?.sequence_id : props.issueSequenceId;
+  const issueTypeId = isUsingStoreData ? issue?.type_id : props.issueTypeId;
   const shouldRenderIssueID = displayProperties ? displayProperties.key : true;
+  const shouldRenderIssueType = displayProperties ? displayProperties.issue_type : true;
 
   if (!shouldRenderIssueID) return null;
 
   return (
-    <div className="shrink-0 flex items-center space-x-2">
+    <div className="shrink-0 flex items-center gap-1">
+      {shouldRenderIssueType && issueTypeId && <IssueTypeIconDisplay issueTypeId={issueTypeId} size={size} />}
       <IdentifierText
         identifier={`${projectIdentifier}-${issueSequenceId}`}
         enableClickToCopyIdentifier={enableClickToCopyIdentifier}
@@ -35,6 +42,74 @@ export const IssueIdentifier = observer(function IssueIdentifier(props: TIssueId
   );
 });
 
-export const IssueTypeIdentifier = observer(function IssueTypeIdentifier(_props: TIssueTypeIdentifier) {
-  return <></>;
+type TIssueTypeIconDisplayProps = {
+  issueTypeId: string;
+  size?: "xs" | "sm" | "md" | "lg";
+};
+
+const IssueTypeIconDisplay = observer(function IssueTypeIconDisplay(props: TIssueTypeIconDisplayProps) {
+  const { issueTypeId, size = "sm" } = props;
+  const { getIssueTypeById } = useIssueType();
+  const issueType = getIssueTypeById(issueTypeId);
+
+  if (!issueType) return null;
+
+  const iconSize = size === "xs" ? 12 : size === "sm" ? 14 : size === "md" ? 16 : 18;
+
+  return (
+    <span className="flex-shrink-0">
+      {getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)}
+    </span>
+  );
+});
+
+export const IssueTypeIdentifier = observer(function IssueTypeIdentifier(props: TIssueTypeIdentifier) {
+  const { issueTypeId, issueId, projectId, workspaceSlug, size = "sm", disabled = false } = props;
+  // store hooks
+  const {
+    issue: { updateIssue },
+  } = useIssueDetail();
+  const { getIssueTypeById } = useIssueType();
+
+  const issueType = issueTypeId ? getIssueTypeById(issueTypeId) : null;
+  const iconSize = size === "xs" ? 12 : size === "sm" ? 14 : size === "md" ? 16 : 18;
+
+  // If we don't have the required props for editing, render read-only
+  const isReadOnly = !workspaceSlug || !projectId || !issueId;
+
+  const handleChange = (value: string | null) => {
+    if (isReadOnly) return;
+    void updateIssue(workspaceSlug, projectId, issueId, { type_id: value });
+  };
+
+  // Read-only mode: just display the icon
+  if (isReadOnly) {
+    if (!issueType) return null;
+    return (
+      <span className="flex-shrink-0">
+        {getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)}
+      </span>
+    );
+  }
+
+  // Editable mode: render dropdown
+  return (
+    <IssueTypeDropdown
+      value={issueTypeId ?? null}
+      onChange={handleChange}
+      workspaceSlug={workspaceSlug}
+      disabled={disabled}
+      buttonVariant="border-without-text"
+      showTooltip
+      button={
+        <span className="flex-shrink-0 cursor-pointer">
+          {issueType ? (
+            getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)
+          ) : (
+            <span className="text-placeholder">-</span>
+          )}
+        </span>
+      }
+    />
+  );
 });

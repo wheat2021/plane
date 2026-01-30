@@ -713,6 +713,8 @@ class IssueDetailAPIEndpoint(BaseAPIView):
         project = Project.objects.get(pk=project_id)
         current_instance = json.dumps(IssueSerializer(issue).data, cls=DjangoJSONEncoder)
         requested_data = json.dumps(self.request.data, cls=DjangoJSONEncoder)
+        print(f"====== DEBUG TYPEID: request.data = {request.data}")
+
         serializer = IssueSerializer(
             issue,
             data=request.data,
@@ -720,6 +722,7 @@ class IssueDetailAPIEndpoint(BaseAPIView):
             partial=True,
         )
         if serializer.is_valid():
+            print(f"====== DEBUG TYPEID: validated_data = {serializer.validated_data}")
             if (
                 request.data.get("external_id")
                 and (issue.external_id != str(request.data.get("external_id")))
@@ -739,6 +742,8 @@ class IssueDetailAPIEndpoint(BaseAPIView):
                 )
 
             serializer.save()
+            issue.refresh_from_db()
+            print(f"====== DEBUG TYPEID: After save, issue.type_id = {issue.type_id}")
             issue_activity.delay(
                 type="issue.activity.updated",
                 requested_data=requested_data,
