@@ -88,6 +88,7 @@ def issue_on_results(
         "sequence_id",
         "project_id",
         "parent_id",
+        "type_id",
         "cycle_id",
         "created_by",
         "state__group",

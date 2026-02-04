@@ -9,41 +9,68 @@
 
 ## 根本原因分析
 
-经过深入调查，发现了两个导致图标不显示的问题：
+经过深入调查，发现了多个需要修复的位置：
 
-### 主要问题：后端序列化器遗漏 type_id 字段
+### 主要问题：`issue_on_results` 函数的 `required_fields` 缺少 type_id
 
-**文件**：`apps/api/plane/app/serializers/issue.py`
+**文件**：`apps/api/plane/utils/grouper.py`
 
-`IssueListDetailSerializer` 的 `to_representation()` 方法手动构建 API 响应数据，但**遗漏了 `type_id` 字段**。这导致：
+前端请求 `/api/workspaces/.../projects/.../issues/` 端点时，使用的是 `IssueViewSet.list()` 方法，该方法调用 `issue_on_results` 函数处理结果。这个函数使用 Django 的 `.values()` 方法返回指定字段，但 `required_fields` 列表**没有包含 `type_id`**。
+
+这导致：
 
 1. API 返回的 issues 数据中没有 `type_id`
 2. 前端无法获取 issue 的类型信息
-3. `IssueTypeIconDisplay` 组件因为 `getIssueTypeById(null)` 返回 `undefined` 而不渲染图标
+3. `IssueTypeIconDisplay` 组件因为 `type_id` 为 `undefined` 而不渲染图标
 
 **验证方法**：
 
-```bash
-# 数据库中有 type_id
-docker exec plane-db psql -U plane -d plane -c \
-  "SELECT id, sequence_id, type_id FROM issues LIMIT 3;"
-
-# 但 API 返回的数据中没有 type_id
-curl http://localhost/api/workspaces/{workspace}/projects/{project}/issues/ | jq '.results[0].type_id'
-# 返回: null
+```javascript
+// 浏览器控制台执行
+fetch("/api/workspaces/{workspace}/projects/{project}/issues/?order_by=-created_at")
+  .then((r) => r.json())
+  .then((data) => console.log(Object.keys(data.results[0])));
+// 修复前：不包含 type_id
+// 修复后：包含 type_id
 ```
 
-### 次要问题：前端未预加载 issue types 数据
+### 次要问题：其他序列化器也需要添加 type_id
 
-**文件**：`apps/web/core/layouts/auth-layout/workspace-wrapper.tsx`
+**文件**：
 
-`WorkspaceAuthWrapper` 组件负责预加载 workspace 级别的数据（members, states, projects等），但缺少 issue types 的预加载。
+- `apps/api/plane/app/serializers/issue.py` - `IssueListDetailSerializer`
+- `apps/api/plane/space/utils/grouper.py` - Space 应用的 `issue_on_results`
 
-虽然前端组件（`IssueTypeDropdown`）在使用时会按需加载 issue types，但列表视图初始渲染时如果 store 中没有数据，会导致图标不显示。
+这些位置在不同的 API 端点中使用，也需要确保包含 `type_id` 字段。
 
 ## 解决方案
 
-### 1. 后端修复：在序列化器中添加 type_id 字段
+### 1. 核心修复：在 grouper.py 的 required_fields 中添加 type_id
+
+**文件**: `apps/api/plane/utils/grouper.py`
+
+在 `issue_on_results` 函数的 `required_fields` 列表中添加 `type_id`：
+
+```python
+required_fields: List[str] = [
+    "id",
+    "name",
+    "state_id",
+    # ... 其他字段 ...
+    "parent_id",
+    "type_id",  # 添加此行
+    "cycle_id",
+    # ... 其他字段 ...
+]
+```
+
+### 2. Space 应用修复
+
+**文件**: `apps/api/plane/space/utils/grouper.py`
+
+同样在 `required_fields` 列表中添加 `type_id`。
+
+### 3. 序列化器修复（已完成）
 
 **文件**: `apps/api/plane/app/serializers/issue.py`
 
@@ -192,11 +219,13 @@ getIssueTypeById(type_id) 从 store 获取数据
 
 ## 相关文件
 
-### 后端
+### 后端（核心修复）
 
-- `apps/api/plane/app/serializers/issue.py` - 添加 type_id 到响应
+- `apps/api/plane/utils/grouper.py` - **核心修复**：在 `issue_on_results` 的 `required_fields` 中添加 `type_id`
+- `apps/api/plane/space/utils/grouper.py` - Space 应用的同样修复
+- `apps/api/plane/app/serializers/issue.py` - `IssueListDetailSerializer` 添加 `type_id`
 
-### 前端
+### 前端（可选优化）
 
 - `apps/web/core/constants/fetch-keys.ts` - 添加 WORKSPACE_ISSUE_TYPES 常量
 - `apps/web/core/layouts/auth-layout/workspace-wrapper.tsx` - 预加载 issue types
@@ -230,17 +259,43 @@ getIssueTypeById(type_id) 从 store 获取数据
 - 需要重新构建 API 镜像以应用修改
 - 因网络下载慢，构建过程较长
 
+### 2026-02-04 17:15 - 发现真正的根本原因
+
+- 验证发现之前的修复未生效，API 仍然不返回 `type_id`
+- 通过浏览器 JavaScript 检查 API 返回的数据结构
+- 发现 `/issues/` 端点使用的是 `IssueViewSet.list()` 而非 `IssueListEndpoint`
+- **真正根源**：`apps/api/plane/utils/grouper.py` 中 `issue_on_results` 函数的 `required_fields` 列表缺少 `type_id`
+
+### 2026-02-04 17:20 - 完成最终修复
+
+- 在 `apps/api/plane/utils/grouper.py` 的 `required_fields` 中添加 `type_id`
+- 在 `apps/api/plane/space/utils/grouper.py` 中同样添加 `type_id`
+- 重启 API 容器验证修复
+- **验证成功**：API 现在正确返回 `type_id`，图标正常显示
+
 ## 总结
 
-这个 bug 的主要原因是后端序列化器遗漏了字段，而不是前端预加载的问题。修复需要：
+这个 bug 的根本原因是 `issue_on_results` 函数的 `required_fields` 列表缺少 `type_id` 字段。
 
-- ✅ **必须修复**：后端添加 `type_id` 到 API 响应
-- ✅ **性能优化**：前端预加载 issue types 数据（可选）
+### 关键发现
 
-后端修复后，即使不部署前端修改，功能也能正常工作，因为前端组件会在需要时自动加载 issue types 数据。前端预加载只是避免了初始加载时的额外 API 请求。
+1. **URL 路由映射**：前端请求的 `/issues/` URL 映射到 `IssueViewSet.list()` 方法，而非 `IssueListEndpoint`
+2. **数据处理**：`IssueViewSet.list()` 使用 `issue_on_results` 函数通过 Django 的 `.values()` 返回指定字段
+3. **字段遗漏**：`required_fields` 列表没有包含 `type_id`，导致 API 不返回该字段
+
+### 修复清单
+
+- ✅ **核心修复**：`apps/api/plane/utils/grouper.py` - 在 `required_fields` 中添加 `type_id`
+- ✅ **Space 应用**：`apps/api/plane/space/utils/grouper.py` - 同样添加 `type_id`
+- ✅ **序列化器**：`apps/api/plane/app/serializers/issue.py` - 已包含 `type_id`（用于其他端点）
+- ⚪ **性能优化**：前端预加载 issue types 数据（可选）
+
+### 验证结果
+
+修复后，API 正确返回 `type_id`，work item 列表页面刷新后图标正常显示。
 
 ## 后续改进建议
 
-1. **添加测试**：为 `IssueListDetailSerializer` 添加单元测试，确保所有必要字段都包含在响应中
-2. **代码审查**：检查其他序列化器是否有类似遗漏
-3. **类型安全**：在前端使用 TypeScript 严格模式，确保 API 响应类型与实际数据匹配
+1. **添加测试**：为 `issue_on_results` 函数添加单元测试，确保 `required_fields` 包含所有必要字段
+2. **统一字段列表**：考虑将字段列表定义为常量，在多个地方复用，避免遗漏
+3. **API 响应验证**：前端可以添加 TypeScript 类型检查，确保 API 响应包含预期字段
