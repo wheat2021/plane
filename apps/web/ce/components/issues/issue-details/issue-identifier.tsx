@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import type { TIssueIdentifierProps, TIssueTypeIdentifier } from "@plane/types";
 // components
 import { IssueTypeDropdown } from "@/components/dropdowns/issue-type";
-import { getIssueTypeIcon } from "@/components/dropdowns/issue-type-icon";
+import { getIssueTypeIcon, getDefaultIssueTypeIcon } from "@/components/dropdowns/issue-type-icon";
 import { IdentifierText } from "@/components/issues/issue-detail/identifier-text";
 // hooks
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
@@ -29,9 +29,16 @@ export const IssueIdentifier = observer(function IssueIdentifier(props: TIssueId
 
   if (!shouldRenderIssueID) return null;
 
+  const iconSize = size === "xs" ? 12 : size === "sm" ? 14 : size === "md" ? 16 : 18;
+
   return (
     <div className="shrink-0 flex items-center gap-1">
-      {shouldRenderIssueType && issueTypeId && <IssueTypeIconDisplay issueTypeId={issueTypeId} size={size} />}
+      {shouldRenderIssueType &&
+        (issueTypeId ? (
+          <IssueTypeIconDisplay issueTypeId={issueTypeId} size={size} />
+        ) : (
+          <span className="flex-shrink-0">{getDefaultIssueTypeIcon(iconSize)}</span>
+        ))}
       <IdentifierText
         identifier={`${projectIdentifier}-${issueSequenceId}`}
         enableClickToCopyIdentifier={enableClickToCopyIdentifier}
@@ -84,10 +91,11 @@ export const IssueTypeIdentifier = observer(function IssueTypeIdentifier(props: 
 
   // Read-only mode: just display the icon
   if (isReadOnly) {
-    if (!issueType) return null;
     return (
       <span className="flex-shrink-0">
-        {getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)}
+        {issueType
+          ? getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)
+          : getDefaultIssueTypeIcon(iconSize)}
       </span>
     );
   }
@@ -103,11 +111,9 @@ export const IssueTypeIdentifier = observer(function IssueTypeIdentifier(props: 
       showTooltip
       button={
         <span className="flex-shrink-0 cursor-pointer">
-          {issueType ? (
-            getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)
-          ) : (
-            <span className="text-placeholder">-</span>
-          )}
+          {issueType
+            ? getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)
+            : getDefaultIssueTypeIcon(iconSize)}
         </span>
       }
     />
