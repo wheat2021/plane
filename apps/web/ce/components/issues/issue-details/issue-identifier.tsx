@@ -32,7 +32,7 @@ export const IssueIdentifier = observer(function IssueIdentifier(props: TIssueId
   const iconSize = size === "xs" ? 12 : size === "sm" ? 14 : size === "md" ? 16 : 18;
 
   return (
-    <div className="shrink-0 flex items-center gap-1">
+    <div className="shrink-0 flex items-center gap-2">
       {shouldRenderIssueType &&
         (issueTypeId ? (
           <IssueTypeIconDisplay issueTypeId={issueTypeId} size={size} />
