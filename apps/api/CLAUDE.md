@@ -5,17 +5,23 @@
 
 ### Jan 28, 2026
 
-| ID    | Time     | T   | Title                                       | Read |
-| ----- | -------- | --- | ------------------------------------------- | ---- |
-| #1186 | 11:16 AM | 🔵  | Requirements File Organization Pattern      | ~310 |
-| #1185 | "        | 🔵  | Python API Linting and Formatting with Ruff | ~467 |
-| #1179 | 11:15 AM | 🔵  | API Package Minimal Configuration           | ~300 |
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #1186 | 11:16 AM | 🔵 | Requirements File Organization Pattern | ~310 |
+| #1185 | " | 🔵 | Python API Linting and Formatting with Ruff | ~467 |
+| #1179 | 11:15 AM | 🔵 | API Package Minimal Configuration | ~300 |
 
 ### Feb 3, 2026
 
-| ID    | Time     | T   | Title                                                                | Read |
-| ----- | -------- | --- | -------------------------------------------------------------------- | ---- |
-| #1357 | 10:46 PM | 🔄  | Optimized API Dockerfile for Better Layer Caching                    | ~404 |
-| #1350 | 10:41 PM | 🔵  | API Dockerfile Shows Poor Layer Caching Due to Dependency Copy Order | ~432 |
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #1357 | 10:46 PM | 🔄 | Optimized API Dockerfile for Better Layer Caching | ~404 |
+| #1350 | 10:41 PM | 🔵 | API Dockerfile Shows Poor Layer Caching Due to Dependency Copy Order | ~432 |
 
+### Feb 4, 2026
+
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #1387 | 10:44 AM | 🟣 | API Docker Image Rebuilt with Build Cache Optimization | ~321 |
+| #1386 | " | 🔵 | API Docker Development Build Configuration | ~278 |
 </claude-mem-context>

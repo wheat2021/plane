@@ -5,15 +5,22 @@
 
 ### Jan 28, 2026
 
-| ID    | Time     | T   | Title                                           | Read |
-| ----- | -------- | --- | ----------------------------------------------- | ---- |
-| #1188 | 11:17 AM | 🔵  | Admin App Configuration for Instance Management | ~422 |
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #1188 | 11:17 AM | 🔵 | Admin App Configuration for Instance Management | ~422 |
 
 ### Feb 3, 2026
 
-| ID    | Time     | T   | Title                                                           | Read |
-| ----- | -------- | --- | --------------------------------------------------------------- | ---- |
-| #1362 | 10:48 PM | 🔄  | Admin Dockerfile Optimized with Same Pattern as Web             | ~427 |
-| #1352 | 10:41 PM | 🔵  | Admin Dockerfile Has Identical Caching Issues as Web Dockerfile | ~361 |
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #1362 | 10:48 PM | 🔄 | Admin Dockerfile Optimized with Same Pattern as Web | ~427 |
+| #1352 | 10:41 PM | 🔵 | Admin Dockerfile Has Identical Caching Issues as Web Dockerfile | ~361 |
 
+### Feb 4, 2026
+
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #1391 | 10:46 AM | 🔴 | Frontend Build Failure Due to Missing Package Entry Points | ~320 |
+| #1382 | 10:43 AM | ✅ | Frontend Environment Files Configured | ~206 |
+| #1381 | " | 🔵 | Frontend Environment Files Missing for Web and Admin Apps | ~183 |
 </claude-mem-context>

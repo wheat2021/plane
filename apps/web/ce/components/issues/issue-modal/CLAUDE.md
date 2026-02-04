@@ -5,8 +5,7 @@
 
 ### Jan 28, 2026
 
-| ID    | Time     | T   | Title                              | Read |
-| ----- | -------- | --- | ---------------------------------- | ---- |
-| #1235 | 11:26 AM | ⚖️  | Work Item Type Implementation Plan | ~509 |
-
+| ID | Time | T | Title | Read |
+|----|------|---|-------|------|
+| #1235 | 11:26 AM | ⚖️ | Work Item Type Implementation Plan | ~509 |
 </claude-mem-context>
