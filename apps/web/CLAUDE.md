@@ -9,4 +9,14 @@
 | ----- | -------- | --- | ----------------------------------------- | ---- |
 | #1178 | 11:15 AM | 🔵  | Web App Technology Stack and Dependencies | ~445 |
 
+### Feb 3, 2026
+
+| ID    | Time     | T   | Title                                                           | Read |
+| ----- | -------- | --- | --------------------------------------------------------------- | ---- |
+| #1361 | 10:48 PM | 🔄  | Web Dockerfile Build Section Organized with Section Comments    | ~317 |
+| #1360 | 10:47 PM | 🔄  | Web Dockerfile Installer Stage Documentation Enhanced           | ~360 |
+| #1359 | "        | 🔄  | Web Dockerfile Builder Stage Refined with Cache Mount           | ~342 |
+| #1358 | 10:46 PM | 🔄  | Web Dockerfile Optimized with Selective Dependency Extraction   | ~466 |
+| #1351 | 10:41 PM | 🔵  | Web Dockerfile Uses Multi-Stage Build But Copies All Code Early | ~449 |
+
 </claude-mem-context>

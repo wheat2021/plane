@@ -11,4 +11,11 @@
 | #1185 | "        | 🔵  | Python API Linting and Formatting with Ruff | ~467 |
 | #1179 | 11:15 AM | 🔵  | API Package Minimal Configuration           | ~300 |
 
+### Feb 3, 2026
+
+| ID    | Time     | T   | Title                                                                | Read |
+| ----- | -------- | --- | -------------------------------------------------------------------- | ---- |
+| #1357 | 10:46 PM | 🔄  | Optimized API Dockerfile for Better Layer Caching                    | ~404 |
+| #1350 | 10:41 PM | 🔵  | API Dockerfile Shows Poor Layer Caching Due to Dependency Copy Order | ~432 |
+
 </claude-mem-context>

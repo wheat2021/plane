@@ -17,17 +17,22 @@ RUN apk update && apk upgrade
 
 WORKDIR /code
 
+# Install runtime dependencies (changes rarely)
 RUN apk add --no-cache --upgrade \
     "libpq" \
     "libxslt" \
     "xmlsec" \
     "ca-certificates" \
-    "openssl"
+    "openssl" \
+    "libffi-dev"
 
+# Copy only dependency files first (for better layer caching)
 COPY requirements.txt ./
 COPY requirements ./requirements
-RUN apk add --no-cache libffi-dev
-RUN apk add --no-cache --virtual .build-deps \
+
+# Install build dependencies and Python packages (cached when requirements unchanged)
+RUN --mount=type=cache,target=/root/.cache/pip \
+    apk add --no-cache --virtual .build-deps \
     "bash~=5.2" \
     "g++" \
     "gcc" \
@@ -36,21 +41,18 @@ RUN apk add --no-cache --virtual .build-deps \
     "make" \
     "postgresql-dev" \
     "libc-dev" \
-    "linux-headers"
+    "linux-headers" \
+ && pip install -r requirements.txt --compile \
+ && apk del .build-deps \
+ && rm -rf /var/cache/apk/*
 
-# Install Python dependencies with pip cache for bandwidth saving
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements.txt --compile
-
-RUN apk del .build-deps && rm -rf /var/cache/apk/*
-
-
-# Add in Django deps and generate Django's static files
+# Copy application code (changes frequently)
 COPY manage.py manage.py
 COPY plane plane/
 COPY templates templates/
 COPY package.json package.json
 
+# Install bash and copy entrypoint scripts
 RUN apk --no-cache add "bash~=5.2"
 COPY ./bin ./bin/
 
