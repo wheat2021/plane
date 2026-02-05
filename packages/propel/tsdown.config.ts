@@ -49,4 +49,5 @@ export default defineConfig({
     }),
   },
   platform: "neutral",
+  clean: !process.argv.includes("--watch"),
 });

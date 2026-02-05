@@ -5,7 +5,7 @@ export default defineConfig({
   outDir: "dist",
   format: ["esm"],
   dts: false,
-  clean: true,
+  clean: !process.argv.includes("--watch"),
   sourcemap: false,
   exports: true,
 });

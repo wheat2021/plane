@@ -5,4 +5,5 @@ export default defineConfig({
   format: ["esm"],
   dts: true,
   platform: "neutral",
+  clean: !process.argv.includes("--watch"),
 });
