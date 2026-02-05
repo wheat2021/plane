@@ -26,6 +26,7 @@ type Props = TDropdownProps & {
   dropdownArrowClassName?: string;
   onChange: (val: string | null) => void;
   onClose?: () => void;
+  projectId?: string;
   value: string | null | undefined;
   workspaceSlug: string;
   renderByDefault?: boolean;
@@ -234,6 +235,7 @@ export const IssueTypeDropdown = observer(function IssueTypeDropdown(props: Prop
     onClose,
     placeholder = t("work_item_type"),
     placement,
+    projectId,
     showTooltip = false,
     tabIndex,
     value,
@@ -264,25 +266,51 @@ export const IssueTypeDropdown = observer(function IssueTypeDropdown(props: Prop
   });
 
   // store hooks
-  const { fetchedMap, fetchWorkspaceIssueTypes, getWorkspaceIssueTypes, getIssueTypeById } = useIssueType();
+  const {
+    fetchedMap,
+    projectFetchedMap,
+    fetchWorkspaceIssueTypes,
+    fetchProjectIssueTypes,
+    getWorkspaceIssueTypes,
+    getProjectIssueTypes,
+    getIssueTypeById,
+  } = useIssueType();
 
-  // Fetch issue types when workspace changes
+  // Fetch issue types when workspace/project changes
   useEffect(() => {
-    if (workspaceSlug && !fetchedMap[workspaceSlug]) {
+    if (projectId && workspaceSlug && !projectFetchedMap[projectId]) {
+      void fetchProjectIssueTypes(workspaceSlug, projectId);
+    } else if (workspaceSlug && !projectId && !fetchedMap[workspaceSlug]) {
       void fetchWorkspaceIssueTypes(workspaceSlug);
     }
-  }, [workspaceSlug, fetchedMap, fetchWorkspaceIssueTypes]);
+  }, [workspaceSlug, projectId, fetchedMap, projectFetchedMap, fetchWorkspaceIssueTypes, fetchProjectIssueTypes]);
 
-  // Get issue types for the workspace
-  const issueTypes = workspaceSlug ? getWorkspaceIssueTypes(workspaceSlug) : [];
-
-  // Build options from issue types
-  const options =
-    issueTypes?.map((issueType) => ({
-      id: issueType.id,
-      name: issueType.name,
-      icon: getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color),
-    })) ?? [];
+  // Build options: use project types when projectId is given, otherwise workspace types
+  const options = (() => {
+    if (projectId) {
+      const projectIssueTypes = getProjectIssueTypes(projectId);
+      return (
+        projectIssueTypes
+          ?.map((pit) => {
+            const detail = pit.issue_type_detail;
+            return {
+              id: pit.issue_type ?? detail?.id ?? "",
+              name: detail?.name ?? "",
+              icon: getIssueTypeIcon(detail?.name ?? "", detail?.logo_props?.icon?.color),
+            };
+          })
+          .filter((o) => o.id && o.name) ?? []
+      );
+    }
+    const issueTypes = workspaceSlug ? getWorkspaceIssueTypes(workspaceSlug) : [];
+    return (
+      issueTypes?.map((issueType) => ({
+        id: issueType.id,
+        name: issueType.name,
+        icon: getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color),
+      })) ?? []
+    );
+  })();
 
   const filteredOptions =
     query === "" ? options : options.filter((o) => o.name.toLowerCase().includes(query.toLowerCase()));

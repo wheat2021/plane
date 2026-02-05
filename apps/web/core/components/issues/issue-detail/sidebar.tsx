@@ -108,6 +108,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                   void issueOperations.update(workspaceSlug, projectId, issueId, { type_id: val });
                 }}
                 workspaceSlug={workspaceSlug}
+                projectId={projectId?.toString()}
                 disabled={!isEditable}
                 buttonVariant="transparent-with-text"
                 className="group w-full grow"

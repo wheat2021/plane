@@ -33,7 +33,11 @@ export interface IIssueTypeStore {
     projectIssueTypeId: string,
     data: Partial<TProjectIssueType>
   ) => Promise<TProjectIssueType>;
-  removeProjectIssueType: (workspaceSlug: string, projectId: string, projectIssueTypeId: string) => Promise<void>;
+  removeProjectIssueType: (
+    workspaceSlug: string,
+    projectId: string,
+    projectIssueTypeId: string
+  ) => Promise<{ migrated_count: number }>;
 }
 
 export class IssueTypeStore implements IIssueTypeStore {
@@ -203,7 +207,7 @@ export class IssueTypeStore implements IIssueTypeStore {
     const projectIssueType = this.projectIssueTypeMap[projectId]?.[projectIssueTypeId];
     const wasDefault = projectIssueType?.is_default;
 
-    await this.issueTypeService.removeProjectIssueType(workspaceSlug, projectId, projectIssueTypeId);
+    const response = await this.issueTypeService.removeProjectIssueType(workspaceSlug, projectId, projectIssueTypeId);
     runInAction(() => {
       delete this.projectIssueTypeMap[projectId][projectIssueTypeId];
 
@@ -216,5 +220,6 @@ export class IssueTypeStore implements IIssueTypeStore {
         }
       }
     });
+    return response;
   };
 }

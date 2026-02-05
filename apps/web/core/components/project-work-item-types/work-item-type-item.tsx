@@ -14,7 +14,7 @@ type TWorkItemTypeItemProps = {
   projectIssueType: TProjectIssueType | undefined;
   isEditable: boolean;
   onEnable: (issueTypeId: string) => Promise<void>;
-  onDisable: (projectIssueTypeId: string) => Promise<void>;
+  onDisable: (projectIssueTypeId: string) => Promise<{ migrated_count: number }>;
   onSetDefault: (projectIssueTypeId: string) => Promise<void>;
 };
 
@@ -25,18 +25,25 @@ export const WorkItemTypeItem = observer(function WorkItemTypeItem(props: TWorkI
 
   const isEnabled = !!projectIssueType;
   const isDefault = projectIssueType?.is_default ?? false;
+  const isTask = issueType.name.toLowerCase() === "task";
+  const isToggleDisabled = !isEditable || isLoading || (isTask && isEnabled);
 
   const handleToggle = async () => {
     if (!isEditable || isLoading) return;
+    if (isTask && isEnabled) return;
 
     setIsLoading(true);
     try {
       if (isEnabled && projectIssueType) {
-        await onDisable(projectIssueType.id);
+        const result = await onDisable(projectIssueType.id);
+        const migratedCount = result?.migrated_count ?? 0;
         setToast({
           type: TOAST_TYPE.SUCCESS,
           title: t("common.success"),
-          message: t("project_settings.work_item_types.disabled_success"),
+          message:
+            migratedCount > 0
+              ? t("project_settings.work_item_types.issues_migrated", { count: migratedCount })
+              : t("project_settings.work_item_types.disabled_success"),
         });
       } else {
         await onEnable(issueType.id);
@@ -110,12 +117,20 @@ export const WorkItemTypeItem = observer(function WorkItemTypeItem(props: TWorkI
             </button>
           </Tooltip>
         )}
-        <ToggleSwitch
-          value={isEnabled}
-          onChange={() => void handleToggle()}
-          disabled={!isEditable || isLoading}
-          size="sm"
-        />
+        <Tooltip
+          tooltipContent={
+            isTask && isEnabled ? t("project_settings.work_item_types.task_cannot_be_disabled") : undefined
+          }
+        >
+          <div>
+            <ToggleSwitch
+              value={isEnabled}
+              onChange={() => void handleToggle()}
+              disabled={isToggleDisabled}
+              size="sm"
+            />
+          </div>
+        </Tooltip>
       </div>
     </div>
   );

@@ -102,6 +102,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
               void issueOperations.update(workspaceSlug, projectId, issueId, { type_id: val });
             }}
             workspaceSlug={workspaceSlug}
+            projectId={projectId}
             disabled={disabled}
             buttonVariant="transparent-with-text"
             className="w-full grow group"

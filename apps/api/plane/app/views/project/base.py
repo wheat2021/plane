@@ -26,8 +26,10 @@ from plane.db.models import (
     DeployBoard,
     ProjectUserProperty,
     Intake,
+    IssueType,
     Project,
     ProjectIdentifier,
+    ProjectIssueType,
     ProjectMember,
     ProjectNetwork,
     State,
@@ -276,6 +278,21 @@ class ProjectViewSet(BaseViewSet):
                     for state in DEFAULT_STATES
                 ]
             )
+
+            # Initialize Task type for the new project
+            task_type = IssueType.objects.filter(
+                workspace=workspace,
+                name="Task",
+                is_active=True,
+            ).first()
+            if task_type:
+                ProjectIssueType.objects.create(
+                    workspace=workspace,
+                    project=serializer.instance,
+                    issue_type=task_type,
+                    is_default=True,
+                    level=0,
+                )
 
             project = self.get_queryset().filter(pk=serializer.data["id"]).first()
 

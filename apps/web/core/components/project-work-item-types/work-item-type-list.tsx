@@ -10,7 +10,7 @@ type TWorkItemTypeListProps = {
   projectIssueTypes: TProjectIssueType[];
   isEditable: boolean;
   onEnable: (issueTypeId: string) => Promise<void>;
-  onDisable: (projectIssueTypeId: string) => Promise<void>;
+  onDisable: (projectIssueTypeId: string) => Promise<{ migrated_count: number }>;
   onSetDefault: (projectIssueTypeId: string) => Promise<void>;
 };
 

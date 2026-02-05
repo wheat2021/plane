@@ -64,7 +64,7 @@ export const ProjectWorkItemTypesRoot = observer(function ProjectWorkItemTypesRo
 
   const handleDisable = useCallback(
     async (projectIssueTypeId: string) => {
-      await removeProjectIssueType(workspaceSlug, projectId, projectIssueTypeId);
+      return await removeProjectIssueType(workspaceSlug, projectId, projectIssueTypeId);
     },
     [workspaceSlug, projectId, removeProjectIssueType]
   );

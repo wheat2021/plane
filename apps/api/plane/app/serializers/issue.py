@@ -37,6 +37,7 @@ from plane.db.models import (
     IssueVersion,
     IssueDescriptionVersion,
     ProjectMember,
+    ProjectIssueType,
     EstimatePoint,
     IssueType,
 )
@@ -192,6 +193,13 @@ class IssueCreateSerializer(BaseSerializer):
             ).exists()
         ):
             raise serializers.ValidationError("Estimate point is not valid please pass a valid estimate_point_id")
+
+        # Validate type is enabled for the project
+        if attrs.get("type") and not ProjectIssueType.objects.filter(
+            project_id=self.context.get("project_id"),
+            issue_type_id=attrs.get("type").id,
+        ).exists():
+            raise serializers.ValidationError("Issue type is not enabled for this project")
 
         return attrs
 

@@ -190,6 +190,111 @@
 
 3. **类型检查**：`pnpm check:types` ✅ 通过
 
+## Phase 6: 设置生效 - 类型约束和迁移
+
+### 实现日期
+
+2026-02-05 (续)
+
+### 6.1 后端修改
+
+#### 项目创建时自动初始化 Task 类型
+
+**文件**: `apps/api/plane/app/views/project/base.py`
+
+在 `create()` 方法中，State 创建之后添加自动创建 `ProjectIssueType` 记录。查找工作区的 "Task" IssueType 并设为默认类型。
+
+#### 禁止禁用 Task 类型
+
+**文件**: `apps/api/plane/app/views/project/issue_type.py`
+
+DELETE 方法中增加 `issue_type.name.lower() == "task"` 检查，返回 400 错误。
+
+#### 禁用类型时迁移现有工作项
+
+**文件**: `apps/api/plane/app/views/project/issue_type.py`
+
+DELETE 方法中使用 `transaction.atomic()` 原子操作：
+
+1. 查找迁移目标类型（项目默认类型或其他可用类型）
+2. 批量 `Issue.issue_objects.filter(...).update(type_id=...)` 迁移工作项
+3. 删除 ProjectIssueType 记录
+4. 返回 `{"migrated_count": N}` 替代 204
+
+#### 创建/更新 Issue 时验证 type_id
+
+**文件**: `apps/api/plane/app/serializers/issue.py`
+
+在 `IssueCreateSerializer.validate()` 中添加 `ProjectIssueType.objects.filter(...)` 检查。
+
+#### 数据迁移：为现有项目初始化 Task 类型
+
+**新文件**: `apps/api/plane/db/migrations/0120_initialize_project_task_types.py`
+
+为没有 ProjectIssueType 记录的现有项目自动创建 Task 类型关联。
+
+### 6.2 前端修改
+
+#### IssueTypeSelect 改用项目类型
+
+**文件**: `apps/web/ce/components/issues/issue-modal/issue-type-select.tsx`
+
+替换为使用 `fetchProjectIssueTypes` / `getProjectIssueTypes`，从项目启用的类型构建选项列表。
+
+#### IssueTypeDropdown 添加 projectId 支持
+
+**文件**: `apps/web/core/components/dropdowns/issue-type.tsx`
+
+新增 `projectId` prop，当提供时使用项目类型，否则保持 workspace 类型（向后兼容）。
+
+#### 详情视图传递 projectId
+
+- `apps/web/core/components/issues/issue-detail/sidebar.tsx`
+- `apps/web/core/components/issues/peek-overview/properties.tsx`
+- `apps/web/ce/components/issues/issue-details/issue-identifier.tsx`
+
+#### IssueModalProvider 实现类型切换
+
+**文件**: `apps/web/ce/components/issues/issue-modal/provider.tsx`
+
+实现 `getIssueTypeIdOnProjectChange` 返回项目默认 type ID，`handleProjectEntitiesFetch` 触发项目类型数据加载。
+
+#### Settings UI 保护 Task 类型
+
+**文件**: `apps/web/core/components/project-work-item-types/work-item-type-item.tsx`
+
+Task 类型且已启用时禁用 ToggleSwitch，添加 Tooltip 说明。
+
+#### 迁移响应处理
+
+更新 service/store/components 返回类型，禁用后 toast 显示迁移数量。
+
+#### 新增翻译键
+
+- `task_cannot_be_disabled`
+- `issues_migrated`
+
+### 6.3 修改文件清单
+
+| 文件                                                                       | 修改类型               |
+| -------------------------------------------------------------------------- | ---------------------- |
+| `apps/api/plane/app/views/project/base.py`                                 | 添加 Task 自动初始化   |
+| `apps/api/plane/app/views/project/issue_type.py`                           | Task 保护 + 迁移逻辑   |
+| `apps/api/plane/app/serializers/issue.py`                                  | type_id 验证           |
+| `apps/api/plane/db/migrations/0120_...py`                                  | 新建：数据迁移         |
+| `apps/web/ce/components/issues/issue-modal/issue-type-select.tsx`          | 改用项目类型           |
+| `apps/web/core/components/dropdowns/issue-type.tsx`                        | 添加 projectId 支持    |
+| `apps/web/core/components/issues/issue-detail/sidebar.tsx`                 | 传递 projectId         |
+| `apps/web/core/components/issues/peek-overview/properties.tsx`             | 传递 projectId         |
+| `apps/web/ce/components/issues/issue-details/issue-identifier.tsx`         | 传递 projectId         |
+| `apps/web/ce/components/issues/issue-modal/provider.tsx`                   | 实现类型切换逻辑       |
+| `apps/web/core/components/project-work-item-types/work-item-type-item.tsx` | Task 保护 + 迁移反馈   |
+| `apps/web/core/components/project-work-item-types/work-item-type-list.tsx` | onDisable 返回类型更新 |
+| `apps/web/core/services/issue-type.service.ts`                             | 返回类型更新           |
+| `apps/web/core/store/issue-type.store.ts`                                  | 返回类型更新           |
+| `apps/web/core/components/project-work-item-types/root.tsx`                | handleDisable 返回值   |
+| `packages/i18n/src/locales/en/translations.ts`                             | 新增翻译键             |
+
 ## 总结
 
 成功实现了项目级工作项类型管理功能，包括：
@@ -198,3 +303,8 @@
 - 前端状态管理和服务层
 - 设置页面 UI 组件
 - 国际化支持
+- Task 作为强制默认类型，不可禁用
+- 禁用类型时自动迁移现有工作项到默认类型
+- 创建/编辑工作项时只允许选择项目已启用的类型
+- 后端验证 type_id 合法性
+- 数据迁移确保现有项目有 Task 类型

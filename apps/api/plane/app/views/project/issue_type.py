@@ -1,3 +1,6 @@
+# Django imports
+from django.db import transaction
+
 # Third party imports
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,7 +9,7 @@ from rest_framework import status
 from plane.app.views.base import BaseAPIView
 from plane.app.serializers import ProjectIssueTypeSerializer, IssueTypeSerializer
 from plane.app.permissions import ROLE, allow_permission
-from plane.db.models import IssueType, ProjectIssueType
+from plane.db.models import Issue, IssueType, ProjectIssueType
 
 
 class ProjectIssueTypesEndpoint(BaseAPIView):
@@ -121,12 +124,12 @@ class ProjectIssueTypeDetailEndpoint(BaseAPIView):
 
     @allow_permission([ROLE.ADMIN])
     def delete(self, request, slug, project_id, pk):
-        """Remove an issue type from a project."""
+        """Remove an issue type from a project, migrating existing issues."""
         project_issue_type = ProjectIssueType.objects.filter(
             pk=pk,
             workspace__slug=slug,
             project_id=project_id,
-        ).first()
+        ).select_related("issue_type").first()
 
         if not project_issue_type:
             return Response(
@@ -134,16 +137,50 @@ class ProjectIssueTypeDetailEndpoint(BaseAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Prevent disabling Task type
+        if project_issue_type.issue_type.name.lower() == "task":
+            return Response(
+                {"error": "Task type cannot be disabled"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        issue_type_id = project_issue_type.issue_type_id
         was_default = project_issue_type.is_default
-        project_issue_type.delete()
 
-        # If deleted item was default, set another one as default
-        if was_default:
-            new_default = ProjectIssueType.objects.filter(
+        # Find migration target: project default type, excluding the one being disabled
+        migration_target = ProjectIssueType.objects.filter(
+            project_id=project_id,
+            is_default=True,
+        ).exclude(pk=pk).select_related("issue_type").first()
+
+        if not migration_target:
+            # Fall back to any other enabled type
+            migration_target = ProjectIssueType.objects.filter(
                 project_id=project_id,
-            ).order_by("level").first()
-            if new_default:
-                new_default.is_default = True
-                new_default.save()
+            ).exclude(pk=pk).order_by("level").select_related("issue_type").first()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if not migration_target:
+            return Response(
+                {"error": "Cannot disable the only enabled type"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            # Migrate issues from the disabled type to the migration target
+            migrated_count = Issue.issue_objects.filter(
+                project_id=project_id,
+                type_id=issue_type_id,
+            ).update(type_id=migration_target.issue_type_id)
+
+            # Delete the project issue type
+            project_issue_type.delete()
+
+            # If deleted item was default, set migration target as default
+            if was_default:
+                migration_target.is_default = True
+                migration_target.save(update_fields=["is_default"])
+
+        return Response(
+            {"migrated_count": migrated_count},
+            status=status.HTTP_200_OK,
+        )

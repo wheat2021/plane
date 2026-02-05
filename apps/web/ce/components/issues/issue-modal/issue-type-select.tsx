@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
-import { Controller  } from "react-hook-form";
-import type {Control} from "react-hook-form";
+import { Controller } from "react-hook-form";
+import type { Control } from "react-hook-form";
 import { usePopper } from "react-popper";
 import { Combobox } from "@headlessui/react";
 import { FileText, BookOpen, Bug, Check } from "lucide-react";
@@ -89,7 +89,7 @@ export const IssueTypeSelect = observer(function IssueTypeSelect<T extends Parti
   const { isMobile } = usePlatformOS();
   const { workspaceSlug } = useParams();
   // store hooks
-  const { fetchedMap, fetchWorkspaceIssueTypes, getWorkspaceIssueTypes, getIssueTypeById } = useIssueType();
+  const { projectFetchedMap, fetchProjectIssueTypes, getProjectIssueTypes, getIssueTypeById } = useIssueType();
 
   // popper-js init
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
@@ -104,23 +104,28 @@ export const IssueTypeSelect = observer(function IssueTypeSelect<T extends Parti
     ],
   });
 
-  // Fetch issue types when workspace changes
+  // Fetch project issue types when projectId changes
   useEffect(() => {
-    if (workspaceSlug && !fetchedMap[workspaceSlug.toString()]) {
-      void fetchWorkspaceIssueTypes(workspaceSlug.toString());
+    if (workspaceSlug && projectId && !projectFetchedMap[projectId]) {
+      void fetchProjectIssueTypes(workspaceSlug.toString(), projectId);
     }
-  }, [workspaceSlug, fetchedMap, fetchWorkspaceIssueTypes]);
+  }, [workspaceSlug, projectId, projectFetchedMap, fetchProjectIssueTypes]);
 
-  // Get issue types for the workspace
-  const issueTypes = workspaceSlug ? getWorkspaceIssueTypes(workspaceSlug.toString()) : [];
+  // Get issue types enabled for the project
+  const projectIssueTypes = projectId ? getProjectIssueTypes(projectId) : [];
 
-  // Build options from issue types
+  // Build options from project issue types
   const options: TIssueTypeOption[] =
-    issueTypes?.map((issueType) => ({
-      id: issueType.id,
-      name: issueType.name,
-      icon: getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color),
-    })) ?? [];
+    projectIssueTypes
+      ?.map((pit) => {
+        const detail = pit.issue_type_detail;
+        return {
+          id: pit.issue_type ?? detail?.id ?? "",
+          name: detail?.name ?? "",
+          icon: getIssueTypeIcon(detail?.name ?? "", detail?.logo_props?.icon?.color),
+        };
+      })
+      .filter((o) => o.id && o.name) ?? [];
 
   const filteredOptions =
     query === "" ? options : options.filter((o) => o.name.toLowerCase().includes(query.toLowerCase()));

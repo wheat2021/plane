@@ -106,6 +106,7 @@ export const IssueTypeIdentifier = observer(function IssueTypeIdentifier(props: 
       value={issueTypeId ?? null}
       onChange={handleChange}
       workspaceSlug={workspaceSlug}
+      projectId={projectId}
       disabled={disabled}
       buttonVariant="border-without-text"
       showTooltip

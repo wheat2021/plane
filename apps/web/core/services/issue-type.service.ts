@@ -80,11 +80,15 @@ export class IssueTypeService extends APIService {
    * @param projectIssueTypeId - The project issue type id
    * @returns Promise<void>
    */
-  async removeProjectIssueType(workspaceSlug: string, projectId: string, projectIssueTypeId: string): Promise<void> {
-    await this.delete(
-      `/api/workspaces/${workspaceSlug}/projects/${projectId}/issue-types/${projectIssueTypeId}/`
-    ).catch((error: { response?: { data?: unknown } }) => {
-      throw error?.response?.data;
-    });
+  async removeProjectIssueType(
+    workspaceSlug: string,
+    projectId: string,
+    projectIssueTypeId: string
+  ): Promise<{ migrated_count: number }> {
+    return this.delete(`/api/workspaces/${workspaceSlug}/projects/${projectId}/issue-types/${projectIssueTypeId}/`)
+      .then((response) => response?.data as { migrated_count: number })
+      .catch((error: { response?: { data?: unknown } }) => {
+        throw error?.response?.data;
+      });
   }
 }

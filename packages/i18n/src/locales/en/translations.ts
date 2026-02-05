@@ -1842,6 +1842,8 @@ export default {
       default_success: "Default work item type updated successfully",
       set_as_default: "Set as default",
       no_types_available: "No work item types available in this workspace",
+      task_cannot_be_disabled: "Task type cannot be disabled",
+      issues_migrated: "{count} work item(s) migrated to default type",
     },
     empty_state: {
       labels: {
