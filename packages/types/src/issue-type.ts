@@ -29,3 +29,17 @@ export type TIssueType = {
  * Lite version of issue type for dropdowns
  */
 export type TIssueTypeLite = Pick<TIssueType, "id" | "name" | "logo_props" | "is_default">;
+
+/**
+ * Project-level issue type configuration
+ */
+export type TProjectIssueType = {
+  id: string;
+  project: string;
+  issue_type: string;
+  issue_type_detail: TIssueType;
+  level: number;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+};

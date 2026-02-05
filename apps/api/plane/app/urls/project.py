@@ -14,6 +14,8 @@ from plane.app.views import (
     UserProjectRolesEndpoint,
     ProjectArchiveUnarchiveEndpoint,
     ProjectMemberPreferenceEndpoint,
+    ProjectIssueTypesEndpoint,
+    ProjectIssueTypeDetailEndpoint,
 )
 
 
@@ -124,5 +126,16 @@ urlpatterns = [
         "workspaces/<str:slug>/projects/<uuid:project_id>/preferences/member/<uuid:member_id>/",
         ProjectMemberPreferenceEndpoint.as_view(),
         name="project-member-preference",
+    ),
+    # Project Issue Types
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/issue-types/",
+        ProjectIssueTypesEndpoint.as_view(),
+        name="project-issue-types",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/issue-types/<uuid:pk>/",
+        ProjectIssueTypeDetailEndpoint.as_view(),
+        name="project-issue-type-detail",
     ),
 ]

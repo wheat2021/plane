@@ -1833,6 +1833,16 @@ export default {
         auto_close_status: "Auto-close status",
       },
     },
+    work_item_types: {
+      short_title: "Work item types",
+      heading: "Work item types",
+      description: "Enable or disable work item types for this project and set the default type for new work items.",
+      enabled_success: "Work item type enabled successfully",
+      disabled_success: "Work item type disabled successfully",
+      default_success: "Default work item type updated successfully",
+      set_as_default: "Set as default",
+      no_types_available: "No work item types available in this workspace",
+    },
     empty_state: {
       labels: {
         title: "No labels yet",

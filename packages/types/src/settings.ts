@@ -24,7 +24,8 @@ export type TProjectSettingsTabs =
   | "states"
   | "labels"
   | "estimates"
-  | "automations";
+  | "automations"
+  | "work_item_types";
 export type TProjectSettingsItem = {
   key: TProjectSettingsTabs;
   i18n_label: string;

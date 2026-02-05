@@ -20,6 +20,11 @@ from .project.member import (
     ProjectMemberPreferenceEndpoint,
 )
 
+from .project.issue_type import (
+    ProjectIssueTypesEndpoint,
+    ProjectIssueTypeDetailEndpoint,
+)
+
 from .user.base import (
     UserEndpoint,
     UpdateUserOnBoardedEndpoint,

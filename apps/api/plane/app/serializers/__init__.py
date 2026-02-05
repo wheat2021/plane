@@ -130,4 +130,4 @@ from .draft import (
     DraftIssueDetailSerializer,
 )
 
-from .issue_type import IssueTypeSerializer, IssueTypeLiteSerializer
+from .issue_type import IssueTypeSerializer, IssueTypeLiteSerializer, ProjectIssueTypeSerializer
