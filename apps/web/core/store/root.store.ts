@@ -64,6 +64,8 @@ import { UserStore } from "./user";
 import type { IWorkspaceRootStore } from "./workspace";
 import type { IIssueTypeStore } from "./issue-type.store";
 import { IssueTypeStore } from "./issue-type.store";
+import type { IExtraPropertyConfigStore } from "./extra-property-config.store";
+import { ExtraPropertyConfigStore } from "./extra-property-config.store";
 
 enableStaticRendering(typeof window === "undefined");
 
@@ -98,6 +100,7 @@ export class CoreRootStore {
   workItemFilters: IWorkItemFilterStore;
   powerK: IPowerKStore;
   issueType: IIssueTypeStore;
+  extraPropertyConfig: IExtraPropertyConfigStore;
 
   constructor() {
     this.router = new RouterStore();
@@ -130,6 +133,7 @@ export class CoreRootStore {
     this.workItemFilters = new WorkItemFilterStore();
     this.powerK = new PowerKStore();
     this.issueType = new IssueTypeStore(this);
+    this.extraPropertyConfig = new ExtraPropertyConfigStore(this);
   }
 
   resetOnSignOut() {
@@ -164,5 +168,6 @@ export class CoreRootStore {
     this.workItemFilters = new WorkItemFilterStore();
     this.powerK = new PowerKStore();
     this.issueType = new IssueTypeStore(this);
+    this.extraPropertyConfig = new ExtraPropertyConfigStore(this);
   }
 }

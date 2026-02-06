@@ -777,6 +777,9 @@ class IssueSerializer(DynamicBaseSerializer):
     label_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
     assignee_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
 
+    # Extra properties (JSON field)
+    extra_properties = serializers.JSONField(required=False, allow_null=True)
+
     # Count items
     sub_issues_count = serializers.IntegerField(read_only=True)
     attachment_count = serializers.IntegerField(read_only=True)
@@ -802,6 +805,7 @@ class IssueSerializer(DynamicBaseSerializer):
             "module_ids",
             "label_ids",
             "assignee_ids",
+            "extra_properties",
             "sub_issues_count",
             "created_at",
             "updated_at",

@@ -1,5 +1,6 @@
 import type { TIssuePriorities } from "../issues";
 import type { TStateGroups } from "../state";
+import type { TIssueExtraProperties } from "../extra-property";
 import type { TIssuePublicComment } from "./activity/issue_comment";
 import type { TIssueAttachment } from "./issue_attachment";
 import type { TIssueLink } from "./issue_link";
@@ -57,6 +58,7 @@ export type TBaseIssue = {
   cycle_id: string | null;
   module_ids: string[] | null;
   type_id: string | null;
+  extra_properties?: TIssueExtraProperties;
 
   created_at: string;
   updated_at: string;

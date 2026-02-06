@@ -77,6 +77,8 @@ from .favorite import UserFavorite
 
 from .issue_type import IssueType, ProjectIssueType
 
+from .extra_property import ExtraPropertyConfig
+
 from .recent_visit import UserRecentVisit
 
 from .label import Label
