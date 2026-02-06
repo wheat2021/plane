@@ -86,7 +86,7 @@
 - `controls/select.tsx`: 单选下拉
 - `controls/multi-select.tsx`: 多选下拉
 - `controls/checkbox.tsx`: 复选框 (ToggleSwitch)
-- `controls/markdown.tsx`: Markdown 编辑器 (简化版)
+- `controls/markdown.tsx`: Markdown 编辑器 (LiteTextEditor 富文本)
 
 #### 3.3 核心组件
 
@@ -147,7 +147,7 @@
 
 ## 待完成工作
 
-1. **Markdown 编辑器升级**: 当前使用简单 textarea，可替换为 LiteTextEditor
+（全部已完成）
 
 ---
 
@@ -213,6 +213,21 @@ curl -X PATCH /api/workspaces/{slug}/projects/{project_id}/issues/{issue_id}/ \
 - 数据持久化验证：关闭并重新打开 peek view 后所有值正确保留
 - API 调用链路：组件加载时 fetch extra-properties 配置 → 编辑时 PATCH issue 更新 extra_properties JSON
 
+### Markdown 编辑器升级 (2026-02-06 21:15)
+
+- 将 `controls/markdown.tsx` 从简单 textarea 升级为 LiteTextEditor 富文本编辑器
+- 使用项目现有的 `@/components/editor/lite-text` wrapper，`variant="none"` 无工具栏模式
+- 支持富文本格式化（加粗、斜体、列表等），通过键盘快捷键操作
+- 通过 `useWorkspace` 获取 workspaceId，通过 `useEditorAsset` 获取文件上传/复制处理器
+- 内容以 HTML 格式存储到 extra_properties JSON 字段
+- Blur 时自动保存，使用容器级 onBlur 事件检测焦点离开
+- TypeScript 类型检查和 ESLint 检查均通过
+- 浏览器验证：
+  - Release Notes (markdown) 字段正确渲染 LiteTextEditor
+  - 富文本输入和格式化（Cmd+B 加粗）功能正常
+  - Blur 触发 PATCH 204 保存成功
+  - 关闭重新打开 peek view 后内容（含格式）正确保留
+
 ## Summary
 
-成功实现了 Extra Properties 功能的完整后端和前端代码。该功能允许为不同的工作项类型配置不同的额外属性，支持 6 种输入类型（text, textarea, select, multiselect, checkbox, markdown）。额外属性会在工作项详情侧边栏（peek overview 和全屏详情页）中自动渲染，用户可以直接编辑。所有控件类型（select, text, checkbox, multiselect）均已在浏览器中验证通过，数据正确持久化到后端。
+成功实现了 Extra Properties 功能的完整后端和前端代码。该功能允许为不同的工作项类型配置不同的额外属性，支持 6 种输入类型（text, textarea, select, multiselect, checkbox, markdown）。额外属性会在工作项详情侧边栏（peek overview 和全屏详情页）中自动渲染，用户可以直接编辑。所有控件类型（select, text, checkbox, multiselect, markdown）均已在浏览器中验证通过，数据正确持久化到后端。Markdown 控件已升级为 LiteTextEditor 富文本编辑器，支持格式化编辑。

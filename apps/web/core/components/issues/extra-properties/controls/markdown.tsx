@@ -1,6 +1,16 @@
+import React, { useCallback, useRef } from "react";
 import type { FC } from "react";
-import { useState, useCallback } from "react";
+import { observer } from "mobx-react";
+// plane editor
+import type { EditorRefApi } from "@plane/editor";
+// plane types
+import { EFileAssetType } from "@plane/types";
 import type { TExtraPropertyConfig, TExtraPropertyValue } from "@plane/types";
+// components
+import { LiteTextEditor } from "@/components/editor/lite-text";
+// hooks
+import { useEditorAsset } from "@/hooks/store/use-editor-asset";
+import { useWorkspace } from "@/hooks/store/use-workspace";
 
 interface IMarkdownControl {
   config: TExtraPropertyConfig;
@@ -11,51 +21,93 @@ interface IMarkdownControl {
   projectId?: string;
 }
 
-export const MarkdownControl: FC<IMarkdownControl> = (props) => {
-  const { config, value, onChange, disabled } = props;
-  const [localState, setLocalState] = useState<{ value: string; externalValue: TExtraPropertyValue }>({
-    value: (value as string) || "",
-    externalValue: value,
-  });
-  const [isExpanded, setIsExpanded] = useState(false);
+export const MarkdownControl: FC<IMarkdownControl> = observer((props) => {
+  const { config, value, onChange, disabled = false, workspaceSlug, projectId } = props;
 
-  // Derive local value, resetting when external value changes
-  let localValue = localState.value;
-  if (localState.externalValue !== value) {
-    localValue = (value as string) || "";
-    setLocalState({ value: localValue, externalValue: value });
-  }
+  // store hooks
+  const { getWorkspaceBySlug } = useWorkspace();
+  const { uploadEditorAsset, duplicateEditorAsset } = useEditorAsset();
 
-  const setLocalValue = (newValue: string) => {
-    setLocalState((prev) => ({ ...prev, value: newValue }));
-  };
+  // derived values
+  const workspaceId = workspaceSlug ? (getWorkspaceBySlug(workspaceSlug)?.id ?? "") : "";
+  const initialValue = (value as string) || "<p></p>";
+  const editable = !disabled;
 
-  const handleBlur = useCallback(() => {
-    setIsExpanded(false);
-    if (localValue !== value) {
-      onChange(localValue);
-    }
-  }, [localValue, value, onChange]);
+  // refs for tracking content and save state
+  const editorRef = useRef<EditorRefApi>(null);
+  const latestHtmlRef = useRef<string>(initialValue);
+  const savedValueRef = useRef<string>(initialValue);
 
-  const handleFocus = () => {
-    setIsExpanded(true);
-  };
+  // Handle content changes - track latest HTML
+  const handleChange = useCallback((_json: object, html: string) => {
+    latestHtmlRef.current = html;
+  }, []);
 
-  // For now, using a simple textarea as markdown editor
-  // This can be replaced with LiteTextEditor when the integration is needed
+  // Save on blur when focus leaves the editor area
+  const handleContainerBlur = useCallback(
+    (e: React.FocusEvent<HTMLDivElement>) => {
+      if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+        const currentHtml = latestHtmlRef.current;
+        if (currentHtml !== savedValueRef.current) {
+          savedValueRef.current = currentHtml;
+          onChange(currentHtml);
+        }
+      }
+    },
+    [onChange]
+  );
+
+  if (!workspaceSlug || !workspaceId) return null;
+
+  // Build editable-specific props (discriminated union)
+  const editableProps = editable
+    ? {
+        editable: true as const,
+        uploadFile: async (blockId: string, file: File) => {
+          const { asset_id } = await uploadEditorAsset({
+            blockId,
+            data: {
+              entity_identifier: config.id,
+              entity_type: EFileAssetType.COMMENT_DESCRIPTION,
+            },
+            file,
+            projectId,
+            workspaceSlug,
+          });
+          return asset_id;
+        },
+        duplicateFile: async (assetId: string) => {
+          const { asset_id } = await duplicateEditorAsset({
+            assetId,
+            entityId: config.id,
+            entityType: EFileAssetType.COMMENT_DESCRIPTION,
+            projectId,
+            workspaceSlug,
+          });
+          return asset_id;
+        },
+      }
+    : { editable: false as const };
+
   return (
-    <div className="w-full">
-      <textarea
-        value={localValue}
-        onChange={(e) => setLocalValue(e.target.value)}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        disabled={disabled}
-        placeholder={config.description || `Enter ${config.label} (Markdown supported)...`}
-        rows={isExpanded ? 5 : 2}
-        className="w-full px-2 py-1.5 text-body-xs-regular bg-transparent border border-transparent rounded hover:border-tertiary focus:border-primary focus:outline-none resize-none disabled:cursor-not-allowed disabled:opacity-60 transition-all font-mono"
+    <div className="w-full" onBlur={handleContainerBlur}>
+      <LiteTextEditor
+        ref={editorRef}
+        id={`extra-property-${config.id}`}
+        initialValue={initialValue}
+        onChange={handleChange}
+        placeholder={config.description || `Enter ${config.label}...`}
+        workspaceSlug={workspaceSlug}
+        workspaceId={workspaceId}
+        projectId={projectId}
+        variant="none"
+        showSubmitButton={false}
+        parentClassName="!border-0"
+        containerClassName="!p-0"
+        editorClassName="!pl-0 !pt-0 !pb-0 text-sm"
+        showPlaceholderOnEmpty
+        {...editableProps}
       />
-      {isExpanded && <div className="text-[10px] text-tertiary mt-1">Markdown formatting supported</div>}
     </div>
   );
-};
+});
