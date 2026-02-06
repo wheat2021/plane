@@ -103,27 +103,30 @@
 
 ## 文件清单
 
-### 新建文件 (17 个)
+> 以下仅列出业务代码、迁移及类型文件，不含 CLAUDE.md 辅助文档及本文档自身。
 
-| 路径                                                                           | 说明            |
-| ------------------------------------------------------------------------------ | --------------- |
-| `apps/api/plane/db/models/extra_property.py`                                   | Django 模型     |
-| `apps/api/plane/app/serializers/extra_property.py`                             | DRF 序列化器    |
-| `apps/api/plane/app/views/workspace/extra_property.py`                         | API 视图        |
-| `packages/types/src/extra-property.ts`                                         | TypeScript 类型 |
-| `apps/web/core/services/extra-property-config.service.ts`                      | API 服务        |
-| `apps/web/core/store/extra-property-config.store.ts`                           | MobX Store      |
-| `apps/web/core/hooks/store/use-extra-property-config.ts`                       | Store Hook      |
-| `apps/web/core/components/issues/extra-properties/index.ts`                    | Barrel export   |
-| `apps/web/core/components/issues/extra-properties/extra-property-renderer.tsx` | 渲染器          |
-| `apps/web/core/components/issues/extra-properties/extra-property-control.tsx`  | 控件分发        |
-| `apps/web/core/components/issues/extra-properties/controls/index.ts`           | 控件导出        |
-| `apps/web/core/components/issues/extra-properties/controls/text.tsx`           | 文本控件        |
-| `apps/web/core/components/issues/extra-properties/controls/textarea.tsx`       | 多行文本控件    |
-| `apps/web/core/components/issues/extra-properties/controls/select.tsx`         | 单选控件        |
-| `apps/web/core/components/issues/extra-properties/controls/multi-select.tsx`   | 多选控件        |
-| `apps/web/core/components/issues/extra-properties/controls/checkbox.tsx`       | 复选框控件      |
-| `apps/web/core/components/issues/extra-properties/controls/markdown.tsx`       | Markdown 控件   |
+### 新建文件 (18 个)
+
+| 路径                                                                                        | 说明            |
+| ------------------------------------------------------------------------------------------- | --------------- |
+| `apps/api/plane/db/models/extra_property.py`                                                | Django 模型     |
+| `apps/api/plane/db/migrations/0121_add_extra_property_config_and_issue_extra_properties.py` | 数据库迁移      |
+| `apps/api/plane/app/serializers/extra_property.py`                                          | DRF 序列化器    |
+| `apps/api/plane/app/views/workspace/extra_property.py`                                      | API 视图        |
+| `packages/types/src/extra-property.ts`                                                      | TypeScript 类型 |
+| `apps/web/core/services/extra-property-config.service.ts`                                   | API 服务        |
+| `apps/web/core/store/extra-property-config.store.ts`                                        | MobX Store      |
+| `apps/web/core/hooks/store/use-extra-property-config.ts`                                    | Store Hook      |
+| `apps/web/core/components/issues/extra-properties/index.ts`                                 | Barrel export   |
+| `apps/web/core/components/issues/extra-properties/extra-property-renderer.tsx`              | 渲染器          |
+| `apps/web/core/components/issues/extra-properties/extra-property-control.tsx`               | 控件分发        |
+| `apps/web/core/components/issues/extra-properties/controls/index.ts`                        | 控件导出        |
+| `apps/web/core/components/issues/extra-properties/controls/text.tsx`                        | 文本控件        |
+| `apps/web/core/components/issues/extra-properties/controls/textarea.tsx`                    | 多行文本控件    |
+| `apps/web/core/components/issues/extra-properties/controls/select.tsx`                      | 单选控件        |
+| `apps/web/core/components/issues/extra-properties/controls/multi-select.tsx`                | 多选控件        |
+| `apps/web/core/components/issues/extra-properties/controls/checkbox.tsx`                    | 复选框控件      |
+| `apps/web/core/components/issues/extra-properties/controls/markdown.tsx`                    | Markdown 控件   |
 
 ### 修改文件 (10 个)
 
@@ -144,10 +147,7 @@
 
 ## 待完成工作
 
-1. **数据库迁移**: 在 Docker 开发环境中运行 `python manage.py makemigrations && python manage.py migrate`
-2. **创建测试配置**: 通过 API 创建测试用的 ExtraPropertyConfig
-3. **验证前端渲染**: 打开工作项详情，验证额外属性正确显示
-4. **Markdown 编辑器升级**: 当前使用简单 textarea，可替换为 LiteTextEditor
+1. **Markdown 编辑器升级**: 当前使用简单 textarea，可替换为 LiteTextEditor
 
 ---
 
