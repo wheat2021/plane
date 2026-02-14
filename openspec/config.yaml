@@ -1,0 +1,33 @@
+schema: spec-driven
+
+context: |
+  Fork of Plane (open-source project management platform).
+  Branch: itemtype (custom features), preview (upstream sync).
+  Never merge itemtype into preview; push directly to itemtype.
+
+  Backend: Django REST (Python 3.11+, Ruff, apps/api/)
+  Frontend: React Router + MobX + TailwindCSS (TypeScript strict, apps/web/)
+  Monorepo: pnpm workspaces, turbo, tsdown
+  Packages: @plane/ui, @plane/types, @plane/services, @plane/shared-state, @plane/editor, @plane/i18n
+  DB: PostgreSQL, migrations in apps/api/plane/db/migrations/
+  Editor: TipTap-based (LiteTextEditor for lightweight rich text)
+
+  Conventions:
+  - MobX stores with computed properties and fetchedMap caching
+  - Service classes (Axios) wrapping REST endpoints
+  - CE edition components in apps/web/ce/
+  - i18next for translations
+  - Commit messages in Chinese, prefixed with #FICC-9999#
+  - Documentation in Chinese, placed in docs/
+
+  Key constraint: upstream sync risk.
+  Modified upstream files may conflict when rebasing onto preview.
+  See spec upstream-diff sections for high/medium risk files.
+
+rules:
+  proposal:
+    - Always include upstream impact assessment
+    - Flag any files that overlap with existing high-risk upstream diff areas
+  tasks:
+    - Mark tasks that touch upstream-modified files with [UPSTREAM-RISK]
+    - Include migration sequence number check as a task when DB changes are involved
