@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 # Module imports
 from .base import BaseSerializer
-from plane.db.models import ExtraPropertyConfig, IssueType
+from plane.db.models import ExtraPropertyConfig, IssueTypeExtraProperty
 
 
 class ExtraPropertyConfigSerializer(BaseSerializer):
@@ -36,13 +36,11 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         model = ExtraPropertyConfig
         fields = [
             "id",
-            "issue_type",
             "workspace",
             "key",
             "label",
             "type",
             "description",
-            "required",
             "sort_order",
             # Flattened config fields
             "options",
@@ -58,7 +56,6 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         read_only_fields = [
             "id",
             "workspace",
-            "issue_type",
             "created_at",
             "updated_at",
             "created_by",
@@ -139,9 +136,8 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         return attrs
 
     def create(self, validated_data):
-        """Create ExtraPropertyConfig with workspace and issue_type from context."""
+        """Create ExtraPropertyConfig with workspace from context."""
         validated_data["workspace_id"] = self.context.get("workspace_id")
-        validated_data["issue_type_id"] = self.context.get("issue_type_id")
         return super().create(validated_data)
 
 
@@ -155,7 +151,43 @@ class ExtraPropertyConfigLiteSerializer(BaseSerializer):
             "key",
             "label",
             "type",
-            "required",
             "sort_order",
         ]
         read_only_fields = fields
+
+
+class IssueTypeExtraPropertySerializer(BaseSerializer):
+    """Serializer for IssueTypeExtraProperty model with nested config detail."""
+
+    extra_property_config_detail = ExtraPropertyConfigSerializer(
+        source="extra_property_config",
+        read_only=True,
+    )
+
+    class Meta:
+        model = IssueTypeExtraProperty
+        fields = [
+            "id",
+            "project",
+            "issue_type",
+            "extra_property_config",
+            "extra_property_config_detail",
+            "sort_order",
+            "is_required",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "project",
+            "issue_type",
+            "extra_property_config_detail",
+            "created_at",
+            "updated_at",
+        ]
+
+    def create(self, validated_data):
+        """Create IssueTypeExtraProperty with project and issue_type from context."""
+        validated_data["project_id"] = self.context.get("project_id")
+        validated_data["issue_type_id"] = self.context.get("issue_type_id")
+        return super().create(validated_data)

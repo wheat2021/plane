@@ -23,16 +23,14 @@ export interface TExtraPropertyOption {
 }
 
 /**
- * Configuration for an extra property on an issue type.
+ * Configuration for an extra property at workspace level.
  */
 export interface TExtraPropertyConfig {
   /** Unique identifier */
   id: string;
-  /** ID of the issue type this property belongs to */
-  issue_type: string;
   /** ID of the workspace */
   workspace: string;
-  /** Unique key identifier within the issue type (alphanumeric with underscores) */
+  /** Unique key identifier within the workspace (alphanumeric with underscores) */
   key: string;
   /** Display label for the property */
   label: string;
@@ -40,8 +38,6 @@ export interface TExtraPropertyConfig {
   type: TExtraPropertyType;
   /** Optional description/help text */
   description?: string;
-  /** Whether this property is required */
-  required?: boolean;
   /** Sort order for display */
   sort_order: number;
   /** Options for select/multiselect types */
@@ -62,10 +58,7 @@ export interface TExtraPropertyConfig {
 /**
  * Lightweight version of TExtraPropertyConfig for lists.
  */
-export type TExtraPropertyConfigLite = Pick<
-  TExtraPropertyConfig,
-  "id" | "key" | "label" | "type" | "required" | "sort_order"
->;
+export type TExtraPropertyConfigLite = Pick<TExtraPropertyConfig, "id" | "key" | "label" | "type" | "sort_order">;
 
 /**
  * Value types that can be stored for extra properties.
@@ -81,8 +74,37 @@ export type TIssueExtraProperties = Record<string, TExtraPropertyValue>;
  * Payload for creating/updating an extra property config.
  */
 export type TExtraPropertyConfigPayload = Partial<
-  Omit<
-    TExtraPropertyConfig,
-    "id" | "issue_type" | "workspace" | "created_at" | "updated_at" | "created_by" | "updated_by"
-  >
+  Omit<TExtraPropertyConfig, "id" | "workspace" | "created_at" | "updated_at" | "created_by" | "updated_by">
 >;
+
+/**
+ * Binding between an IssueType and an ExtraPropertyConfig at project level.
+ */
+export interface TIssueTypeExtraProperty {
+  /** Unique identifier */
+  id: string;
+  /** ID of the project */
+  project: string;
+  /** ID of the issue type */
+  issue_type: string;
+  /** ID of the extra property config */
+  extra_property_config: string;
+  /** Nested extra property config detail */
+  extra_property_config_detail?: TExtraPropertyConfig;
+  /** Sort order for display within the issue type */
+  sort_order: number;
+  /** Whether this property is required for issues of this type */
+  is_required: boolean;
+  /** Audit fields */
+  created_at?: string;
+  updated_at?: string;
+}
+
+/**
+ * Payload for creating an issue type extra property binding.
+ */
+export type TIssueTypeExtraPropertyPayload = {
+  extra_property_config: string;
+  sort_order?: number;
+  is_required?: boolean;
+};

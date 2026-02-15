@@ -25,6 +25,11 @@ from .project.issue_type import (
     ProjectIssueTypeDetailEndpoint,
 )
 
+from .project.issue_type_extra_property import (
+    IssueTypeExtraPropertyEndpoint,
+    IssueTypeExtraPropertyDetailEndpoint,
+)
+
 from .user.base import (
     UserEndpoint,
     UpdateUserOnBoardedEndpoint,

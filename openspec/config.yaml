@@ -28,6 +28,15 @@ rules:
   proposal:
     - Always include upstream impact assessment
     - Flag any files that overlap with existing high-risk upstream diff areas
+    - Write in Chinese
+  specs:
+    - Write in Chinese
+  design:
+    - Write in Chinese
   tasks:
     - Mark tasks that touch upstream-modified files with [UPSTREAM-RISK]
     - Include migration sequence number check as a task when DB changes are involved
+  apply:
+    - Before starting, commit current changes with Chinese message summarizing the changes
+  archive:
+    - After complete, commit all changes with Chinese message summarizing implemented features

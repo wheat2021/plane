@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { observer } from "mobx-react";
 // types
-import type { TExtraPropertyValue } from "@plane/types";
+import type { TExtraPropertyConfig, TExtraPropertyValue } from "@plane/types";
 // hooks
 import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
+import { useIssueTypeExtraProperty } from "@/hooks/store/use-issue-type-extra-property";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 // components
 import { ExtraPropertyRenderer } from "@/components/issues/extra-properties";
@@ -21,7 +22,8 @@ export const WorkItemAdditionalSidebarProperties = observer((props: TWorkItemAdd
   const { workItemId, workItemTypeId, projectId, workspaceSlug, isEditable } = props;
 
   // store hooks
-  const { getConfigsByIssueType, fetchConfigsForIssueType, fetchedMap } = useExtraPropertyConfig();
+  const { fetchedMap: configFetchedMap, fetchWorkspaceConfigs, getConfigById } = useExtraPropertyConfig();
+  const { fetchedMap: bindingFetchedMap, fetchBindings, getBindings } = useIssueTypeExtraProperty();
   const {
     issue: { getIssueById },
     updateIssue,
@@ -30,15 +32,32 @@ export const WorkItemAdditionalSidebarProperties = observer((props: TWorkItemAdd
   // Get issue details
   const issue = getIssueById(workItemId);
 
-  // Get extra property configs for this issue type
-  const configs = workItemTypeId ? getConfigsByIssueType(workItemTypeId) : [];
-
-  // Fetch configs when issue type changes
+  // Fetch workspace configs and bindings when needed
   useEffect(() => {
-    if (workItemTypeId && workspaceSlug && !fetchedMap[workItemTypeId]) {
-      fetchConfigsForIssueType(workspaceSlug, workItemTypeId).catch(console.error);
+    if (workspaceSlug && !configFetchedMap[workspaceSlug]) {
+      fetchWorkspaceConfigs(workspaceSlug).catch(console.error);
     }
-  }, [workItemTypeId, workspaceSlug, fetchedMap, fetchConfigsForIssueType]);
+  }, [workspaceSlug, configFetchedMap, fetchWorkspaceConfigs]);
+
+  useEffect(() => {
+    if (workspaceSlug && projectId && workItemTypeId && !bindingFetchedMap[projectId]?.[workItemTypeId]) {
+      fetchBindings(workspaceSlug, projectId, workItemTypeId).catch(console.error);
+    }
+  }, [workspaceSlug, projectId, workItemTypeId, bindingFetchedMap, fetchBindings]);
+
+  // Get configs via bindings
+  const configs = useMemo(() => {
+    if (!workItemTypeId) return [];
+    const bindings = getBindings(projectId, workItemTypeId);
+    const configList: TExtraPropertyConfig[] = [];
+    bindings.forEach((binding) => {
+      const config = getConfigById(binding.extra_property_config);
+      if (config) {
+        configList.push(config);
+      }
+    });
+    return configList.sort((a, b) => a.sort_order - b.sort_order);
+  }, [workItemTypeId, projectId, getBindings, getConfigById]);
 
   // Handler for updating extra properties
   const handleChange = (key: string, value: TExtraPropertyValue) => {

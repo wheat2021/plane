@@ -66,6 +66,8 @@ import type { IIssueTypeStore } from "./issue-type.store";
 import { IssueTypeStore } from "./issue-type.store";
 import type { IExtraPropertyConfigStore } from "./extra-property-config.store";
 import { ExtraPropertyConfigStore } from "./extra-property-config.store";
+import type { IIssueTypeExtraPropertyStore } from "./issue-type-extra-property.store";
+import { IssueTypeExtraPropertyStore } from "./issue-type-extra-property.store";
 
 enableStaticRendering(typeof window === "undefined");
 
@@ -101,6 +103,7 @@ export class CoreRootStore {
   powerK: IPowerKStore;
   issueType: IIssueTypeStore;
   extraPropertyConfig: IExtraPropertyConfigStore;
+  issueTypeExtraProperty: IIssueTypeExtraPropertyStore;
 
   constructor() {
     this.router = new RouterStore();
@@ -134,6 +137,7 @@ export class CoreRootStore {
     this.powerK = new PowerKStore();
     this.issueType = new IssueTypeStore(this);
     this.extraPropertyConfig = new ExtraPropertyConfigStore(this);
+    this.issueTypeExtraProperty = new IssueTypeExtraPropertyStore(this);
   }
 
   resetOnSignOut() {
@@ -169,5 +173,6 @@ export class CoreRootStore {
     this.powerK = new PowerKStore();
     this.issueType = new IssueTypeStore(this);
     this.extraPropertyConfig = new ExtraPropertyConfigStore(this);
+    this.issueTypeExtraProperty = new IssueTypeExtraPropertyStore(this);
   }
 }

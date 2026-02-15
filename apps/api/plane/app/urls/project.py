@@ -16,6 +16,8 @@ from plane.app.views import (
     ProjectMemberPreferenceEndpoint,
     ProjectIssueTypesEndpoint,
     ProjectIssueTypeDetailEndpoint,
+    IssueTypeExtraPropertyEndpoint,
+    IssueTypeExtraPropertyDetailEndpoint,
 )
 
 
@@ -137,5 +139,16 @@ urlpatterns = [
         "workspaces/<str:slug>/projects/<uuid:project_id>/issue-types/<uuid:pk>/",
         ProjectIssueTypeDetailEndpoint.as_view(),
         name="project-issue-type-detail",
+    ),
+    # Issue Type Extra Property Bindings
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/issue-types/<uuid:issue_type_id>/extra-properties/",
+        IssueTypeExtraPropertyEndpoint.as_view(),
+        name="issue-type-extra-properties",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/issue-types/<uuid:issue_type_id>/extra-properties/<uuid:pk>/",
+        IssueTypeExtraPropertyDetailEndpoint.as_view(),
+        name="issue-type-extra-property-detail",
     ),
 ]

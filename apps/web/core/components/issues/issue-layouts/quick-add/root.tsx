@@ -12,6 +12,8 @@ import type { IProject, TIssue, EIssueLayoutTypes } from "@plane/types";
 import { cn, createIssuePayload } from "@plane/utils";
 // plane web imports
 import { QuickAddIssueFormRoot } from "@/plane-web/components/issues/quick-add";
+// hooks
+import { useIssueType } from "@/hooks/store/use-issue-type";
 // local imports
 import { CreateIssueToastActionItems } from "../../create-issue-toast-action-items";
 
@@ -62,6 +64,8 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
   const { t } = useTranslation();
   // router
   const { workspaceSlug, projectId } = useParams();
+  // store hooks
+  const { getProjectDefaultIssueType } = useIssueType();
   // states
   const [isOpen, setIsOpen] = useState(isQuickAddOpen ?? false);
   // form info
@@ -96,14 +100,17 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
 
     reset({ ...defaultValues });
 
+    const defaultIssueType = getProjectDefaultIssueType(projectId.toString());
+
     const payload = createIssuePayload(projectId.toString(), {
+      type_id: defaultIssueType?.issue_type,
       ...(prePopulatedData ?? {}),
       ...formData,
     });
 
     if (quickAddCallback) {
       const quickAddPromise = quickAddCallback(projectId.toString(), { ...payload });
-      setPromiseToast<any>(quickAddPromise, {
+      setPromiseToast<TIssue>(quickAddPromise, {
         loading: isEpic ? t("epic.adding") : t("issue.adding"),
         success: {
           title: t("common.success"),
@@ -113,14 +120,14 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
             <CreateIssueToastActionItems
               workspaceSlug={workspaceSlug.toString()}
               projectId={projectId.toString()}
-              issueId={data.id}
+              issueId={data?.id ?? ""}
               isEpic={isEpic}
             />
           ),
         },
         error: {
           title: t("common.error.label"),
-          message: (err) => err?.message || t("common.error.message"),
+          message: (err: Error | null) => err?.message || t("common.error.message"),
         },
       });
 
@@ -146,7 +153,7 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
           hasError={errors && errors?.name && errors?.name?.message ? true : false}
           setFocus={setFocus}
           register={register}
-          onSubmit={handleSubmit(onSubmitHandler)}
+          onSubmit={() => void handleSubmit(onSubmitHandler)()}
           onClose={() => handleIsOpen(false)}
           isEpic={isEpic}
         />

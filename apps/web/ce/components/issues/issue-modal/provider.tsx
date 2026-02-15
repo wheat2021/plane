@@ -1,13 +1,24 @@
 import React, { useCallback, useState } from "react";
 import { observer } from "mobx-react";
 // plane imports
+import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import type { ISearchIssueResponse, TIssue } from "@plane/types";
 // components
-import type { THandleProjectEntitiesFetchProps } from "@/components/issues/issue-modal/context";
+import type {
+  TActiveAdditionalPropertiesProps,
+  TCreateUpdatePropertyValuesProps,
+  THandleProjectEntitiesFetchProps,
+  TPropertyValuesValidationProps,
+} from "@/components/issues/issue-modal/context";
 import { IssueModalContext } from "@/components/issues/issue-modal/context";
 // hooks
+import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
+import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useIssueType } from "@/hooks/store/use-issue-type";
+import { useIssueTypeExtraProperty } from "@/hooks/store/use-issue-type-extra-property";
 import { useUser } from "@/hooks/store/user/user-user";
+// types
+import type { TIssuePropertyValueErrors, TIssuePropertyValues } from "@/plane-web/types/issue-types";
 
 export type TIssueModalProviderProps = {
   templateId?: string;
@@ -20,9 +31,14 @@ export const IssueModalProvider = observer(function IssueModalProvider(props: TI
   const { children, allowedProjectIds } = props;
   // states
   const [selectedParentIssue, setSelectedParentIssue] = useState<ISearchIssueResponse | null>(null);
+  const [issuePropertyValues, setIssuePropertyValues] = useState<TIssuePropertyValues>({});
+  const [issuePropertyValueErrors, setIssuePropertyValueErrors] = useState<TIssuePropertyValueErrors>({});
   // store hooks
   const { projectsWithCreatePermissions } = useUser();
   const { getProjectDefaultIssueType, fetchProjectIssueTypes } = useIssueType();
+  const { getBindings } = useIssueTypeExtraProperty();
+  const { updateIssue } = useIssueDetail();
+  const { getConfigById } = useExtraPropertyConfig();
   // derived values
   const projectIdsWithCreatePermissions = Object.keys(projectsWithCreatePermissions ?? {});
 
@@ -44,6 +60,81 @@ export const IssueModalProvider = observer(function IssueModalProvider(props: TI
     [fetchProjectIssueTypes]
   );
 
+  const getActiveAdditionalPropertiesLength = useCallback(
+    (props: TActiveAdditionalPropertiesProps) => {
+      const { projectId, watch } = props;
+      const typeId = watch("type_id");
+      if (!projectId || !typeId) return 0;
+
+      const bindings = getBindings(projectId, typeId);
+      return bindings?.length ?? 0;
+    },
+    [getBindings]
+  );
+
+  const handlePropertyValuesValidation = useCallback(
+    (props: TPropertyValuesValidationProps) => {
+      const { projectId, watch } = props;
+      const typeId = watch("type_id");
+      if (!projectId || !typeId) return true;
+
+      const bindings = getBindings(projectId, typeId);
+      if (!bindings || bindings.length === 0) return true;
+
+      const errors: TIssuePropertyValueErrors = {};
+      const requiredBindings = bindings.filter((b) => b.is_required);
+
+      requiredBindings.forEach((binding) => {
+        const config = getConfigById(binding.extra_property_config);
+        if (!config) return;
+
+        const stateValue = issuePropertyValues[config.key];
+        const value = stateValue !== undefined ? stateValue : (config.default_value ?? null);
+        const isEmpty =
+          value === null ||
+          value === undefined ||
+          (typeof value === "string" && value.trim() === "") ||
+          (Array.isArray(value) && value.length === 0);
+
+        if (isEmpty) {
+          errors[config.key] = "This field is required";
+        }
+      });
+
+      if (Object.keys(errors).length > 0) {
+        setIssuePropertyValueErrors(errors);
+        setToast({
+          type: TOAST_TYPE.ERROR,
+          title: "Error!",
+          message: "Please fill all the required additional properties",
+        });
+        return false;
+      }
+
+      return true;
+    },
+    [getBindings, getConfigById, issuePropertyValues]
+  );
+
+  const handleCreateUpdatePropertyValues = useCallback(
+    async (props: TCreateUpdatePropertyValuesProps) => {
+      const { issueId, projectId, workspaceSlug } = props;
+
+      if (Object.keys(issuePropertyValues).length === 0) return;
+
+      try {
+        await updateIssue(workspaceSlug, projectId, issueId, {
+          extra_properties: issuePropertyValues,
+        });
+        setIssuePropertyValues({});
+        setIssuePropertyValueErrors({});
+      } catch (error) {
+        console.error("Error updating extra properties", error);
+      }
+    },
+    [issuePropertyValues, updateIssue]
+  );
+
   return (
     <IssueModalContext.Provider
       value={{
@@ -54,14 +145,14 @@ export const IssueModalProvider = observer(function IssueModalProvider(props: TI
         setIsApplyingTemplate: () => {},
         selectedParentIssue,
         setSelectedParentIssue,
-        issuePropertyValues: {},
-        setIssuePropertyValues: () => {},
-        issuePropertyValueErrors: {},
-        setIssuePropertyValueErrors: () => {},
+        issuePropertyValues,
+        setIssuePropertyValues,
+        issuePropertyValueErrors,
+        setIssuePropertyValueErrors,
         getIssueTypeIdOnProjectChange,
-        getActiveAdditionalPropertiesLength: () => 0,
-        handlePropertyValuesValidation: () => true,
-        handleCreateUpdatePropertyValues: () => Promise.resolve(),
+        getActiveAdditionalPropertiesLength,
+        handlePropertyValuesValidation,
+        handleCreateUpdatePropertyValues,
         handleProjectEntitiesFetch,
         handleTemplateChange: () => Promise.resolve(),
         handleConvert: () => Promise.resolve(),

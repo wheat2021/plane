@@ -132,4 +132,8 @@ from .draft import (
 
 from .issue_type import IssueTypeSerializer, IssueTypeLiteSerializer, ProjectIssueTypeSerializer
 
-from .extra_property import ExtraPropertyConfigSerializer, ExtraPropertyConfigLiteSerializer
+from .extra_property import (
+    ExtraPropertyConfigSerializer,
+    ExtraPropertyConfigLiteSerializer,
+    IssueTypeExtraPropertySerializer,
+)

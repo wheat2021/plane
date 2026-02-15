@@ -9,34 +9,29 @@ import type { CoreRootStore } from "./root.store";
 
 export interface IExtraPropertyConfigStore {
   // loaders
-  fetchedMap: Record<string, boolean>; // issueTypeId -> boolean
+  fetchedMap: Record<string, boolean>; // workspaceSlug -> boolean
   // observables
   configMap: Record<string, TExtraPropertyConfig>; // configId -> config
-  issueTypeConfigsMap: Record<string, string[]>; // issueTypeId -> configId[]
+  workspaceConfigsMap: Record<string, string[]>; // workspaceSlug -> configId[]
   // computed actions
   getConfigById: (configId: string | null | undefined) => TExtraPropertyConfig | undefined;
-  getConfigsByIssueType: (issueTypeId: string | null | undefined) => TExtraPropertyConfig[];
+  getConfigsByWorkspace: (workspaceSlug: string | null | undefined) => TExtraPropertyConfig[];
   // fetch actions
-  fetchConfigsForIssueType: (workspaceSlug: string, issueTypeId: string) => Promise<TExtraPropertyConfig[]>;
+  fetchWorkspaceConfigs: (workspaceSlug: string) => Promise<TExtraPropertyConfig[]>;
   // CRUD actions
-  createConfig: (
-    workspaceSlug: string,
-    issueTypeId: string,
-    data: TExtraPropertyConfigPayload
-  ) => Promise<TExtraPropertyConfig>;
+  createConfig: (workspaceSlug: string, data: TExtraPropertyConfigPayload) => Promise<TExtraPropertyConfig>;
   updateConfig: (
     workspaceSlug: string,
-    issueTypeId: string,
     configId: string,
     data: TExtraPropertyConfigPayload
   ) => Promise<TExtraPropertyConfig>;
-  deleteConfig: (workspaceSlug: string, issueTypeId: string, configId: string) => Promise<void>;
+  deleteConfig: (workspaceSlug: string, configId: string) => Promise<void>;
 }
 
 export class ExtraPropertyConfigStore implements IExtraPropertyConfigStore {
   // observables
   configMap: Record<string, TExtraPropertyConfig> = {};
-  issueTypeConfigsMap: Record<string, string[]> = {};
+  workspaceConfigsMap: Record<string, string[]> = {};
   // loaders
   fetchedMap: Record<string, boolean> = {};
   // root store
@@ -48,10 +43,10 @@ export class ExtraPropertyConfigStore implements IExtraPropertyConfigStore {
     makeObservable(this, {
       // observables
       configMap: observable,
-      issueTypeConfigsMap: observable,
+      workspaceConfigsMap: observable,
       fetchedMap: observable,
       // fetch actions
-      fetchConfigsForIssueType: action,
+      fetchWorkspaceConfigs: action,
       // CRUD actions
       createConfig: action,
       updateConfig: action,
@@ -70,33 +65,33 @@ export class ExtraPropertyConfigStore implements IExtraPropertyConfigStore {
   });
 
   /**
-   * Returns extra property configs for an issue type, sorted by sort_order
+   * Returns extra property configs for a workspace, sorted by sort_order
    */
-  getConfigsByIssueType = computedFn((issueTypeId: string | null | undefined) => {
-    if (!issueTypeId) return [];
-    const configIds = this.issueTypeConfigsMap[issueTypeId] || [];
+  getConfigsByWorkspace = computedFn((workspaceSlug: string | null | undefined) => {
+    if (!workspaceSlug) return [];
+    const configIds = this.workspaceConfigsMap[workspaceSlug] || [];
     const configs = configIds.map((id) => this.configMap[id]).filter(Boolean);
     return configs.sort((a, b) => a.sort_order - b.sort_order);
   });
 
   /**
-   * Fetches extra property configs for an issue type
+   * Fetches extra property configs for a workspace
    */
-  fetchConfigsForIssueType = async (workspaceSlug: string, issueTypeId: string) => {
+  fetchWorkspaceConfigs = async (workspaceSlug: string) => {
     // Skip if already fetched
-    if (this.fetchedMap[issueTypeId]) {
-      return this.getConfigsByIssueType(issueTypeId);
+    if (this.fetchedMap[workspaceSlug]) {
+      return this.getConfigsByWorkspace(workspaceSlug);
     }
 
-    const response = await this.extraPropertyConfigService.getConfigsForIssueType(workspaceSlug, issueTypeId);
+    const response = await this.extraPropertyConfigService.getConfigs(workspaceSlug);
     runInAction(() => {
       const configIds: string[] = [];
       response.forEach((config) => {
         set(this.configMap, config.id, config);
         configIds.push(config.id);
       });
-      set(this.issueTypeConfigsMap, issueTypeId, configIds);
-      set(this.fetchedMap, issueTypeId, true);
+      set(this.workspaceConfigsMap, workspaceSlug, configIds);
+      set(this.fetchedMap, workspaceSlug, true);
     });
     return response;
   };
@@ -104,12 +99,12 @@ export class ExtraPropertyConfigStore implements IExtraPropertyConfigStore {
   /**
    * Creates a new extra property config
    */
-  createConfig = async (workspaceSlug: string, issueTypeId: string, data: TExtraPropertyConfigPayload) => {
-    const response = await this.extraPropertyConfigService.createConfig(workspaceSlug, issueTypeId, data);
+  createConfig = async (workspaceSlug: string, data: TExtraPropertyConfigPayload) => {
+    const response = await this.extraPropertyConfigService.createConfig(workspaceSlug, data);
     runInAction(() => {
       set(this.configMap, response.id, response);
-      const configIds = this.issueTypeConfigsMap[issueTypeId] || [];
-      set(this.issueTypeConfigsMap, issueTypeId, [...configIds, response.id]);
+      const configIds = this.workspaceConfigsMap[workspaceSlug] || [];
+      set(this.workspaceConfigsMap, workspaceSlug, [...configIds, response.id]);
     });
     return response;
   };
@@ -117,13 +112,8 @@ export class ExtraPropertyConfigStore implements IExtraPropertyConfigStore {
   /**
    * Updates an extra property config
    */
-  updateConfig = async (
-    workspaceSlug: string,
-    issueTypeId: string,
-    configId: string,
-    data: TExtraPropertyConfigPayload
-  ) => {
-    const response = await this.extraPropertyConfigService.updateConfig(workspaceSlug, issueTypeId, configId, data);
+  updateConfig = async (workspaceSlug: string, configId: string, data: TExtraPropertyConfigPayload) => {
+    const response = await this.extraPropertyConfigService.updateConfig(workspaceSlug, configId, data);
     runInAction(() => {
       set(this.configMap, configId, response);
     });
@@ -133,14 +123,14 @@ export class ExtraPropertyConfigStore implements IExtraPropertyConfigStore {
   /**
    * Deletes an extra property config
    */
-  deleteConfig = async (workspaceSlug: string, issueTypeId: string, configId: string) => {
-    await this.extraPropertyConfigService.deleteConfig(workspaceSlug, issueTypeId, configId);
+  deleteConfig = async (workspaceSlug: string, configId: string) => {
+    await this.extraPropertyConfigService.deleteConfig(workspaceSlug, configId);
     runInAction(() => {
       delete this.configMap[configId];
-      const configIds = this.issueTypeConfigsMap[issueTypeId] || [];
+      const configIds = this.workspaceConfigsMap[workspaceSlug] || [];
       set(
-        this.issueTypeConfigsMap,
-        issueTypeId,
+        this.workspaceConfigsMap,
+        workspaceSlug,
         configIds.filter((id) => id !== configId)
       );
     });

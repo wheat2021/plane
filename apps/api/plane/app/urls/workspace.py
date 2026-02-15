@@ -173,14 +173,14 @@ urlpatterns = [
         WorkspaceIssueTypesEndpoint.as_view(),
         name="workspace-issue-types",
     ),
-    # Extra Property Configs
+    # Extra Property Configs (workspace level)
     path(
-        "workspaces/<str:slug>/issue-types/<uuid:issue_type_id>/extra-properties/",
+        "workspaces/<str:slug>/extra-properties/",
         ExtraPropertyConfigEndpoint.as_view(),
         name="extra-property-configs",
     ),
     path(
-        "workspaces/<str:slug>/issue-types/<uuid:issue_type_id>/extra-properties/<uuid:pk>/",
+        "workspaces/<str:slug>/extra-properties/<uuid:pk>/",
         ExtraPropertyConfigDetailEndpoint.as_view(),
         name="extra-property-config-detail",
     ),
