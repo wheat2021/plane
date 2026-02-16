@@ -65,7 +65,7 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
   // router
   const { workspaceSlug, projectId } = useParams();
   // store hooks
-  const { getProjectDefaultIssueType } = useIssueType();
+  const { getProjectDefaultIssueType, getWorkspaceIssueTypes, fetchProjectIssueTypes } = useIssueType();
   // states
   const [isOpen, setIsOpen] = useState(isQuickAddOpen ?? false);
   // form info
@@ -100,17 +100,37 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
 
     reset({ ...defaultValues });
 
-    const defaultIssueType = getProjectDefaultIssueType(projectId.toString());
+    const pId = projectId.toString();
+    const wSlug = workspaceSlug.toString();
 
-    const payload = createIssuePayload(projectId.toString(), {
-      type_id: defaultIssueType?.issue_type,
+    let defaultIssueTypeId = getProjectDefaultIssueType(pId)?.issue_type;
+
+    // If default type is missing, try fetching project issue types
+    if (!defaultIssueTypeId) {
+      try {
+        await fetchProjectIssueTypes(wSlug, pId);
+        defaultIssueTypeId = getProjectDefaultIssueType(pId)?.issue_type;
+      } catch (error) {
+        console.error("Failed to fetch project issue types", error);
+      }
+    }
+
+    // Fallback: If project default type is still not found, try workspace types
+    if (!defaultIssueTypeId) {
+      const workspaceIssueTypes = getWorkspaceIssueTypes(wSlug);
+      const defaultWorkspaceIssueType = workspaceIssueTypes?.find((type) => type.is_default);
+      defaultIssueTypeId = defaultWorkspaceIssueType?.id || workspaceIssueTypes?.[0]?.id;
+    }
+
+    const payload = createIssuePayload(pId, {
+      type_id: defaultIssueTypeId,
       ...(prePopulatedData ?? {}),
       ...formData,
     });
 
     if (quickAddCallback) {
-      const quickAddPromise = quickAddCallback(projectId.toString(), { ...payload });
-      setPromiseToast<TIssue>(quickAddPromise, {
+      const quickAddPromise = quickAddCallback(pId, { ...payload });
+      setPromiseToast<TIssue | undefined>(quickAddPromise, {
         loading: isEpic ? t("epic.adding") : t("issue.adding"),
         success: {
           title: t("common.success"),
@@ -118,8 +138,8 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
           actionItems: (data) => (
             // TODO: Translate here
             <CreateIssueToastActionItems
-              workspaceSlug={workspaceSlug.toString()}
-              projectId={projectId.toString()}
+              workspaceSlug={wSlug}
+              projectId={pId}
               issueId={data?.id ?? ""}
               isEpic={isEpic}
             />
@@ -127,7 +147,7 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
         },
         error: {
           title: t("common.error.label"),
-          message: (err: Error | null) => err?.message || t("common.error.message"),
+          message: (err: { message?: string }) => err?.message || t("common.error.message"),
         },
       });
 
@@ -153,7 +173,9 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
           hasError={errors && errors?.name && errors?.name?.message ? true : false}
           setFocus={setFocus}
           register={register}
-          onSubmit={() => void handleSubmit(onSubmitHandler)()}
+          onSubmit={() => {
+            void handleSubmit(onSubmitHandler)();
+          }}
           onClose={() => handleIsOpen(false)}
           isEpic={isEpic}
         />
