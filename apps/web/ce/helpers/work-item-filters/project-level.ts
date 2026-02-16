@@ -15,6 +15,8 @@ export type TGetAdditionalPropsForProjectLevelFiltersHOC = (
 
 export const getAdditionalProjectLevelFiltersHOCProps: TGetAdditionalPropsForProjectLevelFiltersHOC = ({
   workspaceSlug,
+  projectId,
 }) => ({
   workspaceSlug,
+  projectId,
 });

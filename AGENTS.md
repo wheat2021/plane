@@ -19,8 +19,8 @@ Plane is an open-source project management platform (issues, cycles, modules, vi
 
 ```bash
 # Development
-pnpm dev                    # Start all dev servers (web:3000, admin:3001, space:3002)
-docker compose -f docker-compose-local.yml up  # Start backend services (Redis, PostgreSQL, RabbitMQ, MinIO, API)
+pnpm dev                         # Start all dev servers (web:3000, admin:3001, space:3002)
+docker compose -f compose.dev.yml up   # Start backend services (Redis, PostgreSQL, RabbitMQ, MinIO, API)
 
 # Build & Checks
 pnpm build                  # Build all packages and apps
@@ -37,6 +37,41 @@ pnpm --filter=@plane/codemods run test
 # Python API (from apps/api/)
 ruff check .                # Lint Python code
 ruff format .               # Format Python code
+```
+
+## 代码修改后的重载方式
+
+根据修改的代码位置，需要不同的重载方式：
+
+| 修改位置 | 重载方式 | 说明 |
+|---------|---------|------|
+| `apps/web/`, `apps/admin/`, `apps/space/` | 自动热重载 | Vite 开发服务器自动检测变化 |
+| `packages/` (types, utils, ui 等) | 自动热重载 | pnpm dev 会监听 packages 变化 |
+| `apps/api/` (Python 代码) | `docker compose -f compose.dev.yml restart api` | Django 开发服务器会重载 |
+| `apps/api/` (依赖变更) | `docker compose -f compose.dev.yml up --build api` | 需要重新构建镜像 |
+| `apps/live/` | `docker compose -f compose.dev.yml restart live` | 实时协作服务 |
+
+### 常用 Docker Compose 命令
+
+```bash
+# 启动所有后端服务
+docker compose -f compose.dev.yml up
+
+# 后台启动
+docker compose -f compose.dev.yml up -d
+
+# 重启单个服务（代码修改后）
+docker compose -f compose.dev.yml restart api
+docker compose -f compose.dev.yml restart live
+
+# 重新构建并启动（依赖变更后）
+docker compose -f compose.dev.yml up --build api
+
+# 查看服务日志
+docker compose -f compose.dev.yml logs -f api
+
+# 停止所有服务
+docker compose -f compose.dev.yml down
 ```
 
 ## Architecture
@@ -85,7 +120,7 @@ packages/
 ## Local Development Setup
 
 1. Run `./setup.sh` (installs deps, creates .env)
-2. `docker compose -f docker-compose-local.yml up` (starts backend services)
+2. `docker compose -f compose.dev.yml up` (starts backend services)
 3. `pnpm dev` (starts frontend apps)
 4. Register as instance admin at http://localhost:3001/god-mode/
 5. Access app at http://localhost:3000
@@ -125,10 +160,10 @@ RUN --mount=type=cache,target=/pnpm/store pnpm install
 
 ```bash
 # ✅ 正常构建（会使用缓存）
-docker compose -f docker-compose-local.yml up --build
+docker compose -f compose.dev.yml up --build
 
 # ✅ 只重建特定服务
-docker compose -f docker-compose-local.yml build api
+docker compose -f compose.dev.yml build api
 
 # ❌ 避免使用 --no-cache（会重新下载所有依赖）
 docker compose build --no-cache  # 不要这样做
@@ -151,7 +186,7 @@ docker compose build --no-cache  # 不要这样做
 # pip 镜像
 export PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/
 export PIP_TRUSTED_HOST=mirrors.aliyun.com
-docker compose -f docker-compose-local.yml up --build
+docker compose -f compose.dev.yml up --build
 
 # npm 镜像（编辑 .npmrc 取消注释）
 # registry = https://registry.npmmirror.com

@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
-import { AtSign, Briefcase } from "lucide-react";
+import useSWR from "swr";
+import { AtSign, Briefcase, Layers } from "lucide-react";
 // plane imports
 import { Logo } from "@plane/propel/emoji-icon-picker";
 import {
@@ -26,6 +27,7 @@ import type {
   IModule,
   IProject,
   TWorkItemFilterProperty,
+  TProjectIssueType,
 } from "@plane/types";
 import { Avatar } from "@plane/ui";
 import {
@@ -34,6 +36,7 @@ import {
   getCreatedByFilterConfig,
   getCycleFilterConfig,
   getFileURL,
+  getIssueTypeFilterConfig,
   getLabelFilterConfig,
   getMentionFilterConfig,
   getModuleFilterConfig,
@@ -49,6 +52,7 @@ import {
 } from "@plane/utils";
 // store hooks
 import { useCycle } from "@/hooks/store/use-cycle";
+import { useIssueType } from "@/hooks/store/use-issue-type";
 import { useLabel } from "@/hooks/store/use-label";
 import { useMember } from "@/hooks/store/use-member";
 import { useModule } from "@/hooks/store/use-module";
@@ -56,6 +60,7 @@ import { useProject } from "@/hooks/store/use-project";
 import { useProjectState } from "@/hooks/store/use-project-state";
 // plane web imports
 import { useFiltersOperatorConfigs } from "@/plane-web/hooks/rich-filters/use-filters-operator-configs";
+import { getIssueTypeIcon } from "@/components/dropdowns/issue-type-icon";
 
 export type TWorkItemFiltersEntityProps = {
   workspaceSlug: string;
@@ -92,6 +97,15 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
   const { getModuleById } = useModule();
   const { getStateById } = useProjectState();
   const { getUserDetails } = useMember();
+  const { getProjectIssueTypes, fetchProjectIssueTypes } = useIssueType();
+
+  // Fetch project issue types if not already fetched
+  useSWR(
+    workspaceSlug && projectId ? `PROJECT_ISSUE_TYPES_FILTER_${workspaceSlug}_${projectId}` : null,
+    workspaceSlug && projectId ? () => fetchProjectIssueTypes(workspaceSlug, projectId) : null,
+    { revalidateIfStale: false, revalidateOnFocus: false }
+  );
+
   // derived values
   const operatorConfigs = useFiltersOperatorConfigs({ workspaceSlug });
   const filtersToShow = useMemo(() => new Set(allowedFilters), [allowedFilters]);
@@ -130,6 +144,10 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
         ? (projectIds.map((projectId) => getProjectById(projectId)).filter((project) => project) as IProject[])
         : [],
     [projectIds, getProjectById]
+  );
+  const issueTypes: TProjectIssueType[] | undefined = useMemo(
+    () => (projectId ? getProjectIssueTypes(projectId) : undefined),
+    [projectId, getProjectIssueTypes]
   );
   const areAllConfigsInitialized = useMemo(() => isLoaderReady(projectLoader), [projectLoader]);
 
@@ -356,6 +374,24 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
     [isFilterEnabled, projects, operatorConfigs]
   );
 
+  // issue type filter config
+  const issueTypeFilterConfig = useMemo(
+    () =>
+      getIssueTypeFilterConfig<TWorkItemFilterProperty>("type_id")({
+        isEnabled: isFilterEnabled("type_id") && issueTypes !== undefined && issueTypes.length > 0,
+        filterIcon: Layers,
+        issueTypes: issueTypes ?? [],
+        getOptionIcon: (issueType) =>
+          getIssueTypeIcon(
+            issueType.issue_type_detail.name,
+            issueType.issue_type_detail.logo_props?.icon?.color,
+            14
+          ),
+        ...operatorConfigs,
+      }),
+    [isFilterEnabled, issueTypes, operatorConfigs]
+  );
+
   return {
     areAllConfigsInitialized,
     configs: [
@@ -364,6 +400,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       assigneeFilterConfig,
       priorityFilterConfig,
       projectFilterConfig,
+      issueTypeFilterConfig,
       mentionFilterConfig,
       labelFilterConfig,
       cycleFilterConfig,
@@ -391,6 +428,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       target_date: targetDateFilterConfig,
       created_at: createdAtFilterConfig,
       updated_at: updatedAtFilterConfig,
+      type_id: issueTypeFilterConfig,
     },
     isFilterEnabled,
     members: members ?? [],
