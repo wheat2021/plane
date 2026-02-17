@@ -325,12 +325,10 @@ export class ProjectViewIssuesFilter extends IssueFilterHelperStore implements I
 
         case EIssueFilterType.EXTRA_DISPLAY_PROPERTIES: {
           const updatedExtraDisplayProperties = filters as TExtraDisplayProperties;
-          _filters.extraDisplayProperties = { ..._filters.extraDisplayProperties, ...updatedExtraDisplayProperties };
+          _filters.extraDisplayProperties = { ...(_filters.extraDisplayProperties ?? {}), ...updatedExtraDisplayProperties };
 
           runInAction(() => {
-            Object.keys(updatedExtraDisplayProperties).forEach((_key) => {
-              set(this.filters, [viewId, "extraDisplayProperties", _key], updatedExtraDisplayProperties[_key]);
-            });
+            set(this.filters, [viewId, "extraDisplayProperties"], _filters.extraDisplayProperties);
           });
 
           break;

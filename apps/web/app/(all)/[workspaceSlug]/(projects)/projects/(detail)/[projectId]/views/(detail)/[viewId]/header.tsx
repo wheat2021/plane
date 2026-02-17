@@ -13,7 +13,7 @@ import {
 import { Button } from "@plane/propel/button";
 import { LockIcon, ViewsIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
-import type { ICustomSearchSelectOption, IIssueDisplayFilterOptions, IIssueDisplayProperties } from "@plane/types";
+import type { ICustomSearchSelectOption, IIssueDisplayFilterOptions, IIssueDisplayProperties, TExtraDisplayProperties } from "@plane/types";
 import { EIssuesStoreType, EViewAccess, EIssueLayoutTypes } from "@plane/types";
 import { Breadcrumbs, Header, BreadcrumbNavigationSearchDropdown } from "@plane/ui";
 // components
@@ -87,6 +87,20 @@ export const ProjectViewIssuesHeader = observer(function ProjectViewIssuesHeader
         projectId.toString(),
         EIssueFilterType.DISPLAY_PROPERTIES,
         property,
+        viewId.toString()
+      );
+    },
+    [workspaceSlug, projectId, viewId, updateFilters]
+  );
+
+  const handleExtraDisplayProperties = useCallback(
+    (updatedExtraDisplayProperties: TExtraDisplayProperties) => {
+      if (!workspaceSlug || !projectId || !viewId) return;
+      updateFilters(
+        workspaceSlug.toString(),
+        projectId.toString(),
+        EIssueFilterType.EXTRA_DISPLAY_PROPERTIES,
+        updatedExtraDisplayProperties,
         viewId.toString()
       );
     },
@@ -184,6 +198,8 @@ export const ProjectViewIssuesHeader = observer(function ProjectViewIssuesHeader
                 handleDisplayFiltersUpdate={handleDisplayFilters}
                 displayProperties={issueFilters?.displayProperties ?? {}}
                 handleDisplayPropertiesUpdate={handleDisplayProperties}
+                extraDisplayProperties={issueFilters?.extraDisplayProperties}
+                handleExtraDisplayPropertiesUpdate={handleExtraDisplayProperties}
                 cycleViewDisabled={!currentProjectDetails?.cycle_view}
                 moduleViewDisabled={!currentProjectDetails?.module_view}
               />

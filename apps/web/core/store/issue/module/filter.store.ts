@@ -317,12 +317,10 @@ export class ModuleIssuesFilter extends IssueFilterHelperStore implements IModul
 
         case EIssueFilterType.EXTRA_DISPLAY_PROPERTIES: {
           const updatedExtraDisplayProperties = filters as TExtraDisplayProperties;
-          _filters.extraDisplayProperties = { ..._filters.extraDisplayProperties, ...updatedExtraDisplayProperties };
+          _filters.extraDisplayProperties = { ...(_filters.extraDisplayProperties ?? {}), ...updatedExtraDisplayProperties };
 
           runInAction(() => {
-            Object.keys(updatedExtraDisplayProperties).forEach((_key) => {
-              set(this.filters, [moduleId, "extraDisplayProperties", _key], updatedExtraDisplayProperties[_key]);
-            });
+            set(this.filters, [moduleId, "extraDisplayProperties"], _filters.extraDisplayProperties);
           });
 
           await this.issueFilterService.patchModuleIssueFilters(workspaceSlug, projectId, moduleId, {

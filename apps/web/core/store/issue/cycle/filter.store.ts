@@ -312,12 +312,10 @@ export class CycleIssuesFilter extends IssueFilterHelperStore implements ICycleI
 
         case EIssueFilterType.EXTRA_DISPLAY_PROPERTIES: {
           const updatedExtraDisplayProperties = filters as TExtraDisplayProperties;
-          _filters.extraDisplayProperties = { ..._filters.extraDisplayProperties, ...updatedExtraDisplayProperties };
+          _filters.extraDisplayProperties = { ...(_filters.extraDisplayProperties ?? {}), ...updatedExtraDisplayProperties };
 
           runInAction(() => {
-            Object.keys(updatedExtraDisplayProperties).forEach((_key) => {
-              set(this.filters, [cycleId, "extraDisplayProperties", _key], updatedExtraDisplayProperties[_key]);
-            });
+            set(this.filters, [cycleId, "extraDisplayProperties"], _filters.extraDisplayProperties);
           });
 
           await this.issueFilterService.patchCycleIssueFilters(workspaceSlug, projectId, cycleId, {

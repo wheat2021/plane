@@ -13,6 +13,7 @@ import type {
   IProjectView,
   EIssueLayoutTypes,
   IIssueFilters,
+  TExtraDisplayProperties,
 } from "@plane/types";
 import { EViewAccess, EIssuesStoreType } from "@plane/types";
 import { Input, TextArea } from "@plane/ui";
@@ -91,6 +92,7 @@ export const ProjectViewForm = observer(function ProjectViewForm(props: Props) {
       rich_filters: formData.rich_filters,
       display_filters: formData.display_filters,
       display_properties: formData.display_properties,
+      extra_display_properties: formData.extra_display_properties,
       access: formData.access,
     } as IProjectView);
 
@@ -214,31 +216,50 @@ export const ProjectViewForm = observer(function ProjectViewForm(props: Props) {
                     control={control}
                     name="display_properties"
                     render={({ field: { onChange: onDisplayPropertiesChange, value: displayProperties } }) => (
-                      <FiltersDropdown title={t("common.display")}>
-                        <DisplayFiltersSelection
-                          layoutDisplayFiltersOptions={
-                            ISSUE_DISPLAY_FILTERS_BY_PAGE.issues.layoutOptions[displayFilters.layout]
-                          }
-                          displayFilters={displayFilters ?? {}}
-                          handleDisplayFiltersUpdate={(updatedDisplayFilter: Partial<IIssueDisplayFilterOptions>) => {
-                            onDisplayFiltersChange({
-                              ...displayFilters,
-                              ...updatedDisplayFilter,
-                            });
-                          }}
-                          displayProperties={displayProperties ?? {}}
-                          handleDisplayPropertiesUpdate={(
-                            updatedDisplayProperties: Partial<IIssueDisplayProperties>
-                          ) => {
-                            onDisplayPropertiesChange({
-                              ...displayProperties,
-                              ...updatedDisplayProperties,
-                            });
-                          }}
-                          cycleViewDisabled={!projectDetails?.cycle_view}
-                          moduleViewDisabled={!projectDetails?.module_view}
-                        />
-                      </FiltersDropdown>
+                      <Controller
+                        control={control}
+                        name="extra_display_properties"
+                        render={({
+                          field: { onChange: onExtraDisplayPropertiesChange, value: extraDisplayProperties },
+                        }) => (
+                          <FiltersDropdown title={t("common.display")}>
+                            <DisplayFiltersSelection
+                              layoutDisplayFiltersOptions={
+                                ISSUE_DISPLAY_FILTERS_BY_PAGE.issues.layoutOptions[displayFilters.layout]
+                              }
+                              displayFilters={displayFilters ?? {}}
+                              handleDisplayFiltersUpdate={(
+                                updatedDisplayFilter: Partial<IIssueDisplayFilterOptions>
+                              ) => {
+                                onDisplayFiltersChange({
+                                  ...displayFilters,
+                                  ...updatedDisplayFilter,
+                                });
+                              }}
+                              displayProperties={displayProperties ?? {}}
+                              handleDisplayPropertiesUpdate={(
+                                updatedDisplayProperties: Partial<IIssueDisplayProperties>
+                              ) => {
+                                onDisplayPropertiesChange({
+                                  ...displayProperties,
+                                  ...updatedDisplayProperties,
+                                });
+                              }}
+                              extraDisplayProperties={extraDisplayProperties}
+                              handleExtraDisplayPropertiesUpdate={(
+                                updatedExtraDisplayProperties: TExtraDisplayProperties
+                              ) => {
+                                onExtraDisplayPropertiesChange({
+                                  ...(extraDisplayProperties ?? {}),
+                                  ...updatedExtraDisplayProperties,
+                                });
+                              }}
+                              cycleViewDisabled={!projectDetails?.cycle_view}
+                              moduleViewDisabled={!projectDetails?.module_view}
+                            />
+                          </FiltersDropdown>
+                        )}
+                      />
                     )}
                   />
                 </>

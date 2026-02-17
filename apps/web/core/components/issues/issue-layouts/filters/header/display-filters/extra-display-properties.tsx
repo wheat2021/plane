@@ -53,7 +53,6 @@ export const FilterExtraDisplayProperties = observer(function FilterExtraDisplay
                 }`}
                 onClick={() =>
                   handleUpdate({
-                    ...extraDisplayProperties,
                     [config.id]: !isSelected,
                   })
                 }
