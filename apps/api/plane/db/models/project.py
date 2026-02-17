@@ -344,6 +344,7 @@ class ProjectUserProperty(ProjectBaseModel):
     filters = models.JSONField(default=get_default_filters)
     display_filters = models.JSONField(default=get_default_display_filters)
     display_properties = models.JSONField(default=get_default_display_properties)
+    extra_display_properties = models.JSONField(default=dict)
     rich_filters = models.JSONField(default=dict)
     preferences = models.JSONField(default=get_default_preferences)
     sort_order = models.FloatField(default=65535)

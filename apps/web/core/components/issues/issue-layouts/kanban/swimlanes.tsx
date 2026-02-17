@@ -7,6 +7,7 @@ import type {
   TGroupedIssues,
   TIssue,
   IIssueDisplayProperties,
+  TExtraDisplayProperties,
   IIssueMap,
   TSubGroupedIssues,
   TIssueKanbanFilters,
@@ -104,6 +105,7 @@ interface ISubGroupSwimlane extends ISubGroupSwimlaneHeader {
   collapsedGroups: TIssueKanbanFilters;
   disableIssueCreation?: boolean;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   enableQuickIssueCreate: boolean;
   getGroupIssueCount: (
     groupId: string | undefined,
@@ -131,6 +133,7 @@ const SubGroupSwimlane = observer(function SubGroupSwimlane(props: ISubGroupSwim
     collapsedGroups,
     disableIssueCreation,
     displayProperties,
+    extraDisplayProperties,
     enableQuickIssueCreate,
     getGroupIssueCount,
     group_by,
@@ -198,6 +201,7 @@ const SubGroupSwimlane = observer(function SubGroupSwimlane(props: ISubGroupSwim
                     groupedIssueIds={groupedIssueIds}
                     getGroupIssueCount={getGroupIssueCount}
                     displayProperties={displayProperties}
+                    extraDisplayProperties={extraDisplayProperties}
                     sub_group_by={sub_group_by}
                     group_by={group_by}
                     sub_group_id={_list.id}
@@ -235,6 +239,7 @@ export interface IKanBanSwimLanes {
   collapsedGroups: TIssueKanbanFilters;
   disableIssueCreation?: boolean;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   enableQuickIssueCreate: boolean;
   getGroupIssueCount: (
     groupId: string | undefined,
@@ -263,6 +268,7 @@ export const KanBanSwimLanes = observer(function KanBanSwimLanes(props: IKanBanS
     groupedIssueIds,
     getGroupIssueCount,
     displayProperties,
+    extraDisplayProperties,
     sub_group_by,
     group_by,
     orderBy,
@@ -321,6 +327,7 @@ export const KanBanSwimLanes = observer(function KanBanSwimLanes(props: IKanBanS
           groupedIssueIds={groupedIssueIds}
           getGroupIssueCount={getGroupIssueCount}
           displayProperties={displayProperties}
+          extraDisplayProperties={extraDisplayProperties}
           group_by={group_by}
           sub_group_by={sub_group_by}
           orderBy={orderBy}

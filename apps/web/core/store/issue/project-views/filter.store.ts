@@ -331,6 +331,11 @@ export class ProjectViewIssuesFilter extends IssueFilterHelperStore implements I
             set(this.filters, [viewId, "extraDisplayProperties"], _filters.extraDisplayProperties);
           });
 
+          // Save to backend
+          await this.issueFilterService.patchView(workspaceSlug, projectId, viewId, {
+            extra_display_properties: _filters.extraDisplayProperties,
+          });
+
           break;
         }
         default:

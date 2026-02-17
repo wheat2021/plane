@@ -46,13 +46,13 @@ export const FilterExtraDisplayProperties = observer(function FilterExtraDisplay
               <button
                 key={config.id}
                 type="button"
-                className={`rounded-sm border px-2 py-0.5 text-11 transition-all ${
-                  isSelected
+                className={`rounded-sm border px-2 py-0.5 text-11 transition-all ${isSelected
                     ? "border-accent-strong bg-accent-primary text-on-color"
                     : "border-subtle hover:bg-layer-1"
-                }`}
+                  }`}
                 onClick={() =>
                   handleUpdate({
+                    ...(extraDisplayProperties ?? {}),
                     [config.id]: !isSelected,
                   })
                 }

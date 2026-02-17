@@ -9,7 +9,7 @@ import { useOutsideClickDetector } from "@plane/hooks";
 import { ChevronRightIcon } from "@plane/propel/icons";
 // types
 import { Tooltip } from "@plane/propel/tooltip";
-import type { IIssueDisplayProperties, TIssue } from "@plane/types";
+import type { IIssueDisplayProperties, TExtraDisplayProperties, TIssue } from "@plane/types";
 import { EIssueServiceType } from "@plane/types";
 // ui
 import { ControlLink, Row } from "@plane/ui";
@@ -34,6 +34,7 @@ import { IssueColumn } from "./issue-column";
 
 interface Props {
   displayProperties: IIssueDisplayProperties;
+  extraDisplayProperties?: TExtraDisplayProperties;
   isEstimateEnabled: boolean;
   quickActions: TRenderQuickActions;
   canEditProperties: (projectId: string | undefined) => boolean;
@@ -53,6 +54,7 @@ interface Props {
 export const SpreadsheetIssueRow = observer(function SpreadsheetIssueRow(props: Props) {
   const {
     displayProperties,
+    extraDisplayProperties,
     issueId,
     isEstimateEnabled,
     nestingLevel,
@@ -126,6 +128,7 @@ export const SpreadsheetIssueRow = observer(function SpreadsheetIssueRow(props: 
             key={subIssueId}
             issueId={subIssueId}
             displayProperties={displayProperties}
+            extraDisplayProperties={extraDisplayProperties}
             quickActions={quickActions}
             canEditProperties={canEditProperties}
             nestingLevel={nestingLevel + 1}
@@ -208,9 +211,8 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
   const customActionButton = (
     <div
       ref={menuActionRef}
-      className={`flex items-center h-full w-full cursor-pointer rounded-sm p-1 text-placeholder hover:bg-layer-1 ${
-        isMenuActive ? "bg-layer-1 text-primary" : "text-secondary"
-      }`}
+      className={`flex items-center h-full w-full cursor-pointer rounded-sm p-1 text-placeholder hover:bg-layer-1 ${isMenuActive ? "bg-layer-1 text-primary" : "text-secondary"
+        }`}
       onClick={() => setIsMenuActive(!isMenuActive)}
     >
       <MoreHorizontal className="h-3.5 w-3.5" />

@@ -83,6 +83,7 @@ export const BaseKanBanRoot = observer(function BaseKanBanRoot(props: IBaseKanBa
 
   const displayFilters = issuesFilter?.issueFilters?.displayFilters;
   const displayProperties = issuesFilter?.issueFilters?.displayProperties;
+  const extraDisplayProperties = issuesFilter?.issueFilters?.extraDisplayProperties;
 
   const sub_group_by = displayFilters?.sub_group_by;
   const group_by = displayFilters?.group_by;
@@ -238,17 +239,14 @@ export const BaseKanBanRoot = observer(function BaseKanBanRoot(props: IBaseKanBa
       />
       {/* drag and delete component */}
       <div
-        className={`fixed left-1/2 -translate-x-1/2 ${
-          isDragging ? "z-40" : ""
-        } top-3 mx-3 flex w-72 items-center justify-center`}
+        className={`fixed left-1/2 -translate-x-1/2 ${isDragging ? "z-40" : ""
+          } top-3 mx-3 flex w-72 items-center justify-center`}
         ref={deleteAreaRef}
       >
         <div
-          className={`${
-            isDragging ? `opacity-100` : `opacity-0`
-          } flex w-full items-center justify-center rounded-sm border-2 border-danger-strong/20 bg-surface-1 px-3 py-5 text-11 font-medium italic text-danger-primary ${
-            isDragOverDelete ? "bg-danger-primary blur-2xl" : ""
-          } transition duration-300`}
+          className={`${isDragging ? `opacity-100` : `opacity-0`
+            } flex w-full items-center justify-center rounded-sm border-2 border-danger-strong/20 bg-surface-1 px-3 py-5 text-11 font-medium italic text-danger-primary ${isDragOverDelete ? "bg-danger-primary blur-2xl" : ""
+            } transition duration-300`}
         >
           Drop here to delete the work item.
         </div>
@@ -265,6 +263,7 @@ export const BaseKanBanRoot = observer(function BaseKanBanRoot(props: IBaseKanBa
                 groupedIssueIds={groupedIssueIds ?? {}}
                 getGroupIssueCount={issues.getGroupIssueCount}
                 displayProperties={displayProperties}
+                extraDisplayProperties={extraDisplayProperties}
                 sub_group_by={sub_group_by}
                 group_by={group_by}
                 orderBy={orderBy}

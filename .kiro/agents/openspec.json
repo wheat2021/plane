@@ -5,5 +5,5 @@
   "resources": ["skill://.claude/skills/**/SKILL.md", "file://openspec/**/*"],
   "tools": ["fs_read", "fs_write", "execute_bash", "introspect"],
   "allowedTools": ["fs_read", "fs_write", "execute_bash", "introspect"],
-  "model": "claude-sonnet-4"
+  "model": "claude-opus-4.6"
 }

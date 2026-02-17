@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 // plane constants
 import { SPREADSHEET_SELECT_GROUP, SPREADSHEET_PROPERTY_LIST } from "@plane/constants";
 // types
-import type { TIssue, IIssueDisplayFilterOptions, IIssueDisplayProperties } from "@plane/types";
+import type { TIssue, IIssueDisplayFilterOptions, IIssueDisplayProperties, TExtraDisplayProperties } from "@plane/types";
 import { EIssueLayoutTypes } from "@plane/types";
 // components
 import { MultipleSelectGroup } from "@/components/core/multiple-select";
@@ -20,6 +20,7 @@ import { SpreadsheetTable } from "./spreadsheet-table";
 
 type Props = {
   displayProperties: IIssueDisplayProperties;
+  extraDisplayProperties?: TExtraDisplayProperties;
   displayFilters: IIssueDisplayFilterOptions;
   handleDisplayFilterUpdate: (data: Partial<IIssueDisplayFilterOptions>) => void;
   issueIds: string[] | undefined;
@@ -39,6 +40,7 @@ type Props = {
 export const SpreadsheetView = observer(function SpreadsheetView(props: Props) {
   const {
     displayProperties,
+    extraDisplayProperties,
     displayFilters,
     handleDisplayFilterUpdate,
     issueIds,
@@ -66,10 +68,10 @@ export const SpreadsheetView = observer(function SpreadsheetView(props: Props) {
   const spreadsheetColumnsList = isWorkspaceLevel
     ? SPREADSHEET_PROPERTY_LIST
     : SPREADSHEET_PROPERTY_LIST.filter((property) => {
-        if (property === "cycle" && !currentProjectDetails?.cycle_view) return false;
-        if (property === "modules" && !currentProjectDetails?.module_view) return false;
-        return true;
-      });
+      if (property === "cycle" && !currentProjectDetails?.cycle_view) return false;
+      if (property === "modules" && !currentProjectDetails?.module_view) return false;
+      return true;
+    });
 
   if (!issueIds || issueIds.length === 0) return <></>;
   return (
@@ -87,6 +89,7 @@ export const SpreadsheetView = observer(function SpreadsheetView(props: Props) {
             <div ref={containerRef} className="vertical-scrollbar horizontal-scrollbar scrollbar-lg h-full w-full">
               <SpreadsheetTable
                 displayProperties={displayProperties}
+                extraDisplayProperties={extraDisplayProperties}
                 displayFilters={displayFilters}
                 handleDisplayFilterUpdate={handleDisplayFilterUpdate}
                 issueIds={issueIds}

@@ -71,6 +71,10 @@ export const BaseListRoot = observer(function BaseListRoot(props: IBaseListRoot)
   const displayFilters = issuesFilter?.issueFilters?.displayFilters;
   const displayProperties = issuesFilter?.issueFilters?.displayProperties;
   const extraDisplayProperties = issuesFilter?.issueFilters?.extraDisplayProperties;
+  console.log('[BaseListRoot] extraDisplayProperties from store:', {
+    extraDisplayProperties,
+    issueFilters: issuesFilter?.issueFilters,
+  });
   const orderBy = displayFilters?.order_by || undefined;
 
   const group_by = (displayFilters?.group_by || null) as GroupByColumnTypes | null;

@@ -2,7 +2,7 @@ import type { MutableRefObject } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 // plane imports
-import type { IIssueDisplayFilterOptions, IIssueDisplayProperties, TIssue } from "@plane/types";
+import type { IIssueDisplayFilterOptions, IIssueDisplayProperties, TExtraDisplayProperties, TIssue } from "@plane/types";
 // components
 import { SpreadsheetIssueRowLoader } from "@/components/ui/loader/layouts/spreadsheet-layout-loader";
 // hooks
@@ -18,6 +18,7 @@ import { SpreadsheetHeader } from "./spreadsheet-header";
 
 type Props = {
   displayProperties: IIssueDisplayProperties;
+  extraDisplayProperties?: TExtraDisplayProperties;
   displayFilters: IIssueDisplayFilterOptions;
   handleDisplayFilterUpdate: (data: Partial<IIssueDisplayFilterOptions>) => void;
   issueIds: string[];
@@ -37,6 +38,7 @@ type Props = {
 export const SpreadsheetTable = observer(function SpreadsheetTable(props: Props) {
   const {
     displayProperties,
+    extraDisplayProperties,
     displayFilters,
     handleDisplayFilterUpdate,
     issueIds,
@@ -122,6 +124,7 @@ export const SpreadsheetTable = observer(function SpreadsheetTable(props: Props)
             key={id}
             issueId={id}
             displayProperties={displayProperties}
+            extraDisplayProperties={extraDisplayProperties}
             quickActions={quickActions}
             canEditProperties={canEditProperties}
             nestingLevel={0}

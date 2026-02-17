@@ -1,7 +1,7 @@
 import type { MutableRefObject } from "react";
 import { observer } from "mobx-react";
 // plane imports
-import type { TIssue, IIssueDisplayProperties, IIssueMap } from "@plane/types";
+import type { TIssue, IIssueDisplayProperties, TExtraDisplayProperties, IIssueMap } from "@plane/types";
 // local imports
 import type { TRenderQuickActions } from "../list/list-view-types";
 import { KanbanIssueBlock } from "./block";
@@ -12,6 +12,7 @@ interface IssueBlocksListProps {
   issuesMap: IIssueMap;
   issueIds: string[];
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   updateIssue: ((projectId: string | null, issueId: string, data: Partial<TIssue>) => Promise<void>) | undefined;
   quickActions: TRenderQuickActions;
   canEditProperties: (projectId: string | undefined) => boolean;
@@ -28,6 +29,7 @@ export const KanbanIssueBlocksList = observer(function KanbanIssueBlocksList(pro
     issuesMap,
     issueIds,
     displayProperties,
+    extraDisplayProperties,
     canDropOverIssue,
     canDragIssuesInCurrentGrouping,
     updateIssue,
@@ -57,6 +59,7 @@ export const KanbanIssueBlocksList = observer(function KanbanIssueBlocksList(pro
                 shouldRenderByDefault={index <= 10}
                 issuesMap={issuesMap}
                 displayProperties={displayProperties}
+                extraDisplayProperties={extraDisplayProperties}
                 updateIssue={updateIssue}
                 quickActions={quickActions}
                 draggableId={draggableId}

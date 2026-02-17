@@ -32,8 +32,15 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
   const { workspaceSlug, projectId } = useParams();
   const { isMobile } = usePlatformOS();
 
-  const { getConfigById } = useExtraPropertyConfig();
+  const { getConfigById, fetchWorkspaceConfigs } = useExtraPropertyConfig();
   const { getConfigIdsByIssueType } = useIssueTypeExtraProperty();
+
+  // Ensure configs are loaded when component mounts
+  React.useEffect(() => {
+    if (workspaceSlug) {
+      fetchWorkspaceConfigs(workspaceSlug.toString());
+    }
+  }, [workspaceSlug, fetchWorkspaceConfigs]);
 
   const validConfigIds = useMemo(() => {
     if (!projectId || !issue.type_id) return new Set<string>();
@@ -41,10 +48,18 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
   }, [projectId, issue.type_id, getConfigIdsByIssueType]);
 
   const selectedConfigIds = useMemo(() => {
-    if (!extraDisplayProperties) return [];
-    return Object.entries(extraDisplayProperties)
+    if (!extraDisplayProperties) {
+      console.log('[WorkItemLayoutAdditionalProperties] no extraDisplayProperties');
+      return [];
+    }
+    const ids = Object.entries(extraDisplayProperties)
       .filter(([_, isSelected]) => isSelected)
       .map(([configId]) => configId);
+    console.log('[WorkItemLayoutAdditionalProperties] selectedConfigIds:', {
+      extraDisplayProperties,
+      selectedConfigIds: ids,
+    });
+    return ids;
   }, [extraDisplayProperties]);
 
   const handlePropertyChange = useCallback(

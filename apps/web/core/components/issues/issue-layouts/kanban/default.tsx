@@ -8,6 +8,7 @@ import type {
   TGroupedIssues,
   TIssue,
   IIssueDisplayProperties,
+  TExtraDisplayProperties,
   IIssueMap,
   TSubGroupedIssues,
   TIssueKanbanFilters,
@@ -41,6 +42,7 @@ export interface IKanBan {
     isSubGroupCumulative: boolean
   ) => number | undefined;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   sub_group_by: TIssueGroupByOptions | undefined;
   group_by: TIssueGroupByOptions | undefined;
   orderBy: TIssueOrderByOptions | undefined;
@@ -71,6 +73,7 @@ export const KanBan = observer(function KanBan(props: IKanBan) {
     groupedIssueIds,
     getGroupIssueCount,
     displayProperties,
+    extraDisplayProperties,
     sub_group_by,
     group_by,
     sub_group_id = "null",
@@ -158,9 +161,8 @@ export const KanBan = observer(function KanBan(props: IKanBan) {
           return (
             <div
               key={subList.id}
-              className={`group relative flex flex-shrink-0 flex-col ${
-                groupByVisibilityToggle.showIssues ? `w-[350px]` : ``
-              } `}
+              className={`group relative flex flex-shrink-0 flex-col ${groupByVisibilityToggle.showIssues ? `w-[350px]` : ``
+                } `}
             >
               {sub_group_by === null && (
                 <div className="sticky top-0 z-[2] w-full flex-shrink-0 bg-surface-2 py-1">
@@ -208,6 +210,7 @@ export const KanBan = observer(function KanBan(props: IKanBan) {
                     issuesMap={issuesMap}
                     groupedIssueIds={groupedIssueIds}
                     displayProperties={displayProperties}
+                    extraDisplayProperties={extraDisplayProperties}
                     sub_group_by={sub_group_by}
                     group_by={group_by}
                     orderBy={orderBy}

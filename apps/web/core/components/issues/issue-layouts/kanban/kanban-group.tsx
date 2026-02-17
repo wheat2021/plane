@@ -14,6 +14,7 @@ import type {
   TGroupedIssues,
   TIssue,
   IIssueDisplayProperties,
+  TExtraDisplayProperties,
   IIssueMap,
   TSubGroupedIssues,
   TIssueGroupByOptions,
@@ -46,6 +47,7 @@ interface IKanbanGroup {
   issuesMap: IIssueMap;
   groupedIssueIds: TGroupedIssues | TSubGroupedIssues;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   sub_group_by: TIssueGroupByOptions | undefined;
   group_by: TIssueGroupByOptions | undefined;
   sub_group_id: string;
@@ -75,6 +77,7 @@ export const KanbanGroup = observer(function KanbanGroup(props: IKanbanGroup) {
     sub_group_by,
     issuesMap,
     displayProperties,
+    extraDisplayProperties,
     groupedIssueIds,
     isDropDisabled,
     dropErrorMessage,
@@ -296,6 +299,7 @@ export const KanbanGroup = observer(function KanbanGroup(props: IKanbanGroup) {
         issuesMap={issuesMap}
         issueIds={issueIds || []}
         displayProperties={displayProperties}
+        extraDisplayProperties={extraDisplayProperties}
         updateIssue={updateIssue}
         quickActions={quickActions}
         canEditProperties={canEditProperties}

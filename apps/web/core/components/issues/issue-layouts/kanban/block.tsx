@@ -10,7 +10,7 @@ import { useOutsideClickDetector } from "@plane/hooks";
 // types
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import { Tooltip } from "@plane/propel/tooltip";
-import type { TIssue, IIssueDisplayProperties, IIssueMap } from "@plane/types";
+import type { TIssue, IIssueDisplayProperties, TExtraDisplayProperties, IIssueMap } from "@plane/types";
 import { EIssueServiceType } from "@plane/types";
 // ui
 import { ControlLink, DropIndicator } from "@plane/ui";
@@ -39,6 +39,7 @@ interface IssueBlockProps {
   subGroupId: string;
   issuesMap: IIssueMap;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   draggableId: string;
   canDropOverIssue: boolean;
   canDragIssuesInCurrentGrouping: boolean;
@@ -54,6 +55,7 @@ interface IssueDetailsBlockProps {
   cardRef: React.RefObject<HTMLElement>;
   issue: TIssue;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   updateIssue: ((projectId: string | null, issueId: string, data: Partial<TIssue>) => Promise<void>) | undefined;
   quickActions: TRenderQuickActions;
   isReadOnly: boolean;
@@ -61,7 +63,7 @@ interface IssueDetailsBlockProps {
 }
 
 const KanbanIssueDetailsBlock = observer(function KanbanIssueDetailsBlock(props: IssueDetailsBlockProps) {
-  const { cardRef, issue, updateIssue, quickActions, isReadOnly, displayProperties, isEpic = false } = props;
+  const { cardRef, issue, updateIssue, quickActions, isReadOnly, displayProperties, extraDisplayProperties, isEpic = false } = props;
   // refs
   const menuActionRef = useRef<HTMLDivElement | null>(null);
   // states
@@ -72,9 +74,8 @@ const KanbanIssueDetailsBlock = observer(function KanbanIssueDetailsBlock(props:
   const customActionButton = (
     <div
       ref={menuActionRef}
-      className={`flex items-center h-full w-full cursor-pointer rounded-sm p-1 text-placeholder hover:bg-layer-1 ${
-        isMenuActive ? "bg-layer-1 text-primary" : "text-secondary"
-      }`}
+      className={`flex items-center h-full w-full cursor-pointer rounded-sm p-1 text-placeholder hover:bg-layer-1 ${isMenuActive ? "bg-layer-1 text-primary" : "text-secondary"
+        }`}
       onClick={() => setIsMenuActive(!isMenuActive)}
     >
       <MoreHorizontal className="h-3.5 w-3.5" />
@@ -128,6 +129,7 @@ const KanbanIssueDetailsBlock = observer(function KanbanIssueDetailsBlock(props:
         className="flex flex-wrap items-center gap-2 whitespace-nowrap text-tertiary pt-1.5"
         issue={issue}
         displayProperties={displayProperties}
+        extraDisplayProperties={extraDisplayProperties}
         activeLayout="Kanban"
         updateIssue={updateIssue}
         isReadOnly={isReadOnly}
@@ -154,6 +156,7 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
     subGroupId,
     issuesMap,
     displayProperties,
+    extraDisplayProperties,
     canDropOverIssue,
     canDragIssuesInCurrentGrouping,
     updateIssue,
@@ -289,6 +292,7 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
               cardRef={cardRef}
               issue={issue}
               displayProperties={displayProperties}
+              extraDisplayProperties={extraDisplayProperties}
               updateIssue={updateIssue}
               quickActions={quickActions}
               isReadOnly={!canEditIssueProperties}
