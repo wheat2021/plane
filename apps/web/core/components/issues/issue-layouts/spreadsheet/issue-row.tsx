@@ -212,6 +212,14 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
 
   const issueDetail = issue.getIssueById(issueId);
 
+  // Get valid extra property config IDs for this issue's type
+  // Must be before early return to satisfy React Hooks rules
+  const validConfigIds = useMemo(() => {
+    if (!projectId || !issueDetail?.type_id) return new Set<string>();
+    const configIds = getConfigIdsByIssueType(projectId.toString(), issueDetail.type_id);
+    return new Set(configIds);
+  }, [projectId, issueDetail?.type_id, getConfigIdsByIssueType]);
+
   const subIssueIndentation = `${spacingLeft}px`;
 
   useOutsideClickDetector(menuActionRef, () => setIsMenuActive(false));
@@ -219,9 +227,18 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
   const customActionButton = (
     <div
       ref={menuActionRef}
-      className={`flex items-center h-full w-full cursor-pointer rounded-sm p-1 text-placeholder hover:bg-layer-1 ${isMenuActive ? "bg-layer-1 text-primary" : "text-secondary"
-        }`}
+      role="button"
+      tabIndex={0}
+      className={`flex items-center h-full w-full cursor-pointer rounded-sm p-1 text-placeholder hover:bg-layer-1 ${
+        isMenuActive ? "bg-layer-1 text-primary" : "text-secondary"
+      }`}
       onClick={() => setIsMenuActive(!isMenuActive)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setIsMenuActive(!isMenuActive);
+        }
+      }}
     >
       <MoreHorizontal className="h-3.5 w-3.5" />
     </div>
@@ -236,7 +253,7 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
     } else {
       setExpanded((prevState) => {
         if (!prevState && workspaceSlug && issueDetail && issueDetail.project_id)
-          subIssuesStore.fetchSubIssues(workspaceSlug.toString(), issueDetail.project_id, issueDetail.id);
+          void subIssuesStore.fetchSubIssues(workspaceSlug.toString(), issueDetail.project_id, issueDetail.id);
         return !prevState;
       });
     }
@@ -248,22 +265,6 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
   const projectIdentifier = getProjectIdentifierById(issueDetail.project_id);
 
   const canSelectIssues = !disableUserActions && !selectionHelpers.isSelectionDisabled;
-
-  // Get valid extra property config IDs for this issue's type
-  const validConfigIds = useMemo(() => {
-    if (!projectId || !issueDetail.type_id) {
-      console.log('[IssueRowDetails] Missing projectId or type_id:', { projectId, type_id: issueDetail.type_id, issueId: issueDetail.id });
-      return new Set<string>();
-    }
-    const configIds = getConfigIdsByIssueType(projectId.toString(), issueDetail.type_id);
-    console.log('[IssueRowDetails] validConfigIds:', {
-      projectId: projectId.toString(),
-      type_id: issueDetail.type_id,
-      issueId: issueDetail.id,
-      configIds
-    });
-    return new Set(configIds);
-  }, [projectId, issueDetail.type_id, getConfigIdsByIssueType]);
 
   const workItemLink = generateWorkItemLink({
     workspaceSlug: workspaceSlug?.toString(),
@@ -388,6 +389,7 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
                   </div>
                 </div>
                 <div
+                  role="presentation"
                   className={`opacity-0 group-hover:opacity-100 transition-opacity ${isMenuActive ? "!opacity-100" : ""}`}
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -416,47 +418,50 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
         />
       ))}
       {/* Extra Properties Columns - One column per property */}
-      {extraDisplayProperties && (() => {
-        const selectedExtraPropertyIds = Object.keys(extraDisplayProperties).filter(key => extraDisplayProperties[key]);
-
-        return selectedExtraPropertyIds.map((configId) => {
-          const config = getConfigById(configId);
-          if (!config) return null;
-
-          // If validConfigIds is empty, it means the work item type has no restrictions
-          // so all extra properties are available
-          const isValid = validConfigIds.size === 0 || validConfigIds.has(configId);
-          const currentValue = issueDetail.extra_properties?.[config.key] ?? config.default_value ?? null;
-
-          return (
-            <td
-              key={configId}
-              className="h-11 min-w-36 text-13 after:absolute after:w-full after:bottom-[-1px] after:border after:border-subtle border-r-[1px] border-subtle"
-            >
-              <div className="flex items-center px-2 py-2">
-                {!isValid ? (
-                  <div className="flex h-5 flex-shrink-0 items-center opacity-40 cursor-not-allowed">
-                    <span className="text-caption-sm-regular text-secondary">—</span>
-                  </div>
-                ) : (
-                  <CompactExtraPropertyControl
-                    config={config}
-                    value={currentValue}
-                    onChange={(value) => {
-                      if (updateIssue) {
-                        updateIssue(issueDetail.project_id, issueDetail.id, {
-                          extra_properties: { ...issueDetail.extra_properties, [config.key]: value },
-                        });
-                      }
-                    }}
-                    disabled={disableUserActions}
-                  />
-                )}
-              </div>
-            </td>
+      {extraDisplayProperties &&
+        (() => {
+          const selectedExtraPropertyIds = Object.keys(extraDisplayProperties).filter(
+            (key) => extraDisplayProperties[key]
           );
-        });
-      })()}
+
+          return selectedExtraPropertyIds.map((configId) => {
+            const config = getConfigById(configId);
+            if (!config) return null;
+
+            // If validConfigIds is empty, it means the work item type has no restrictions
+            // so all extra properties are available
+            const isValid = validConfigIds.size === 0 || validConfigIds.has(configId);
+            const currentValue = issueDetail.extra_properties?.[config.key] ?? config.default_value ?? null;
+
+            return (
+              <td
+                key={configId}
+                className="h-11 min-w-36 text-13 after:absolute after:w-full after:bottom-[-1px] after:border after:border-subtle border-r-[1px] border-subtle"
+              >
+                <div className="flex items-center px-2 py-2">
+                  {!isValid ? (
+                    <div className="flex h-5 flex-shrink-0 items-center opacity-40 cursor-not-allowed">
+                      <span className="text-caption-sm-regular text-secondary">—</span>
+                    </div>
+                  ) : (
+                    <CompactExtraPropertyControl
+                      config={config}
+                      value={currentValue}
+                      onChange={(value) => {
+                        if (updateIssue) {
+                          void updateIssue(issueDetail.project_id, issueDetail.id, {
+                            extra_properties: { ...issueDetail.extra_properties, [config.key]: value },
+                          });
+                        }
+                      }}
+                      disabled={disableUserActions}
+                    />
+                  )}
+                </div>
+              </td>
+            );
+          });
+        })()}
     </>
   );
 });
