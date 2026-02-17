@@ -7,6 +7,7 @@ import { EIssueFilterType } from "@plane/constants";
 import type {
   IIssueDisplayFilterOptions,
   IIssueDisplayProperties,
+  TExtraDisplayProperties,
   TIssueKanbanFilters,
   IIssueFilters,
   TIssueParams,
@@ -145,6 +146,9 @@ export class ModuleIssuesFilter extends IssueFilterHelperStore implements IModul
     const richFilters: TWorkItemFilterExpression = _filters?.rich_filters;
     const displayFilters: IIssueDisplayFilterOptions = this.computedDisplayFilters(_filters?.display_filters);
     const displayProperties: IIssueDisplayProperties = this.computedDisplayProperties(_filters?.display_properties);
+    const extraDisplayProperties: TExtraDisplayProperties = this.computedExtraDisplayProperties(
+      _filters?.extra_display_properties
+    );
 
     // fetching the kanban toggle helpers in the local storage
     const kanbanFilters = {
@@ -168,6 +172,7 @@ export class ModuleIssuesFilter extends IssueFilterHelperStore implements IModul
       set(this.filters, [moduleId, "displayFilters"], displayFilters);
       set(this.filters, [moduleId, "displayProperties"], displayProperties);
       set(this.filters, [moduleId, "kanbanFilters"], kanbanFilters);
+      set(this.filters, [moduleId, "extraDisplayProperties"], extraDisplayProperties);
     });
   };
 
@@ -211,6 +216,7 @@ export class ModuleIssuesFilter extends IssueFilterHelperStore implements IModul
         displayFilters: this.filters[moduleId].displayFilters as IIssueDisplayFilterOptions,
         displayProperties: this.filters[moduleId].displayProperties as IIssueDisplayProperties,
         kanbanFilters: this.filters[moduleId].kanbanFilters as TIssueKanbanFilters,
+        extraDisplayProperties: this.filters[moduleId].extraDisplayProperties as TExtraDisplayProperties,
       };
 
       switch (type) {
@@ -306,6 +312,22 @@ export class ModuleIssuesFilter extends IssueFilterHelperStore implements IModul
             });
           });
 
+          break;
+        }
+
+        case EIssueFilterType.EXTRA_DISPLAY_PROPERTIES: {
+          const updatedExtraDisplayProperties = filters as TExtraDisplayProperties;
+          _filters.extraDisplayProperties = { ..._filters.extraDisplayProperties, ...updatedExtraDisplayProperties };
+
+          runInAction(() => {
+            Object.keys(updatedExtraDisplayProperties).forEach((_key) => {
+              set(this.filters, [moduleId, "extraDisplayProperties", _key], updatedExtraDisplayProperties[_key]);
+            });
+          });
+
+          await this.issueFilterService.patchModuleIssueFilters(workspaceSlug, projectId, moduleId, {
+            extra_display_properties: _filters.extraDisplayProperties,
+          });
           break;
         }
         default:

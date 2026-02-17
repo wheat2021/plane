@@ -5,7 +5,7 @@ import { ChartNoAxesColumn, SlidersHorizontal } from "lucide-react";
 import { EIssueFilterType, ISSUE_STORE_TO_FILTERS_MAP } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
-import type { IIssueDisplayFilterOptions, IIssueDisplayProperties } from "@plane/types";
+import type { IIssueDisplayFilterOptions, IIssueDisplayProperties, TExtraDisplayProperties } from "@plane/types";
 import { EIssueLayoutTypes, EIssuesStoreType } from "@plane/types";
 // hooks
 import { useIssues } from "@/hooks/store/use-issues";
@@ -80,6 +80,14 @@ export const HeaderFilters = observer(function HeaderFilters(props: Props) {
     [workspaceSlug, projectId, updateFilters]
   );
 
+  const handleExtraDisplayProperties = useCallback(
+    (updatedExtraDisplayProperties: TExtraDisplayProperties) => {
+      if (!workspaceSlug || !projectId) return;
+      updateFilters(workspaceSlug, projectId, EIssueFilterType.EXTRA_DISPLAY_PROPERTIES, updatedExtraDisplayProperties);
+    },
+    [workspaceSlug, projectId, updateFilters]
+  );
+
   return (
     <>
       <WorkItemsModal
@@ -114,6 +122,8 @@ export const HeaderFilters = observer(function HeaderFilters(props: Props) {
           handleDisplayFiltersUpdate={handleDisplayFilters}
           displayProperties={issueFilters?.displayProperties ?? {}}
           handleDisplayPropertiesUpdate={handleDisplayProperties}
+          extraDisplayProperties={issueFilters?.extraDisplayProperties}
+          handleExtraDisplayPropertiesUpdate={handleExtraDisplayProperties}
           cycleViewDisabled={!currentProjectDetails?.cycle_view}
           moduleViewDisabled={!currentProjectDetails?.module_view}
           isEpic={storeType === EIssuesStoreType.EPIC}

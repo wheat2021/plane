@@ -1010,6 +1010,10 @@ export default {
         sub_issue: "子工作项",
         work_item_count: "工作项数量",
       },
+      extra_properties: {
+        label: "额外属性",
+        not_available: "此属性对当前工作项类型不可用",
+      },
       extra: {
         show_sub_issues: "显示子工作项",
         show_empty_groups: "显示空组",

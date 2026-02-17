@@ -177,14 +177,21 @@ export type TIssueKanbanFilters = {
   sub_group_by: string[];
 };
 
+export type TExtraDisplayProperties = Record<string, boolean>;
+
 export interface IIssueFilters {
   richFilters: TWorkItemFilterExpression;
   displayFilters: IIssueDisplayFilterOptions | undefined;
   displayProperties: IIssueDisplayProperties | undefined;
   kanbanFilters: TIssueKanbanFilters | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties | undefined;
 }
 
-export type TSupportedFilterForUpdate = IIssueDisplayFilterOptions | IIssueDisplayProperties | TIssueKanbanFilters;
+export type TSupportedFilterForUpdate =
+  | IIssueDisplayFilterOptions
+  | IIssueDisplayProperties
+  | TIssueKanbanFilters
+  | TExtraDisplayProperties;
 
 export interface ISubWorkItemFilters extends Omit<IIssueFilters, "richFilters"> {
   filters: IIssueFilterOptions;
@@ -194,6 +201,7 @@ export interface IIssueFiltersResponse {
   rich_filters: TWorkItemFilterExpression;
   display_filters: IIssueDisplayFilterOptions;
   display_properties: IIssueDisplayProperties;
+  extra_display_properties?: TExtraDisplayProperties;
 }
 
 export interface IProjectUserPropertiesResponse extends IIssueFiltersResponse {
@@ -242,12 +250,14 @@ export interface IWorkspaceViewIssuesParams {
 export interface IProjectViewProps {
   rich_filters: TWorkItemFilterExpression;
   display_filters: IIssueDisplayFilterOptions | undefined;
+  extra_display_properties?: TExtraDisplayProperties;
 }
 
 export interface IWorkspaceViewProps {
   rich_filters: TWorkItemFilterExpression;
   display_filters: IIssueDisplayFilterOptions | undefined;
   display_properties: IIssueDisplayProperties;
+  extra_display_properties?: TExtraDisplayProperties;
 }
 
 export interface IssuePaginationOptions {

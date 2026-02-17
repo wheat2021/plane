@@ -30,12 +30,14 @@ export enum EIssueFilterType {
   DISPLAY_FILTERS = "display_filters",
   DISPLAY_PROPERTIES = "display_properties",
   KANBAN_FILTERS = "kanban_filters",
+  EXTRA_DISPLAY_PROPERTIES = "extra_display_properties",
 }
 
 export type TSupportedFilterTypeForUpdate =
   | EIssueFilterType.DISPLAY_FILTERS
   | EIssueFilterType.DISPLAY_PROPERTIES
-  | EIssueFilterType.KANBAN_FILTERS;
+  | EIssueFilterType.KANBAN_FILTERS
+  | EIssueFilterType.EXTRA_DISPLAY_PROPERTIES;
 
 export const ISSUE_DISPLAY_FILTERS_BY_LAYOUT: {
   [key in TIssueLayout]: Record<"filters", TIssueFilterKeys[]>;

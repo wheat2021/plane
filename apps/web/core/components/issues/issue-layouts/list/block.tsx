@@ -8,7 +8,7 @@ import { ChevronRightIcon } from "@plane/propel/icons";
 // types
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import { Tooltip } from "@plane/propel/tooltip";
-import type { TIssue, IIssueDisplayProperties, TIssueMap } from "@plane/types";
+import type { TIssue, IIssueDisplayProperties, TExtraDisplayProperties, TIssueMap } from "@plane/types";
 import { EIssueServiceType } from "@plane/types";
 // ui
 import { Spinner, ControlLink, Row } from "@plane/ui";
@@ -38,6 +38,7 @@ interface IssueBlockProps {
   updateIssue: ((projectId: string | null, issueId: string, data: Partial<TIssue>) => Promise<void>) | undefined;
   quickActions: TRenderQuickActions;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   canEditProperties: (projectId: string | undefined) => boolean;
   nestingLevel: number;
   spacingLeft?: number;
@@ -58,6 +59,7 @@ export const IssueBlock = observer(function IssueBlock(props: IssueBlockProps) {
     updateIssue,
     quickActions,
     displayProperties,
+    extraDisplayProperties,
     canEditProperties,
     nestingLevel,
     spacingLeft = 14,
@@ -311,6 +313,7 @@ export const IssueBlock = observer(function IssueBlock(props: IssueBlockProps) {
                 isReadOnly={!canEditIssueProperties}
                 updateIssue={updateIssue}
                 displayProperties={displayProperties}
+                extraDisplayProperties={extraDisplayProperties}
                 activeLayout="List"
                 isEpic={isEpic}
               />

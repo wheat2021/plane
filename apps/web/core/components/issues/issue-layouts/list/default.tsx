@@ -10,6 +10,7 @@ import type {
   TGroupedIssues,
   TIssue,
   IIssueDisplayProperties,
+  TExtraDisplayProperties,
   TIssueMap,
   TIssueGroupByOptions,
   TIssueOrderByOptions,
@@ -38,6 +39,7 @@ export interface IList {
   updateIssue: ((projectId: string | null, issueId: string, data: Partial<TIssue>) => Promise<void>) | undefined;
   quickActions: TRenderQuickActions;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   enableIssueQuickAdd: boolean;
   showEmptyGroup?: boolean;
   canEditProperties: (projectId: string | undefined) => boolean;
@@ -61,6 +63,7 @@ export const List = observer(function List(props: IList) {
     updateIssue,
     quickActions,
     displayProperties,
+    extraDisplayProperties,
     enableIssueQuickAdd,
     showEmptyGroup,
     canEditProperties,
@@ -149,6 +152,7 @@ export const List = observer(function List(props: IList) {
                     getGroupIndex={getGroupIndex}
                     handleOnDrop={handleOnDrop}
                     displayProperties={displayProperties}
+                    extraDisplayProperties={extraDisplayProperties}
                     enableIssueQuickAdd={enableIssueQuickAdd}
                     showEmptyGroup={showEmptyGroup}
                     canEditProperties={canEditProperties}

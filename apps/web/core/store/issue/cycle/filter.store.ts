@@ -7,6 +7,7 @@ import { EIssueFilterType } from "@plane/constants";
 import type {
   IIssueDisplayFilterOptions,
   IIssueDisplayProperties,
+  TExtraDisplayProperties,
   TIssueKanbanFilters,
   IIssueFilters,
   TIssueParams,
@@ -145,6 +146,9 @@ export class CycleIssuesFilter extends IssueFilterHelperStore implements ICycleI
     const richFilters: TWorkItemFilterExpression = _filters?.rich_filters;
     const displayFilters: IIssueDisplayFilterOptions = this.computedDisplayFilters(_filters?.display_filters);
     const displayProperties: IIssueDisplayProperties = this.computedDisplayProperties(_filters?.display_properties);
+    const extraDisplayProperties: TExtraDisplayProperties = this.computedExtraDisplayProperties(
+      _filters?.extra_display_properties
+    );
 
     // fetching the kanban toggle helpers in the local storage
     const kanbanFilters = {
@@ -168,6 +172,7 @@ export class CycleIssuesFilter extends IssueFilterHelperStore implements ICycleI
       set(this.filters, [cycleId, "displayFilters"], displayFilters);
       set(this.filters, [cycleId, "displayProperties"], displayProperties);
       set(this.filters, [cycleId, "kanbanFilters"], kanbanFilters);
+      set(this.filters, [cycleId, "extraDisplayProperties"], extraDisplayProperties);
     });
   };
 
@@ -206,6 +211,7 @@ export class CycleIssuesFilter extends IssueFilterHelperStore implements ICycleI
         displayFilters: this.filters[cycleId].displayFilters as IIssueDisplayFilterOptions,
         displayProperties: this.filters[cycleId].displayProperties as IIssueDisplayProperties,
         kanbanFilters: this.filters[cycleId].kanbanFilters as TIssueKanbanFilters,
+        extraDisplayProperties: this.filters[cycleId].extraDisplayProperties as TExtraDisplayProperties,
       };
 
       switch (type) {
@@ -301,6 +307,22 @@ export class CycleIssuesFilter extends IssueFilterHelperStore implements ICycleI
             });
           });
 
+          break;
+        }
+
+        case EIssueFilterType.EXTRA_DISPLAY_PROPERTIES: {
+          const updatedExtraDisplayProperties = filters as TExtraDisplayProperties;
+          _filters.extraDisplayProperties = { ..._filters.extraDisplayProperties, ...updatedExtraDisplayProperties };
+
+          runInAction(() => {
+            Object.keys(updatedExtraDisplayProperties).forEach((_key) => {
+              set(this.filters, [cycleId, "extraDisplayProperties", _key], updatedExtraDisplayProperties[_key]);
+            });
+          });
+
+          await this.issueFilterService.patchCycleIssueFilters(workspaceSlug, projectId, cycleId, {
+            extra_display_properties: _filters.extraDisplayProperties,
+          });
           break;
         }
         default:

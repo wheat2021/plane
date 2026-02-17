@@ -14,7 +14,7 @@ import {
 import { Button } from "@plane/propel/button";
 import { ModuleIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
-import type { ICustomSearchSelectOption, IIssueDisplayFilterOptions, IIssueDisplayProperties } from "@plane/types";
+import type { ICustomSearchSelectOption, IIssueDisplayFilterOptions, IIssueDisplayProperties, TExtraDisplayProperties } from "@plane/types";
 import { EIssuesStoreType, EIssueLayoutTypes } from "@plane/types";
 import { Breadcrumbs, Header, BreadcrumbNavigationSearchDropdown } from "@plane/ui";
 import { cn } from "@plane/utils";
@@ -101,6 +101,14 @@ export const ModuleIssuesHeader = observer(function ModuleIssuesHeader() {
     (property: Partial<IIssueDisplayProperties>) => {
       if (!projectId) return;
       updateFilters(projectId.toString(), EIssueFilterType.DISPLAY_PROPERTIES, property);
+    },
+    [projectId, updateFilters]
+  );
+
+  const handleExtraDisplayProperties = useCallback(
+    (updatedExtraDisplayProperties: TExtraDisplayProperties) => {
+      if (!projectId) return;
+      updateFilters(projectId.toString(), EIssueFilterType.EXTRA_DISPLAY_PROPERTIES, updatedExtraDisplayProperties);
     },
     [projectId, updateFilters]
   );
@@ -213,6 +221,8 @@ export const ModuleIssuesHeader = observer(function ModuleIssuesHeader() {
                 handleDisplayFiltersUpdate={handleDisplayFilters}
                 displayProperties={issueFilters?.displayProperties ?? {}}
                 handleDisplayPropertiesUpdate={handleDisplayProperties}
+                extraDisplayProperties={issueFilters?.extraDisplayProperties}
+                handleExtraDisplayPropertiesUpdate={handleExtraDisplayProperties}
                 ignoreGroupedFilters={["module"]}
                 cycleViewDisabled={!currentProjectDetails?.cycle_view}
                 moduleViewDisabled={!currentProjectDetails?.module_view}

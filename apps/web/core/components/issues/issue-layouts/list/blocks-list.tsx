@@ -1,6 +1,6 @@
 import type { FC, MutableRefObject } from "react";
 // components
-import type { TIssue, IIssueDisplayProperties, TIssueMap, TGroupedIssues } from "@plane/types";
+import type { TIssue, IIssueDisplayProperties, TExtraDisplayProperties, TIssueMap, TGroupedIssues } from "@plane/types";
 // hooks
 import type { TSelectionHelper } from "@/hooks/use-multiple-select";
 // types
@@ -15,6 +15,7 @@ interface Props {
   updateIssue: ((projectId: string | null, issueId: string, data: Partial<TIssue>) => Promise<void>) | undefined;
   quickActions: TRenderQuickActions;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   containerRef: MutableRefObject<HTMLDivElement | null>;
   isDragAllowed: boolean;
   canDropOverIssue: boolean;
@@ -30,6 +31,7 @@ export function IssueBlocksList(props: Props) {
     updateIssue,
     quickActions,
     displayProperties,
+    extraDisplayProperties,
     canEditProperties,
     containerRef,
     selectionHelpers,
@@ -51,6 +53,7 @@ export function IssueBlocksList(props: Props) {
             quickActions={quickActions}
             canEditProperties={canEditProperties}
             displayProperties={displayProperties}
+            extraDisplayProperties={extraDisplayProperties}
             nestingLevel={0}
             spacingLeft={0}
             containerRef={containerRef}

@@ -1010,6 +1010,10 @@ export default {
         sub_issue: "子工作事項",
         work_item_count: "工作事項數量",
       },
+      extra_properties: {
+        label: "額外屬性",
+        not_available: "此屬性對當前工作事項類型不可用",
+      },
       extra: {
         show_sub_issues: "顯示子工作事項",
         show_empty_groups: "顯示空群組",

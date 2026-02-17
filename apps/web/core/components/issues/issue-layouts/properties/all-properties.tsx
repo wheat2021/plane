@@ -9,7 +9,7 @@ import { Paperclip } from "lucide-react";
 import { useTranslation } from "@plane/i18n";
 import { LinkIcon, StartDatePropertyIcon, ViewsIcon, DueDatePropertyIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
-import type { TIssue, IIssueDisplayProperties, TIssuePriorities } from "@plane/types";
+import type { TIssue, IIssueDisplayProperties, TExtraDisplayProperties, TIssuePriorities } from "@plane/types";
 // ui
 import {
   cn,
@@ -46,6 +46,7 @@ export interface IIssueProperties {
   issue: TIssue;
   updateIssue: ((projectId: string | null, issueId: string, data: Partial<TIssue>) => Promise<void>) | undefined;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   isReadOnly: boolean;
   className: string;
   activeLayout: string;
@@ -53,7 +54,7 @@ export interface IIssueProperties {
 }
 
 export const IssueProperties = observer(function IssueProperties(props: IIssueProperties) {
-  const { issue, updateIssue, displayProperties, isReadOnly, className, isEpic = false } = props;
+  const { issue, updateIssue, displayProperties, extraDisplayProperties, isReadOnly, className, isEpic = false } = props;
   // i18n
   const { t } = useTranslation();
   // store hooks
@@ -466,7 +467,13 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
       </WithDisplayPropertiesHOC>
 
       {/* Additional Properties */}
-      <WorkItemLayoutAdditionalProperties displayProperties={displayProperties} issue={issue} />
+      <WorkItemLayoutAdditionalProperties
+        displayProperties={displayProperties}
+        extraDisplayProperties={extraDisplayProperties}
+        issue={issue}
+        updateIssue={updateIssue}
+        disabled={isReadOnly}
+      />
 
       {/* label */}
       <WithDisplayPropertiesHOC displayProperties={displayProperties} displayPropertyKey="labels">

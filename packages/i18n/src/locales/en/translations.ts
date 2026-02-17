@@ -863,6 +863,10 @@ export default {
         sub_issue: "Sub-work item",
         work_item_count: "Work item count",
       },
+      extra_properties: {
+        label: "Extra Properties",
+        not_available: "This property is not available for the current work item type",
+      },
       extra: {
         show_sub_issues: "Show sub-work items",
         show_empty_groups: "Show empty groups",

@@ -7,6 +7,7 @@ import { EIssueFilterType } from "@plane/constants";
 import type {
   IIssueDisplayFilterOptions,
   IIssueDisplayProperties,
+  TExtraDisplayProperties,
   TIssueKanbanFilters,
   IIssueFilters,
   TIssueParams,
@@ -134,6 +135,7 @@ export class ProjectIssuesFilter extends IssueFilterHelperStore implements IProj
     const richFilters = _filters?.rich_filters;
     const displayFilters = this.computedDisplayFilters(_filters?.display_filters);
     const displayProperties = this.computedDisplayProperties(_filters?.display_properties);
+    const extraDisplayProperties = this.computedExtraDisplayProperties(_filters?.extra_display_properties);
 
     // fetching the kanban toggle helpers in the local storage
     const kanbanFilters = {
@@ -157,6 +159,7 @@ export class ProjectIssuesFilter extends IssueFilterHelperStore implements IProj
       set(this.filters, [projectId, "displayFilters"], displayFilters);
       set(this.filters, [projectId, "displayProperties"], displayProperties);
       set(this.filters, [projectId, "kanbanFilters"], kanbanFilters);
+      set(this.filters, [projectId, "extraDisplayProperties"], extraDisplayProperties);
     });
   };
 
@@ -194,6 +197,7 @@ export class ProjectIssuesFilter extends IssueFilterHelperStore implements IProj
         displayFilters: this.filters[projectId].displayFilters as IIssueDisplayFilterOptions,
         displayProperties: this.filters[projectId].displayProperties as IIssueDisplayProperties,
         kanbanFilters: this.filters[projectId].kanbanFilters as TIssueKanbanFilters,
+        extraDisplayProperties: this.filters[projectId].extraDisplayProperties as TExtraDisplayProperties,
       };
 
       switch (type) {
@@ -284,6 +288,22 @@ export class ProjectIssuesFilter extends IssueFilterHelperStore implements IProj
             });
           });
 
+          break;
+        }
+
+        case EIssueFilterType.EXTRA_DISPLAY_PROPERTIES: {
+          const updatedExtraDisplayProperties = filters as TExtraDisplayProperties;
+          _filters.extraDisplayProperties = { ..._filters.extraDisplayProperties, ...updatedExtraDisplayProperties };
+
+          runInAction(() => {
+            Object.keys(updatedExtraDisplayProperties).forEach((_key) => {
+              set(this.filters, [projectId, "extraDisplayProperties", _key], updatedExtraDisplayProperties[_key]);
+            });
+          });
+
+          await this.projectService.updateProjectUserProperties(workspaceSlug, projectId, {
+            extra_display_properties: _filters.extraDisplayProperties,
+          });
           break;
         }
         default:

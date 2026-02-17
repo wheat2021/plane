@@ -7,7 +7,7 @@ import { observer } from "mobx-react";
 // plane helpers
 import { useOutsideClickDetector } from "@plane/hooks";
 // types
-import type { IIssueDisplayProperties, TIssue, TIssueMap } from "@plane/types";
+import type { IIssueDisplayProperties, TExtraDisplayProperties, TIssue, TIssueMap } from "@plane/types";
 import { EIssueServiceType } from "@plane/types";
 // components
 import { DropIndicator } from "@plane/ui";
@@ -29,6 +29,7 @@ type Props = {
   quickActions: TRenderQuickActions;
   canEditProperties: (projectId: string | undefined) => boolean;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   nestingLevel: number;
   spacingLeft?: number;
   containerRef: MutableRefObject<HTMLDivElement | null>;
@@ -51,6 +52,7 @@ export const IssueBlockRoot = observer(function IssueBlockRoot(props: Props) {
     quickActions,
     canEditProperties,
     displayProperties,
+    extraDisplayProperties,
     nestingLevel,
     spacingLeft = 14,
     containerRef,
@@ -144,6 +146,7 @@ export const IssueBlockRoot = observer(function IssueBlockRoot(props: Props) {
           quickActions={quickActions}
           canEditProperties={canEditProperties}
           displayProperties={displayProperties}
+          extraDisplayProperties={extraDisplayProperties}
           isExpanded={isExpanded}
           setExpanded={setExpanded}
           nestingLevel={nestingLevel}
@@ -167,6 +170,7 @@ export const IssueBlockRoot = observer(function IssueBlockRoot(props: Props) {
             quickActions={quickActions}
             canEditProperties={canEditProperties}
             displayProperties={displayProperties}
+            extraDisplayProperties={extraDisplayProperties}
             nestingLevel={nestingLevel + 1}
             spacingLeft={spacingLeft + 12}
             containerRef={containerRef}

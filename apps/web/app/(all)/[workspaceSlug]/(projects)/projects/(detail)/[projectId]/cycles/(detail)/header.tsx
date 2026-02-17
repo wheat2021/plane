@@ -17,7 +17,7 @@ import { Button } from "@plane/propel/button";
 import { IconButton } from "@plane/propel/icon-button";
 import { CycleIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
-import type { ICustomSearchSelectOption, IIssueDisplayFilterOptions, IIssueDisplayProperties } from "@plane/types";
+import type { ICustomSearchSelectOption, IIssueDisplayFilterOptions, IIssueDisplayProperties, TExtraDisplayProperties } from "@plane/types";
 import { EIssuesStoreType, EIssueLayoutTypes } from "@plane/types";
 import { Breadcrumbs, BreadcrumbNavigationSearchDropdown, Header } from "@plane/ui";
 import { cn } from "@plane/utils";
@@ -94,6 +94,14 @@ export const CycleIssuesHeader = observer(function CycleIssuesHeader() {
     (property: Partial<IIssueDisplayProperties>) => {
       if (!workspaceSlug || !projectId) return;
       updateFilters(workspaceSlug, projectId, EIssueFilterType.DISPLAY_PROPERTIES, property, cycleId);
+    },
+    [workspaceSlug, projectId, cycleId, updateFilters]
+  );
+
+  const handleExtraDisplayProperties = useCallback(
+    (updatedExtraDisplayProperties: TExtraDisplayProperties) => {
+      if (!workspaceSlug || !projectId) return;
+      updateFilters(workspaceSlug, projectId, EIssueFilterType.EXTRA_DISPLAY_PROPERTIES, updatedExtraDisplayProperties, cycleId);
     },
     [workspaceSlug, projectId, cycleId, updateFilters]
   );
@@ -219,6 +227,8 @@ export const CycleIssuesHeader = observer(function CycleIssuesHeader() {
                 handleDisplayFiltersUpdate={handleDisplayFilters}
                 displayProperties={issueFilters?.displayProperties ?? {}}
                 handleDisplayPropertiesUpdate={handleDisplayProperties}
+                extraDisplayProperties={issueFilters?.extraDisplayProperties}
+                handleExtraDisplayPropertiesUpdate={handleExtraDisplayProperties}
                 ignoreGroupedFilters={["cycle"]}
                 cycleViewDisabled={!currentProjectDetails?.cycle_view}
                 moduleViewDisabled={!currentProjectDetails?.module_view}

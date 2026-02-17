@@ -14,6 +14,7 @@ import type {
   TIssueOrderByOptions,
   TIssue,
   IIssueDisplayProperties,
+  TExtraDisplayProperties,
   TIssueKanbanFilters,
 } from "@plane/types";
 import { EIssueLayoutTypes } from "@plane/types";
@@ -52,6 +53,7 @@ interface Props {
   updateIssue: ((projectId: string | null, issueId: string, data: Partial<TIssue>) => Promise<void>) | undefined;
   quickActions: TRenderQuickActions;
   displayProperties: IIssueDisplayProperties | undefined;
+  extraDisplayProperties?: TExtraDisplayProperties;
   enableIssueQuickAdd: boolean;
   canEditProperties: (projectId: string | undefined) => boolean;
   containerRef: MutableRefObject<HTMLDivElement | null>;
@@ -79,6 +81,7 @@ export const ListGroup = observer(function ListGroup(props: Props) {
     updateIssue,
     quickActions,
     displayProperties,
+    extraDisplayProperties,
     enableIssueQuickAdd,
     canEditProperties,
     containerRef,
@@ -297,6 +300,7 @@ export const ListGroup = observer(function ListGroup(props: Props) {
               updateIssue={updateIssue}
               quickActions={quickActions}
               displayProperties={displayProperties}
+              extraDisplayProperties={extraDisplayProperties}
               canEditProperties={canEditProperties}
               containerRef={containerRef}
               isDragAllowed={isDragAllowed}

@@ -3,6 +3,7 @@ import type {
   IIssueDisplayFilterOptions,
   IIssueDisplayProperties,
   IIssueFilterOptions,
+  TExtraDisplayProperties,
   TWorkItemFilterExpression,
 } from "./view-props";
 
@@ -24,6 +25,7 @@ export interface IProjectView {
   rich_filters: TWorkItemFilterExpression;
   display_filters: IIssueDisplayFilterOptions;
   display_properties: IIssueDisplayProperties;
+  extra_display_properties?: TExtraDisplayProperties;
   query: IIssueFilterOptions;
   query_data: IIssueFilterOptions;
   project: string;

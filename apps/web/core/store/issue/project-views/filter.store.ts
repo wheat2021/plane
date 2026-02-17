@@ -7,6 +7,7 @@ import { EIssueFilterType } from "@plane/constants";
 import type {
   IIssueDisplayFilterOptions,
   IIssueDisplayProperties,
+  TExtraDisplayProperties,
   TIssueKanbanFilters,
   IIssueFilters,
   TIssueParams,
@@ -141,6 +142,9 @@ export class ProjectViewIssuesFilter extends IssueFilterHelperStore implements I
     const richFilters: TWorkItemFilterExpression = viewDetails?.rich_filters;
     const displayFilters: IIssueDisplayFilterOptions = this.computedDisplayFilters(viewDetails?.display_filters);
     const displayProperties: IIssueDisplayProperties = this.computedDisplayProperties(viewDetails?.display_properties);
+    const extraDisplayProperties: TExtraDisplayProperties = this.computedExtraDisplayProperties(
+      viewDetails?.extra_display_properties
+    );
 
     // fetching the kanban toggle helpers in the local storage
     const kanbanFilters = {
@@ -164,6 +168,7 @@ export class ProjectViewIssuesFilter extends IssueFilterHelperStore implements I
       set(this.filters, [viewId, "displayFilters"], displayFilters);
       set(this.filters, [viewId, "displayProperties"], displayProperties);
       set(this.filters, [viewId, "kanbanFilters"], kanbanFilters);
+      set(this.filters, [viewId, "extraDisplayProperties"], extraDisplayProperties);
     });
   });
 
@@ -220,6 +225,7 @@ export class ProjectViewIssuesFilter extends IssueFilterHelperStore implements I
         displayFilters: this.filters[viewId].displayFilters as IIssueDisplayFilterOptions,
         displayProperties: this.filters[viewId].displayProperties as IIssueDisplayProperties,
         kanbanFilters: this.filters[viewId].kanbanFilters as TIssueKanbanFilters,
+        extraDisplayProperties: this.filters[viewId].extraDisplayProperties as TExtraDisplayProperties,
       };
 
       switch (type) {
@@ -311,6 +317,19 @@ export class ProjectViewIssuesFilter extends IssueFilterHelperStore implements I
                 [viewId, "kanbanFilters", _key],
                 updatedKanbanFilters[_key as keyof TIssueKanbanFilters]
               );
+            });
+          });
+
+          break;
+        }
+
+        case EIssueFilterType.EXTRA_DISPLAY_PROPERTIES: {
+          const updatedExtraDisplayProperties = filters as TExtraDisplayProperties;
+          _filters.extraDisplayProperties = { ..._filters.extraDisplayProperties, ...updatedExtraDisplayProperties };
+
+          runInAction(() => {
+            Object.keys(updatedExtraDisplayProperties).forEach((_key) => {
+              set(this.filters, [viewId, "extraDisplayProperties", _key], updatedExtraDisplayProperties[_key]);
             });
           });
 
