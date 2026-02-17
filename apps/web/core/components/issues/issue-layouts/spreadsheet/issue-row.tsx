@@ -1,5 +1,5 @@
 import type { Dispatch, MouseEvent, MutableRefObject, SetStateAction } from "react";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
 import { MoreHorizontal } from "lucide-react";
@@ -31,6 +31,9 @@ import { IssueIdentifier } from "@/plane-web/components/issues/issue-details/iss
 import type { TRenderQuickActions } from "../list/list-view-types";
 import { isIssueNew } from "../utils";
 import { IssueColumn } from "./issue-column";
+import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
+import { useIssueTypeExtraProperty } from "@/hooks/store/use-issue-type-extra-property";
+import { CompactExtraPropertyControl } from "@/components/issues/extra-properties/compact-controls/compact-extra-property-control";
 
 interface Props {
   displayProperties: IIssueDisplayProperties;
@@ -105,6 +108,7 @@ export const SpreadsheetIssueRow = observer(function SpreadsheetIssueRow(props: 
         <IssueRowDetails
           issueId={issueId}
           displayProperties={displayProperties}
+          extraDisplayProperties={extraDisplayProperties}
           quickActions={quickActions}
           canEditProperties={canEditProperties}
           nestingLevel={nestingLevel}
@@ -149,6 +153,7 @@ export const SpreadsheetIssueRow = observer(function SpreadsheetIssueRow(props: 
 
 interface IssueRowDetailsProps {
   displayProperties: IIssueDisplayProperties;
+  extraDisplayProperties?: TExtraDisplayProperties;
   isEstimateEnabled: boolean;
   quickActions: TRenderQuickActions;
   canEditProperties: (projectId: string | undefined) => boolean;
@@ -168,6 +173,7 @@ interface IssueRowDetailsProps {
 const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetailsProps) {
   const {
     displayProperties,
+    extraDisplayProperties,
     issueId,
     isEstimateEnabled,
     nestingLevel,
@@ -195,6 +201,8 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
   const { getIsIssuePeeked, peekIssue } = useIssueDetail(isEpic ? EIssueServiceType.EPICS : EIssueServiceType.ISSUES);
   const { handleRedirection } = useIssuePeekOverviewRedirection(isEpic);
   const { isMobile } = usePlatformOS();
+  const { getConfigById } = useExtraPropertyConfig();
+  const { getConfigIdsByIssueType } = useIssueTypeExtraProperty();
 
   // handlers
   const handleIssuePeekOverview = (issue: TIssue) =>
@@ -240,6 +248,22 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
   const projectIdentifier = getProjectIdentifierById(issueDetail.project_id);
 
   const canSelectIssues = !disableUserActions && !selectionHelpers.isSelectionDisabled;
+
+  // Get valid extra property config IDs for this issue's type
+  const validConfigIds = useMemo(() => {
+    if (!projectId || !issueDetail.type_id) {
+      console.log('[IssueRowDetails] Missing projectId or type_id:', { projectId, type_id: issueDetail.type_id, issueId: issueDetail.id });
+      return new Set<string>();
+    }
+    const configIds = getConfigIdsByIssueType(projectId.toString(), issueDetail.type_id);
+    console.log('[IssueRowDetails] validConfigIds:', {
+      projectId: projectId.toString(),
+      type_id: issueDetail.type_id,
+      issueId: issueDetail.id,
+      configIds
+    });
+    return new Set(configIds);
+  }, [projectId, issueDetail.type_id, getConfigIdsByIssueType]);
 
   const workItemLink = generateWorkItemLink({
     workspaceSlug: workspaceSlug?.toString(),
@@ -391,6 +415,48 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
           isEstimateEnabled={isEstimateEnabled}
         />
       ))}
+      {/* Extra Properties Columns - One column per property */}
+      {extraDisplayProperties && (() => {
+        const selectedExtraPropertyIds = Object.keys(extraDisplayProperties).filter(key => extraDisplayProperties[key]);
+
+        return selectedExtraPropertyIds.map((configId) => {
+          const config = getConfigById(configId);
+          if (!config) return null;
+
+          // If validConfigIds is empty, it means the work item type has no restrictions
+          // so all extra properties are available
+          const isValid = validConfigIds.size === 0 || validConfigIds.has(configId);
+          const currentValue = issueDetail.extra_properties?.[config.key] ?? config.default_value ?? null;
+
+          return (
+            <td
+              key={configId}
+              className="h-11 min-w-36 text-13 after:absolute after:w-full after:bottom-[-1px] after:border after:border-subtle border-r-[1px] border-subtle"
+            >
+              <div className="flex items-center px-2 py-2">
+                {!isValid ? (
+                  <div className="flex h-5 flex-shrink-0 items-center opacity-40 cursor-not-allowed">
+                    <span className="text-caption-sm-regular text-secondary">—</span>
+                  </div>
+                ) : (
+                  <CompactExtraPropertyControl
+                    config={config}
+                    value={currentValue}
+                    onChange={(value) => {
+                      if (updateIssue) {
+                        updateIssue(issueDetail.project_id, issueDetail.id, {
+                          extra_properties: { ...issueDetail.extra_properties, [config.key]: value },
+                        });
+                      }
+                    }}
+                    disabled={disableUserActions}
+                  />
+                )}
+              </div>
+            </td>
+          );
+        });
+      })()}
     </>
   );
 });

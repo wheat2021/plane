@@ -3,16 +3,18 @@ import { useParams } from "next/navigation";
 // constants
 import { SPREADSHEET_SELECT_GROUP } from "@plane/constants";
 // ui
-import type { IIssueDisplayFilterOptions, IIssueDisplayProperties } from "@plane/types";
+import type { IIssueDisplayFilterOptions, IIssueDisplayProperties, TExtraDisplayProperties } from "@plane/types";
 // components
 import { cn } from "@plane/utils";
 import { MultipleSelectGroupAction } from "@/components/core/multiple-select";
 // hooks
 import type { TSelectionHelper } from "@/hooks/use-multiple-select";
+import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
 import { SpreadsheetHeaderColumn } from "./spreadsheet-header-column";
 
 interface Props {
   displayProperties: IIssueDisplayProperties;
+  extraDisplayProperties?: TExtraDisplayProperties;
   displayFilters: IIssueDisplayFilterOptions;
   handleDisplayFilterUpdate: (data: Partial<IIssueDisplayFilterOptions>) => void;
   canEditProperties: (projectId: string | undefined) => boolean;
@@ -25,6 +27,7 @@ interface Props {
 export const SpreadsheetHeader = observer(function SpreadsheetHeader(props: Props) {
   const {
     displayProperties,
+    extraDisplayProperties,
     displayFilters,
     handleDisplayFilterUpdate,
     canEditProperties,
@@ -35,10 +38,15 @@ export const SpreadsheetHeader = observer(function SpreadsheetHeader(props: Prop
   } = props;
   // router
   const { projectId } = useParams();
+  // hooks
+  const { getConfigById } = useExtraPropertyConfig();
   // derived values
   const isGroupSelectionEmpty = selectionHelpers.isGroupSelected(SPREADSHEET_SELECT_GROUP) === "empty";
   // auth
   const canSelectIssues = canEditProperties(projectId?.toString()) && !selectionHelpers.isSelectionDisabled;
+
+  // Get selected extra property configs
+  const selectedExtraPropertyIds = extraDisplayProperties ? Object.keys(extraDisplayProperties).filter(key => extraDisplayProperties[key]) : [];
 
   return (
     <thead className="sticky top-0 left-0 z-[12] border-b-[0.5px] border-subtle">
@@ -81,6 +89,23 @@ export const SpreadsheetHeader = observer(function SpreadsheetHeader(props: Prop
             isEpic={isEpic}
           />
         ))}
+        {/* Extra Properties Headers - One column per property */}
+        {selectedExtraPropertyIds.map((configId) => {
+          const config = getConfigById(configId);
+          if (!config) return null;
+
+          return (
+            <th
+              key={configId}
+              className="h-11 min-w-36 bg-layer-1 text-13 font-medium border-r-[0.5px] border-subtle"
+              tabIndex={-1}
+            >
+              <div className="flex items-center px-2">
+                <span className="text-13 font-medium">{config.label}</span>
+              </div>
+            </th>
+          );
+        })}
       </tr>
     </thead>
   );

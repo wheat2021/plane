@@ -110,6 +110,7 @@ export const SpreadsheetTable = observer(function SpreadsheetTable(props: Props)
     <table className="overflow-y-auto bg-surface-1 w-full" onKeyDown={handleKeyBoardNavigation}>
       <SpreadsheetHeader
         displayProperties={displayProperties}
+        extraDisplayProperties={extraDisplayProperties}
         displayFilters={displayFilters}
         handleDisplayFilterUpdate={handleDisplayFilterUpdate}
         canEditProperties={canEditProperties}
