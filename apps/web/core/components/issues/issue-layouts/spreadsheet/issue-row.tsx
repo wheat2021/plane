@@ -1,5 +1,5 @@
 import type { Dispatch, MouseEvent, MutableRefObject, SetStateAction } from "react";
-import { useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
 import { MoreHorizontal } from "lucide-react";
@@ -201,8 +201,8 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
   const { getIsIssuePeeked, peekIssue } = useIssueDetail(isEpic ? EIssueServiceType.EPICS : EIssueServiceType.ISSUES);
   const { handleRedirection } = useIssuePeekOverviewRedirection(isEpic);
   const { isMobile } = usePlatformOS();
-  const { getConfigById } = useExtraPropertyConfig();
-  const { getConfigIdsByIssueType } = useIssueTypeExtraProperty();
+  const { getConfigById, fetchWorkspaceConfigs } = useExtraPropertyConfig();
+  const { fetchedMap: bindingFetchedMap, fetchBindings, getConfigIdsByIssueType } = useIssueTypeExtraProperty();
 
   // handlers
   const handleIssuePeekOverview = (issue: TIssue) =>
@@ -214,11 +214,25 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
 
   // Get valid extra property config IDs for this issue's type
   // Must be before early return to satisfy React Hooks rules
-  const validConfigIds = useMemo(() => {
-    if (!projectId || !issueDetail?.type_id) return new Set<string>();
-    const configIds = getConfigIdsByIssueType(projectId.toString(), issueDetail.type_id);
-    return new Set(configIds);
-  }, [projectId, issueDetail?.type_id, getConfigIdsByIssueType]);
+  useEffect(() => {
+    if (workspaceSlug) {
+      void fetchWorkspaceConfigs(workspaceSlug.toString());
+    }
+  }, [workspaceSlug, fetchWorkspaceConfigs]);
+
+  useEffect(() => {
+    const wsSlug = workspaceSlug?.toString();
+    const projId = projectId?.toString();
+    const typeId = issueDetail?.type_id;
+    if (wsSlug && projId && typeId && !bindingFetchedMap[projId]?.[typeId]) {
+      void fetchBindings(wsSlug, projId, typeId);
+    }
+  }, [workspaceSlug, projectId, issueDetail?.type_id, bindingFetchedMap, fetchBindings]);
+
+  const validConfigIds =
+    !projectId || !issueDetail?.type_id
+      ? new Set<string>()
+      : new Set(getConfigIdsByIssueType(projectId.toString(), issueDetail.type_id));
 
   const subIssueIndentation = `${spacingLeft}px`;
 
