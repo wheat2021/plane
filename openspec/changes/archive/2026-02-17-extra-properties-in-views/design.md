@@ -3,6 +3,7 @@
 当前 Plane 视图系统支持通过 Display Properties 面板控制系统属性（State、Priority、Assignee 等）在 List、Kanban、Spreadsheet 等布局中的显示/隐藏。工作空间已支持定义额外属性（Extra Properties），并可通过 `IssueTypeExtraProperty` 绑定到项目级别的特定工作项类型。
 
 现有架构：
+
 - `IIssueDisplayProperties` 是固定的静态类型，包含 `assignee`、`priority` 等布尔属性
 - `FilterDisplayProperties` 组件读取 `ISSUE_DISPLAY_PROPERTIES` 常量渲染属性选择器
 - `IssueProperties` / `WorkItemLayoutAdditionalProperties` 在各布局中渲染属性
@@ -10,18 +11,21 @@
 - `IssueTypeExtraPropertyStore` 管理项目+类型级别的属性绑定
 
 约束：
+
 - 需要保持与上游 Plane 代码的兼容性，尽量使用扩展点而非修改核心类型
 - 额外属性的有效性取决于工作项类型，不同类型可能绑定不同的属性
 
 ## Goals / Non-Goals
 
 **Goals:**
+
 - 在 Views Display 面板中新增额外属性选择区域
 - 额外属性与系统属性以统一视觉风格显示
 - 对于当前工作项类型未绑定的属性，显示为灰色不可操作状态
 - 支持在 List、Kanban、Spreadsheet 布局中显示选中的额外属性
 
 **Non-Goals:**
+
 - 不修改 Gantt 和 Calendar 视图（空间有限）
 - 不支持按额外属性分组或排序（需要后端支持）
 - 不修改核心 `IIssueDisplayProperties` 类型定义
@@ -33,6 +37,7 @@
 **选择**: 在 `IIssueDisplayProperties` 旁边新增 `extraDisplayProperties: Record<string, boolean>` 字段
 
 **备选方案**:
+
 - A) 扩展 `IIssueDisplayProperties` 类型添加动态属性 → 破坏 TypeScript 类型安全
 - B) 使用独立的 display properties 字段 → **选择此方案**，不影响核心类型
 
@@ -43,6 +48,7 @@
 **选择**: 在渲染时根据工作项的 `type_id` 查询 `IssueTypeExtraPropertyStore.getBindings()`
 
 **备选方案**:
+
 - A) 在每个工作项上预计算有效属性列表 → 数据冗余，更新复杂
 - B) 渲染时动态查询绑定关系 → **选择此方案**，利用现有 store 缓存
 
@@ -53,6 +59,7 @@
 **选择**: 扩展 `WorkItemLayoutAdditionalProperties` 组件（CE 扩展点）
 
 **备选方案**:
+
 - A) 修改 `IssueProperties` 核心组件 → 上游同步风险高
 - B) 使用 CE 扩展点 `WorkItemLayoutAdditionalProperties` → **选择此方案**
 
