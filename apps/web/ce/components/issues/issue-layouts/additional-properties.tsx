@@ -65,10 +65,10 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
     }
   }, [workspaceSlug, projectId, issue.type_id, bindingFetchedMap, fetchBindings]);
 
-  const validConfigIds = useMemo(() => {
-    if (!projectId || !issue.type_id) return new Set<string>();
-    return new Set(getConfigIdsByIssueType(projectId.toString(), issue.type_id));
-  }, [projectId, issue.type_id, getConfigIdsByIssueType]);
+  const validConfigIds =
+    !projectId || !issue.type_id
+      ? new Set<string>()
+      : new Set(getConfigIdsByIssueType(projectId.toString(), issue.type_id));
 
   const selectedConfigIds = useMemo(() => {
     if (!extraDisplayProperties) return [];
