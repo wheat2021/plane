@@ -1012,7 +1012,7 @@ export default {
       },
       extra_properties: {
         label: "额外属性",
-        not_available: "此属性对当前工作项类型不可用",
+        not_available: "属性\u201C{propertyName}\u201D对当前工作项类型不可用",
       },
       extra: {
         show_sub_issues: "显示子工作项",

@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
 import { useTranslation } from "@plane/i18n";
+import { HashPropertyIcon, DropdownPropertyIcon, BooleanPropertyIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
 import type {
   IIssueDisplayProperties,
@@ -15,6 +16,18 @@ import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config"
 import { useIssueTypeExtraProperty } from "@/hooks/store/use-issue-type-extra-property";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 import { CompactExtraPropertyControl } from "@/components/issues/extra-properties/compact-controls/compact-extra-property-control";
+
+const getPropertyIcon = (type: string) => {
+  switch (type) {
+    case "select":
+    case "multiselect":
+      return DropdownPropertyIcon;
+    case "checkbox":
+      return BooleanPropertyIcon;
+    default:
+      return HashPropertyIcon;
+  }
+};
 
 export type TWorkItemLayoutAdditionalProperties = {
   displayProperties: IIssueDisplayProperties;
@@ -38,7 +51,7 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
   // Ensure configs are loaded when component mounts
   React.useEffect(() => {
     if (workspaceSlug) {
-      fetchWorkspaceConfigs(workspaceSlug.toString());
+      void fetchWorkspaceConfigs(workspaceSlug.toString());
     }
   }, [workspaceSlug, fetchWorkspaceConfigs]);
 
@@ -48,18 +61,10 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
   }, [projectId, issue.type_id, getConfigIdsByIssueType]);
 
   const selectedConfigIds = useMemo(() => {
-    if (!extraDisplayProperties) {
-      console.log('[WorkItemLayoutAdditionalProperties] no extraDisplayProperties');
-      return [];
-    }
-    const ids = Object.entries(extraDisplayProperties)
+    if (!extraDisplayProperties) return [];
+    return Object.entries(extraDisplayProperties)
       .filter(([_, isSelected]) => isSelected)
       .map(([configId]) => configId);
-    console.log('[WorkItemLayoutAdditionalProperties] selectedConfigIds:', {
-      extraDisplayProperties,
-      selectedConfigIds: ids,
-    });
-    return ids;
   }, [extraDisplayProperties]);
 
   const handlePropertyChange = useCallback(
@@ -88,19 +93,20 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
         const currentValue = issue.extra_properties?.[config.key] ?? config.default_value ?? null;
 
         if (!isValid) {
+          const PropertyIcon = getPropertyIcon(config.type);
           return (
             <Tooltip
               key={configId}
-              tooltipContent={t("issue.display.extra_properties.not_available")}
+              tooltipContent={t("issue.display.extra_properties.not_available", { propertyName: config.label })}
               isMobile={isMobile}
             >
               <div
                 className={cn(
-                  "flex h-5 flex-shrink-0 items-center justify-center gap-1 overflow-hidden rounded-sm border-[0.5px] border-strong px-2 py-1",
-                  "opacity-40 cursor-not-allowed bg-layer-2"
+                  "flex h-5 flex-shrink-0 items-center justify-center rounded-sm",
+                  "opacity-40 cursor-not-allowed"
                 )}
               >
-                <span className="text-caption-sm-regular text-secondary truncate max-w-20">{config.label}</span>
+                <PropertyIcon className="h-3 w-3 flex-shrink-0 text-secondary" />
               </div>
             </Tooltip>
           );
@@ -111,7 +117,7 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
             key={configId}
             config={config}
             value={currentValue}
-            onChange={(value) => handlePropertyChange(config, value)}
+            onChange={(value) => void handlePropertyChange(config, value)}
             disabled={disabled}
             workspaceSlug={workspaceSlug?.toString()}
             projectId={projectId?.toString()}

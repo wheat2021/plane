@@ -865,7 +865,7 @@ export default {
       },
       extra_properties: {
         label: "Extra Properties",
-        not_available: "This property is not available for the current work item type",
+        not_available: 'Property "{propertyName}" is not available for the current work item type',
       },
       extra: {
         show_sub_issues: "Show sub-work items",
