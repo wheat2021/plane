@@ -46,7 +46,7 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
   const { isMobile } = usePlatformOS();
 
   const { getConfigById, fetchWorkspaceConfigs } = useExtraPropertyConfig();
-  const { getConfigIdsByIssueType } = useIssueTypeExtraProperty();
+  const { fetchedMap: bindingFetchedMap, fetchBindings, getConfigIdsByIssueType } = useIssueTypeExtraProperty();
 
   // Ensure configs are loaded when component mounts
   React.useEffect(() => {
@@ -54,6 +54,16 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
       void fetchWorkspaceConfigs(workspaceSlug.toString());
     }
   }, [workspaceSlug, fetchWorkspaceConfigs]);
+
+  // Ensure bindings are loaded for this issue's type
+  React.useEffect(() => {
+    const wsSlug = workspaceSlug?.toString();
+    const projId = projectId?.toString();
+    const typeId = issue.type_id;
+    if (wsSlug && projId && typeId && !bindingFetchedMap[projId]?.[typeId]) {
+      void fetchBindings(wsSlug, projId, typeId);
+    }
+  }, [workspaceSlug, projectId, issue.type_id, bindingFetchedMap, fetchBindings]);
 
   const validConfigIds = useMemo(() => {
     if (!projectId || !issue.type_id) return new Set<string>();
