@@ -161,7 +161,11 @@ class WorkItemFiltersAdapter extends FilterAdapter<TWorkItemFilterProperty, TWor
 
     // Validate property is in allowed list
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!WORK_ITEM_FILTER_PROPERTY_KEYS.includes(property as any) && !property.startsWith("customproperty_")) {
+    if (
+      !WORK_ITEM_FILTER_PROPERTY_KEYS.includes(property as any) &&
+      !property.startsWith("customproperty_") &&
+      !property.startsWith("extra_property_")
+    ) {
       return false;
     }
 

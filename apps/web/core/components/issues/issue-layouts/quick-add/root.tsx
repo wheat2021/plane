@@ -123,9 +123,9 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
     }
 
     const payload = createIssuePayload(pId, {
-      type_id: defaultIssueTypeId,
       ...(prePopulatedData ?? {}),
       ...formData,
+      type_id: formData.type_id ?? prePopulatedData?.type_id ?? defaultIssueTypeId,
     });
 
     if (quickAddCallback) {
@@ -147,7 +147,7 @@ export const QuickAddIssueRoot = observer(function QuickAddIssueRoot(props: TQui
         },
         error: {
           title: t("common.error.label"),
-          message: (err: { message?: string }) => err?.message || t("common.error.message"),
+          message: () => t("common.error.message"),
         },
       });
 

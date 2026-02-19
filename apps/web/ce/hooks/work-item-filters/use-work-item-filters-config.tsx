@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { AtSign, Briefcase, Layers } from "lucide-react";
 // plane imports
@@ -101,8 +101,12 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
   const { getStateById } = useProjectState();
   const { getUserDetails } = useMember();
   const { getProjectIssueTypes, fetchProjectIssueTypes } = useIssueType();
-  const { getConfigById } = useExtraPropertyConfig();
-  const { getConfigIdsByIssueType } = useIssueTypeExtraProperty();
+  const { fetchedMap: extraPropertyConfigsFetchedMap, fetchWorkspaceConfigs, getConfigById } = useExtraPropertyConfig();
+  const {
+    fetchedMap: issueTypeExtraPropertyBindingsFetchedMap,
+    fetchBindings: fetchIssueTypeExtraPropertyBindings,
+    getConfigIdsByIssueType,
+  } = useIssueTypeExtraProperty();
 
   // Fetch project issue types if not already fetched
   useSWR(
@@ -110,6 +114,13 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
     workspaceSlug && projectId ? () => fetchProjectIssueTypes(workspaceSlug, projectId) : null,
     { revalidateIfStale: false, revalidateOnFocus: false }
   );
+
+  // Ensure workspace-level extra property configs are loaded
+  useEffect(() => {
+    if (!workspaceSlug) return;
+    if (extraPropertyConfigsFetchedMap[workspaceSlug]) return;
+    void fetchWorkspaceConfigs(workspaceSlug);
+  }, [workspaceSlug, extraPropertyConfigsFetchedMap, fetchWorkspaceConfigs]);
 
   // derived values
   const operatorConfigs = useFiltersOperatorConfigs({ workspaceSlug });
@@ -150,10 +161,24 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
         : [],
     [projectIds, getProjectById]
   );
-  const issueTypes: TProjectIssueType[] | undefined = useMemo(
-    () => (projectId ? getProjectIssueTypes(projectId) : undefined),
-    [projectId, getProjectIssueTypes]
-  );
+  const issueTypes: TProjectIssueType[] | undefined = projectId ? getProjectIssueTypes(projectId) : undefined;
+
+  // Ensure issue type -> extra property bindings are loaded for this project
+  useEffect(() => {
+    if (!workspaceSlug || !projectId || !issueTypes || issueTypes.length === 0) return;
+    for (const issueType of issueTypes) {
+      const issueTypeId = issueType.issue_type;
+      if (!issueTypeId) continue;
+      if (issueTypeExtraPropertyBindingsFetchedMap[projectId]?.[issueTypeId]) continue;
+      void fetchIssueTypeExtraPropertyBindings(workspaceSlug, projectId, issueTypeId);
+    }
+  }, [
+    workspaceSlug,
+    projectId,
+    issueTypes,
+    issueTypeExtraPropertyBindingsFetchedMap,
+    fetchIssueTypeExtraPropertyBindings,
+  ]);
   const areAllConfigsInitialized = useMemo(() => isLoaderReady(projectLoader), [projectLoader]);
 
   /**
@@ -398,10 +423,13 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
   );
 
   // extra property filter configs - collect unique option/multiselect configs across all issue types
-  const extraPropertyFilterConfigs: TFilterConfig<TWorkItemFilterProperty>[] = useMemo(() => {
+  // NOTE: Avoid useMemo here since the underlying MobX store updates (bindings/configMap) should trigger recomputation.
+  const extraPropertyFilterConfigs: TFilterConfig<TWorkItemFilterProperty>[] = (() => {
     if (!projectId || !issueTypes || issueTypes.length === 0) return [];
+
     const seen = new Set<string>();
     const configs: TFilterConfig<TWorkItemFilterProperty>[] = [];
+
     for (const issueType of issueTypes) {
       const configIds = getConfigIdsByIssueType(projectId, issueType.issue_type);
       for (const configId of configIds) {
@@ -410,6 +438,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
         const config = getConfigById(configId);
         if (!config || (config.type !== "select" && config.type !== "multiselect")) continue;
         if (!config.options || config.options.length === 0) continue;
+
         const key = `extra_property_${configId}` as TWorkItemFilterProperty;
         configs.push(
           getExtraPropertyOptionFilterConfig<TWorkItemFilterProperty>(key)({
@@ -421,17 +450,15 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
         );
       }
     }
+
     return configs;
-  }, [projectId, issueTypes, getConfigIdsByIssueType, getConfigById, operatorConfigs]);
+  })();
 
   // build extra property config map
-  const extraPropertyConfigMap = useMemo(() => {
-    const map: Record<string, TFilterConfig<TWorkItemFilterProperty>> = {};
-    for (const config of extraPropertyFilterConfigs) {
-      map[config.id] = config;
-    }
-    return map;
-  }, [extraPropertyFilterConfigs]);
+  const extraPropertyConfigMap: Record<string, TFilterConfig<TWorkItemFilterProperty>> = {};
+  for (const config of extraPropertyFilterConfigs) {
+    extraPropertyConfigMap[config.id] = config;
+  }
 
   return {
     areAllConfigsInitialized,

@@ -60,6 +60,9 @@ class IssueComplexFilterBackend(ComplexFilterBackend):
             has_extra = True
             config_id = match.group(1)
             operator = match.group(2)
+            # Normalize values: frontend joins multi-values as comma-separated strings
+            if isinstance(values, str) and values:
+                values = [v.strip() for v in values.split(",") if v.strip()]
             if operator == "in" and isinstance(values, list) and values:
                 try:
                     config = ExtraPropertyConfig.objects.get(id=config_id, deleted_at__isnull=True)
