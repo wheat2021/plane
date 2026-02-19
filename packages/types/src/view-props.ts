@@ -105,7 +105,8 @@ export const WORK_ITEM_FILTER_PROPERTY_KEYS = [
   "updated_at",
   "type_id",
 ] as const;
-export type TWorkItemFilterProperty = (typeof WORK_ITEM_FILTER_PROPERTY_KEYS)[number];
+export type TExtraPropertyFilterKey = `extra_property_${string}`;
+export type TWorkItemFilterProperty = (typeof WORK_ITEM_FILTER_PROPERTY_KEYS)[number] | TExtraPropertyFilterKey;
 
 export type TWorkItemFilterConditionKey = `${TWorkItemFilterProperty}__${TSupportedOperators}`;
 

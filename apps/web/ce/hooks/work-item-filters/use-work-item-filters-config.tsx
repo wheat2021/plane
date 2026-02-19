@@ -35,6 +35,7 @@ import {
   getCreatedAtFilterConfig,
   getCreatedByFilterConfig,
   getCycleFilterConfig,
+  getExtraPropertyOptionFilterConfig,
   getFileURL,
   getIssueTypeFilterConfig,
   getLabelFilterConfig,
@@ -52,7 +53,9 @@ import {
 } from "@plane/utils";
 // store hooks
 import { useCycle } from "@/hooks/store/use-cycle";
+import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
 import { useIssueType } from "@/hooks/store/use-issue-type";
+import { useIssueTypeExtraProperty } from "@/hooks/store/use-issue-type-extra-property";
 import { useLabel } from "@/hooks/store/use-label";
 import { useMember } from "@/hooks/store/use-member";
 import { useModule } from "@/hooks/store/use-module";
@@ -98,6 +101,8 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
   const { getStateById } = useProjectState();
   const { getUserDetails } = useMember();
   const { getProjectIssueTypes, fetchProjectIssueTypes } = useIssueType();
+  const { getConfigById } = useExtraPropertyConfig();
+  const { getConfigIdsByIssueType } = useIssueTypeExtraProperty();
 
   // Fetch project issue types if not already fetched
   useSWR(
@@ -392,6 +397,42 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
     [isFilterEnabled, issueTypes, operatorConfigs]
   );
 
+  // extra property filter configs - collect unique option/multiselect configs across all issue types
+  const extraPropertyFilterConfigs: TFilterConfig<TWorkItemFilterProperty>[] = useMemo(() => {
+    if (!projectId || !issueTypes || issueTypes.length === 0) return [];
+    const seen = new Set<string>();
+    const configs: TFilterConfig<TWorkItemFilterProperty>[] = [];
+    for (const issueType of issueTypes) {
+      const configIds = getConfigIdsByIssueType(projectId, issueType.issue_type);
+      for (const configId of configIds) {
+        if (seen.has(configId)) continue;
+        seen.add(configId);
+        const config = getConfigById(configId);
+        if (!config || (config.type !== "select" && config.type !== "multiselect")) continue;
+        if (!config.options || config.options.length === 0) continue;
+        const key = `extra_property_${configId}` as TWorkItemFilterProperty;
+        configs.push(
+          getExtraPropertyOptionFilterConfig<TWorkItemFilterProperty>(key)({
+            isEnabled: true,
+            label: config.label,
+            options: config.options,
+            ...operatorConfigs,
+          })
+        );
+      }
+    }
+    return configs;
+  }, [projectId, issueTypes, getConfigIdsByIssueType, getConfigById, operatorConfigs]);
+
+  // build extra property config map
+  const extraPropertyConfigMap = useMemo(() => {
+    const map: Record<string, TFilterConfig<TWorkItemFilterProperty>> = {};
+    for (const config of extraPropertyFilterConfigs) {
+      map[config.id] = config;
+    }
+    return map;
+  }, [extraPropertyFilterConfigs]);
+
   return {
     areAllConfigsInitialized,
     configs: [
@@ -411,6 +452,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       updatedAtFilterConfig,
       createdByFilterConfig,
       subscriberFilterConfig,
+      ...extraPropertyFilterConfigs,
     ],
     configMap: {
       project_id: projectFilterConfig,
@@ -429,6 +471,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       created_at: createdAtFilterConfig,
       updated_at: updatedAtFilterConfig,
       type_id: issueTypeFilterConfig,
+      ...extraPropertyConfigMap,
     },
     isFilterEnabled,
     members: members ?? [],
