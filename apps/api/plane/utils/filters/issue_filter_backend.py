@@ -66,15 +66,17 @@ class IssueComplexFilterBackend(ComplexFilterBackend):
                 except ExtraPropertyConfig.DoesNotExist:
                     continue
                 config_key = config.key
+                # Ensure the key exists in extra_properties
+                key_exists_q = Q(extra_properties__has_key=config_key)
                 if config.type == "multiselect":
                     # For multiselect: match if stored array contains any of the filter values
                     value_q = Q()
                     for v in values:
                         value_q |= Q(**{f"extra_properties__{config_key}__contains": v})
-                    extra_q &= value_q
+                    extra_q &= key_exists_q & value_q
                 else:
                     # For select: exact value match against the list
-                    extra_q &= Q(**{f"extra_properties__{config_key}__in": values})
+                    extra_q &= key_exists_q & Q(**{f"extra_properties__{config_key}__in": values})
 
         # Build standard Q from remaining conditions
         standard_q = super()._build_leaf_q(leaf_conditions, view, queryset)
