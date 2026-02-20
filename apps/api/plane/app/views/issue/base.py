@@ -172,6 +172,7 @@ class IssueListEndpoint(BaseAPIView):
                 "module_ids",
                 "label_ids",
                 "assignee_ids",
+                "extra_properties",
                 "sub_issues_count",
                 "created_at",
                 "updated_at",
@@ -880,6 +881,7 @@ class IssuePaginatedViewSet(BaseViewSet):
             "link_count",
             "attachment_count",
             "sub_issues_count",
+            "extra_properties",
         ]
 
         if str(is_description_required).lower() == "true":

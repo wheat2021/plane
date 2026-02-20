@@ -2,19 +2,20 @@
 
 ### 根因
 
-存在两处代码遗漏 `extra_properties` 字段：
+`extra_properties` 字段在四处代码中被遗漏，导致读取链路断裂：
 
-1. **前端 `addIssueToStore`**：`apps/web/core/store/issue/issue-details/issue.store.ts` 中显式映射 issue 字段时遗漏了 `extra_properties`，导致通过详情页 `fetchIssue` 加载工作项时该字段被丢弃。
+1. **前端 `addIssueToStore`**（`issue-details/issue.store.ts`）：显式映射字段时遗漏
+2. **后端 `IssueListDetailSerializer`**（`serializers/issue.py`）：`to_representation` 显式列举时遗漏
+3. **后端 `IssueViewSet.list`**（`views/issue/base.py`）：`.values()` 显式列举时遗漏
+4. **后端 `IssuePaginatedViewSet.list`**（`views/issue/base.py`）：`required_fields` 显式列举时遗漏
 
-2. **后端 `IssueListDetailSerializer`**：`apps/api/plane/app/serializers/issue.py` 中 `to_representation` 显式列举返回字段时遗漏了 `extra_properties`，导致列表接口不返回该字段，首次从列表加载的 issue 在 store 中没有 `extra_properties`。
+### 表现
 
-### 影响范围
-
-- 所有 Extra Property 类型（text、select、multiselect、checkbox、markdown）均受影响
-- 列表视图和详情视图都会丢失 extra_properties 数据
-- API PATCH 保存到数据库是成功的，但前端无法正确读取
+- API PATCH 成功保存到数据库（已通过 raw SQL 验证）
+- 列表 API 不返回 `extra_properties` → store 中为 `undefined`
+- 前端 fallback 到 `config.default_value`（如 `medium`）→ 用户看到默认值
+- 打开详情页后 `fetchIssue` 返回正确值并更新 store → 关闭详情后列表显示正确
 
 ## 修复方案
 
-1. 在 `addIssueToStore` 的 `issuePayload` 中添加 `extra_properties: issue?.extra_properties`
-2. 在 `IssueListDetailSerializer.to_representation` 的 data dict 中添加 `"extra_properties": instance.extra_properties`
+在四处遗漏位置各添加一行 `extra_properties` 字段。
