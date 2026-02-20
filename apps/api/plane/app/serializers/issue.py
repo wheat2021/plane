@@ -883,6 +883,7 @@ class IssueListDetailSerializer(serializers.Serializer):
             "module_ids": self.get_module_ids(instance),
             "label_ids": self.get_label_ids(instance),
             "assignee_ids": self.get_assignee_ids(instance),
+            "extra_properties": instance.extra_properties,
             "sub_issues_count": instance.sub_issues_count,
             "attachment_count": instance.attachment_count,
             "link_count": instance.link_count,
