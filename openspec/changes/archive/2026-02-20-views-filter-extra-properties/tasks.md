@@ -23,8 +23,8 @@
 
 ## 5. 验证与收尾
 
-- [ ] 5.1 在浏览器中打开项目 Views 的筛选器面板，确认已绑定 Extra Property 的选项出现在筛选器列表中
-- [ ] 5.2 选择一个 Extra Property 选项值进行筛选，确认工作项列表实时更新正确
-- [ ] 5.3 将包含 Extra Property 筛选条件的 View 保存后重新打开，确认筛选条件正确恢复
-- [ ] 5.4 同时设置 Extra Property 筛选和标准属性（如 state）筛选，确认 AND 组合逻辑正确
+- [x] 5.1 在浏览器中打开项目 Views 的筛选器面板，确认已绑定 Extra Property 的选项出现在筛选器列表中
+- [x] 5.2 选择一个 Extra Property 选项值进行筛选，确认工作项列表实时更新正确
+- [x] 5.3 将包含 Extra Property 筛选条件的 View 保存后重新打开，确认筛选条件正确恢复
+- [x] 5.4 同时设置 Extra Property 筛选和标准属性（如 state）筛选，确认 AND 组合逻辑正确
 - [x] 5.5 运行 TypeScript 类型检查：`pnpm check:types`，确认无新增类型错误
