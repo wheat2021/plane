@@ -1,12 +1,14 @@
-## 1. 修复前端 addIssueToStore
+## 1. 修复后端核心字段列表
 
-- [x] 1.1 [UPSTREAM-RISK] 在 `apps/web/core/store/issue/issue-details/issue.store.ts` 的 `addIssueToStore` 中添加 `extra_properties: issue?.extra_properties`
+- [x] 1.1 [UPSTREAM-RISK] 在 `apps/api/plane/utils/grouper.py` 的 `issue_on_results` 函数的 `required_fields` 中添加 `"extra_properties"`（这是列表视图分页查询的核心字段列表）
+- [x] 1.2 [UPSTREAM-RISK] 在 `apps/api/plane/app/serializers/issue.py` 的 `IssueListDetailSerializer.to_representation` 中添加 `"extra_properties": instance.extra_properties`
+- [x] 1.3 [UPSTREAM-RISK] 在 `apps/api/plane/app/views/issue/base.py` 的 `IssueViewSet.list` 的 `.values()` 中添加 `"extra_properties"`
+- [x] 1.4 [UPSTREAM-RISK] 在 `apps/api/plane/app/views/issue/base.py` 的 `IssueViewSet.create` 的 `.values()` 中添加 `"extra_properties"`
+- [x] 1.5 [UPSTREAM-RISK] 在 `apps/api/plane/app/views/issue/base.py` 的 `IssuePaginatedViewSet.list` 的 `required_fields` 中添加 `"extra_properties"`
 
-## 2. 修复后端列表接口
+## 2. 修复前端 store
 
-- [x] 2.1 [UPSTREAM-RISK] 在 `apps/api/plane/app/serializers/issue.py` 的 `IssueListDetailSerializer.to_representation` 中添加 `"extra_properties": instance.extra_properties`
-- [x] 2.2 [UPSTREAM-RISK] 在 `apps/api/plane/app/views/issue/base.py` 的 `IssueViewSet.list` 的 `.values()` 中添加 `"extra_properties"`
-- [x] 2.3 [UPSTREAM-RISK] 在 `apps/api/plane/app/views/issue/base.py` 的 `IssuePaginatedViewSet.list` 的 `required_fields` 中添加 `"extra_properties"`
+- [x] 2.1 [UPSTREAM-RISK] 在 `apps/web/core/store/issue/issue-details/issue.store.ts` 的 `addIssueToStore` 中添加 `extra_properties: issue?.extra_properties`
 
 ## 3. 验证
 

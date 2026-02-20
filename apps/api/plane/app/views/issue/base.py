@@ -439,6 +439,7 @@ class IssueViewSet(BaseViewSet):
                     "module_ids",
                     "label_ids",
                     "assignee_ids",
+                    "extra_properties",
                     "sub_issues_count",
                     "created_at",
                     "updated_at",
