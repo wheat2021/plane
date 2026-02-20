@@ -114,6 +114,39 @@ Spreadsheet 视图布局 SHALL 支持额外属性列。
 - **THEN** UI SHALL 回滚到之前的值
 - **AND** SHALL 显示错误提示
 
+### Requirement: API 响应包含 extra_properties 字段
+
+所有返回工作项数据的 API 接口 SHALL 在响应中包含 `extra_properties` 字段。
+
+#### Scenario: 列表接口返回 extra_properties
+
+- **WHEN** 前端请求工作项列表（含或不含 group_by 参数）
+- **THEN** 每个工作项对象 SHALL 包含 `extra_properties` 字段
+- **AND** 字段值为该工作项已设置的额外属性键值对（`Record<string, TExtraPropertyValue>`）
+- **AND** 未设置任何额外属性的工作项 SHALL 返回空对象 `{}`
+
+#### Scenario: 详情接口返回 extra_properties
+
+- **WHEN** 前端请求工作项详情
+- **THEN** 响应 SHALL 包含 `extra_properties` 字段
+- **AND** 前端 store 映射 SHALL 保留该字段
+
+### Requirement: 未设置属性的展示行为
+
+展示场景中，未设置的额外属性 SHALL 显示为空/未选择状态，而非默认值。
+
+#### Scenario: 未设置属性显示为空
+
+- **WHEN** 某工作项未设置某个额外属性的值
+- **THEN** 该属性 SHALL 显示为空/未选择状态
+- **AND** SHALL NOT 显示该属性的 `default_value`
+
+#### Scenario: default_value 仅用于创建预填充
+
+- **WHEN** 用户创建新工作项
+- **THEN** 额外属性的 `default_value` SHALL 作为表单预填充值
+- **AND** 此为 `default_value` 的唯一使用场景
+
 ### Requirement: 类型信息化 interface 扩展
 
 TypeScript 类型定义 SHALL 扩展以支持额外属性显示配置。
