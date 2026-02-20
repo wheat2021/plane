@@ -100,7 +100,7 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
         if (!config) return null;
 
         const isValid = validConfigIds.has(configId);
-        const currentValue = issue.extra_properties?.[config.key] ?? config.default_value ?? null;
+        const currentValue = issue.extra_properties?.[config.key] ?? null;
 
         if (!isValid) {
           const PropertyIcon = getPropertyIcon(config.type);

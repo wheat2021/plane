@@ -47,7 +47,7 @@ export const ExtraPropertyRenderer: FC<IExtraPropertyRenderer> = observer((props
     <>
       {configs.map((config) => {
         const Icon = getPropertyIcon(config.type);
-        const currentValue = values?.[config.key] ?? config.default_value ?? null;
+        const currentValue = values?.[config.key] ?? null;
 
         return (
           <SidebarPropertyListItem key={config.id} icon={Icon} label={config.label}>

@@ -445,7 +445,7 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
             // If validConfigIds is empty, it means the work item type has no restrictions
             // so all extra properties are available
             const isValid = validConfigIds.size === 0 || validConfigIds.has(configId);
-            const currentValue = issueDetail.extra_properties?.[config.key] ?? config.default_value ?? null;
+            const currentValue = issueDetail.extra_properties?.[config.key] ?? null;
 
             return (
               <td
