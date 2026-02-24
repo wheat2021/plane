@@ -52,13 +52,16 @@ Header (立即渲染)
 
 当前 `handleToggleFilter` 在 filter 为 undefined 时调用 `console.error`，但因为 `disabled` 后按钮不可点击，此错误路径不再可达。移除该日志，保持代码整洁。
 
-### Decision 3：将 `getFilter` 从 `computedFn` 改为普通方法
+### Decision 3：将 `getOrCreateFilter` 从 render 阶段移到 effect 阶段
 
-**问题**：`WorkItemFilterStore.getFilter` 使用 `computedFn`（mobx-utils），在 `keepAlive: false`（默认）模式下，当 observer 组件首次渲染时 `getFilter` 返回 `undefined`，`computedFn` 创建的 computed 可能在 React 18 并发渲染周期中被 `onBecomeUnobserved` 过早清理，导致后续 `filters.set()` 不会触发组件重渲染。
+**问题**：`WorkItemFilterRoot` 在 `useMemo` 中调用 `getOrCreateFilter`（MobX action），该 action 执行 `this.filters.set()` 修改 observable Map。这发生在 React render 阶段，导致：
 
-**选择**：将 `getFilter` 改为普通方法，直接返回 `this.filters.get(key)`。observer 组件在 render 中调用时，MobX 会直接追踪 observable Map 的 `get` 操作，当 Map 被 `set` 时可靠地触发重渲染。
+1. React 报错 `Cannot update a component while rendering a different component`（render 阶段级联更新）
+2. `computedFn` 的 computed 在 React 18 + `useSyncExternalStore` 下可能被过早清理，导致 `WorkItemFiltersToggle` 不会重渲染
 
-**拒绝替代方案**：给 `computedFn` 设置 `keepAlive: true` 会引入内存泄漏风险（每个 entityType+entityId 组合的 computed 永远不会被 GC）。
+**选择**：将 `getOrCreateFilter` 从 `useMemo` 改为 `useEffect` + `useState`。filter 实例在 commit 阶段（effect 中）创建，`filters.set()` 不在 render 阶段执行，MobX 正常通知 `computedFn` 的 computed 重新计算，`WorkItemFiltersToggle` 正确重渲染。
+
+**影响**：`WorkItemFilterRoot` 首次 render 时 filter 为 `undefined`，children 函数需要处理此情况。已确认所有调用方都已对 filter 做了 null/undefined check。
 
 ## Risks / Trade-offs
 

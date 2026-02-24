@@ -27,11 +27,7 @@ export const FiltersToggle = observer(function FiltersToggle<P extends TFilterPr
   const showAddFilterButton = !hasAnyConditions && !isFilterRowVisible && !hasUpdates;
 
   const handleToggleFilter = () => {
-    if (!filter) {
-      console.error("Filters toggle error - filter instance not available");
-      return;
-    }
-    filter.toggleVisibility();
+    filter?.toggleVisibility();
   };
 
   // Base classes when filter is active
@@ -77,6 +73,7 @@ export const FiltersToggle = observer(function FiltersToggle<P extends TFilterPr
       variant="secondary"
       icon={showFilterRowChangesPill ? FilterAppliedIcon : FilterIcon}
       onClick={handleToggleFilter}
+      disabled={!filter}
       className={buttonClassName}
       iconClassName={iconClassName}
     />
