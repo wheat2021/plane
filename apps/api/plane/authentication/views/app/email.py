@@ -1,3 +1,6 @@
+# Python imports
+import re
+
 # Django imports
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -60,23 +63,32 @@ class SignInAuthEndpoint(View):
             )
             return HttpResponseRedirect(url)
 
-        # Validate email
+        # Normalize email / employee ID
         email = email.strip().lower()
-        try:
-            validate_email(email)
-        except ValidationError:
-            exc = AuthenticationException(
-                error_code=AUTHENTICATION_ERROR_CODES["INVALID_EMAIL_SIGN_IN"],
-                error_message="INVALID_EMAIL_SIGN_IN",
-                payload={"email": str(email)},
-            )
-            params = exc.get_error_dict()
-            url = get_safe_redirect_url(
-                base_url=base_host(request=request, is_app=True),
-                next_path=next_path,
-                params=params,
-            )
-            return HttpResponseRedirect(url)
+
+        # Employee ID conversion: 6-digit number → email
+        if re.fullmatch(r"\d{6}", email):
+            employee_user = User.objects.filter(employee_id=email).first()
+            if employee_user:
+                email = employee_user.email
+            # If no match, keep as-is; the user-does-not-exist check below will fire
+
+        if not re.fullmatch(r"\d{6}", email):
+            try:
+                validate_email(email)
+            except ValidationError:
+                exc = AuthenticationException(
+                    error_code=AUTHENTICATION_ERROR_CODES["INVALID_EMAIL_SIGN_IN"],
+                    error_message="INVALID_EMAIL_SIGN_IN",
+                    payload={"email": str(email)},
+                )
+                params = exc.get_error_dict()
+                url = get_safe_redirect_url(
+                    base_url=base_host(request=request, is_app=True),
+                    next_path=next_path,
+                    params=params,
+                )
+                return HttpResponseRedirect(url)
 
         existing_user = User.objects.filter(email=email).first()
 
@@ -105,6 +117,14 @@ class SignInAuthEndpoint(View):
             user = provider.authenticate()
             # Login the user and record his device info
             user_login(request=request, user=user, is_app=True)
+            # Force password change: redirect to set-password page
+            if user.is_password_reset_required:
+                url = get_safe_redirect_url(
+                    base_url=base_host(request=request, is_app=True),
+                    next_path="/accounts/set-password",
+                    params={},
+                )
+                return HttpResponseRedirect(url)
             # Get the redirection path
             if next_path:
                 path = next_path

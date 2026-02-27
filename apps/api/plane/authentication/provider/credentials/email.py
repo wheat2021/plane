@@ -1,5 +1,6 @@
 # Python imports
 import os
+import re
 
 # Module imports
 from plane.authentication.adapter.credential import CredentialAdapter
@@ -36,6 +37,12 @@ class EmailProvider(CredentialAdapter):
             )
 
     def set_user_data(self):
+        # Employee ID conversion: 6-digit number → email (defensive layer)
+        if re.fullmatch(r"\d{6}", self.key):
+            employee_user = User.objects.filter(employee_id=self.key).first()
+            if employee_user:
+                self.key = employee_user.email
+
         if self.is_signup:
             # Check if the user already exists
             if User.objects.filter(email=self.key).exists():

@@ -1,5 +1,6 @@
 # Python imports
 import os
+import re
 
 # Django imports
 from django.core.validators import validate_email
@@ -63,15 +64,23 @@ class EmailCheckEndpoint(APIView):
         # Lower the email
         email = str(email).lower().strip()
 
-        # Validate email
-        try:
-            validate_email(email)
-        except ValidationError:
-            exc = AuthenticationException(
-                error_code=AUTHENTICATION_ERROR_CODES["INVALID_EMAIL"],
-                error_message="INVALID_EMAIL",
-            )
-            return Response(exc.get_error_dict(), status=status.HTTP_400_BAD_REQUEST)
+        # Employee ID conversion: 6-digit number → email
+        if re.fullmatch(r"\d{6}", email):
+            employee_user = User.objects.filter(employee_id=email).first()
+            if employee_user:
+                email = employee_user.email
+
+        # Validate email (skip for unresolved 6-digit employee IDs)
+        if not re.fullmatch(r"\d{6}", email):
+            try:
+                validate_email(email)
+            except ValidationError:
+                exc = AuthenticationException(
+                    error_code=AUTHENTICATION_ERROR_CODES["INVALID_EMAIL"],
+                    error_message="INVALID_EMAIL",
+                )
+                return Response(exc.get_error_dict(), status=status.HTTP_400_BAD_REQUEST)
+
         # Check if a user already exists with the given email
         existing_user = User.objects.filter(email=email).first()
 
