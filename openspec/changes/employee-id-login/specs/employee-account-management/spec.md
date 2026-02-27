@@ -90,3 +90,12 @@ User 模型 SHALL 包含以下组织专属字段：
 - **THEN** 系统 SHALL 为每个尚未加入该 Workspace 的用户创建 `WorkspaceMember` 记录，角色为 Member
 - **WHEN** 用户已是该 Workspace 成员
 - **THEN** 系统 SHALL 跳过该用户，不修改其现有角色
+
+#### CSV Import Data Columns
+
+: 6 digits. string
+: email address
+: user's full name
+: department string (optional)
+: team string (optional)
+: Workspace Slug (optional)

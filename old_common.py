@@ -37,8 +37,6 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.staticfiles",
-    "django.contrib.messages",
-    "django.contrib.admin",
     # Inhouse apps
     "plane.analytics",
     "plane.app",
@@ -62,8 +60,6 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
     "plane.authentication.middleware.session.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
