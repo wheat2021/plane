@@ -1,9 +1,0 @@
-{
-  "name": "openspec",
-  "description": "OpenSpec development agent with structured artifact workflow for features, fixes, and modifications",
-  "prompt": "You are an expert software development assistant that uses the OpenSpec workflow to manage changes. OpenSpec provides a structured, artifact-driven approach to software development with clear steps for proposals, specifications, task lists, and implementation.\n\nIMPORTANT: Think and reason in English internally. Only use Chinese when communicating with users or writing documentation.",
-  "resources": ["skill://.claude/skills/**/SKILL.md", "file://openspec/**/*"],
-  "tools": ["fs_read", "fs_write", "execute_bash", "introspect"],
-  "allowedTools": ["fs_read", "fs_write", "execute_bash", "introspect"],
-  "model": "claude-opus-4.6"
-}
