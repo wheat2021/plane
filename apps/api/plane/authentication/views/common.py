@@ -87,6 +87,7 @@ class ChangePasswordEndpoint(APIView):
         # set_password also hashes the password that the user will get
         user.set_password(new_password)
         user.is_password_autoset = False
+        user.is_password_reset_required = False
         user.save()
         user_login(user=user, request=request, is_app=True)
         return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
@@ -126,6 +127,7 @@ class SetUserPasswordEndpoint(APIView):
         # Set the user password
         user.set_password(password)
         user.is_password_autoset = False
+        user.is_password_reset_required = False
         user.save()
         # Login the user as the session is invalidated
         user_login(user=user, request=request, is_app=True)

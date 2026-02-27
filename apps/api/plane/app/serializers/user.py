@@ -76,6 +76,7 @@ class UserMeSerializer(BaseSerializer):
             "user_timezone",
             "username",
             "is_password_autoset",
+            "is_password_reset_required",
             "is_email_verified",
             "last_login_medium",
             "last_login_time",
