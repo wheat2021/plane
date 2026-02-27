@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}批量分配 Workspace{% endblock %}
+
+{% block content %}
+<h1>批量分配 Workspace</h1>
+
+<p>将以下 {{ users|length }} 个用户分配到指定 Workspace（已是成员的用户将自动跳过）：</p>
+<ul>
+  {% for user in users %}
+    <li>{{ user.display_name }} ({{ user.email }}{% if user.employee_id %}, 工号: {{ user.employee_id }}{% endif %})</li>
+  {% endfor %}
+</ul>
+
+<form method="post">
+  {% csrf_token %}
+  <table>
+    {{ form.as_table }}
+  </table>
+  <input type="submit" value="确认分配" class="default">
+  &nbsp;<a href="{% url 'admin:db_user_changelist' %}">取消</a>
+</form>
+{% endblock %}

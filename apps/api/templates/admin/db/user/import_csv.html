@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}批量导入员工账号（CSV）{% endblock %}
+
+{% block content %}
+<h1>批量导入员工账号（CSV）</h1>
+
+<p>CSV 文件首行为 header，列顺序：
+  <code>employee_id, email, display_name, department, team, workspace</code><br>
+  其中 <strong>employee_id、email、display_name</strong> 为必填，其余可留空。
+  <code>workspace</code> 填写 Workspace slug（不存在时跳过分配）。
+</p>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <table>
+    {{ form.as_table }}
+  </table>
+  <input type="submit" value="开始导入" class="default">
+  &nbsp;<a href="{% url 'admin:db_user_changelist' %}">取消</a>
+</form>
+{% endblock %}
