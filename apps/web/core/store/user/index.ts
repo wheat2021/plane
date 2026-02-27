@@ -155,7 +155,9 @@ export class UserStore implements IUserStore {
           if (this.data) set(this.data, userKey, data[userKey]);
         });
       }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const user = await this.userService.updateUser(data);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return user;
     } catch (error) {
       if (currentUserData) {
@@ -183,8 +185,11 @@ export class UserStore implements IUserStore {
     const currentUserData = cloneDeep(this.data);
     try {
       if (currentUserData && currentUserData.is_password_autoset && this.data) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const user = await this.authService.setPassword(csrfToken, { password: data.password });
         set(this.data, ["is_password_autoset"], false);
+        set(this.data, ["is_password_reset_required"], false);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return user;
       }
       return undefined;
@@ -208,8 +213,10 @@ export class UserStore implements IUserStore {
     }
   ): Promise<IUser | undefined> => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const user = await this.userService.changePassword(csrfToken, payload);
       if (this.data) set(this.data, ["is_password_autoset"], false);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return user;
     } catch (error) {
       console.log(error);
@@ -264,6 +271,7 @@ export class UserStore implements IUserStore {
     const userPermissions =
       (allWorkspaceProjectRoles &&
         Object.keys(allWorkspaceProjectRoles)
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
           .filter((key) => allWorkspaceProjectRoles[key] >= EUserPermissions.MEMBER)
           .reduce(
             (res: { [projectId: string]: number }, key: string) => ((res[key] = allWorkspaceProjectRoles[key]), res),

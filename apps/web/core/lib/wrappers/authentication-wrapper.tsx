@@ -113,7 +113,14 @@ export const AuthenticationWrapper = observer(function AuthenticationWrapper(pro
       router.push(`/${pathname ? `?next_path=${pathname}` : ``}`);
       return <></>;
     } else {
-      if (currentUser && !currentUser?.is_password_autoset && currentUserProfile?.id && isUserOnboard) {
+      // Redirect away only when password is already set AND no forced reset is pending
+      if (
+        currentUser &&
+        !currentUser?.is_password_autoset &&
+        !currentUser?.is_password_reset_required &&
+        currentUserProfile?.id &&
+        isUserOnboard
+      ) {
         const currentRedirectRoute = getWorkspaceRedirectionUrl();
         router.push(currentRedirectRoute);
         return <></>;

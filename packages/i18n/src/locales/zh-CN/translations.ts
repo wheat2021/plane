@@ -22,7 +22,7 @@ export default {
     common: {
       email: {
         label: "邮箱",
-        placeholder: "name@company.com",
+        placeholder: "邮箱 / 工号",
         errors: {
           required: "邮箱是必填项",
           invalid: "邮箱格式无效",

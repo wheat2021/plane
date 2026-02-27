@@ -1,4 +1,4 @@
-import type { FC, FormEvent } from "react";
+import type { FormEvent } from "react";
 import { useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react";
 // icons
@@ -22,9 +22,12 @@ export const AuthEmailForm = observer(function AuthEmailForm(props: TAuthEmailFo
   const [email, setEmail] = useState(defaultEmail);
   // plane hooks
   const { t } = useTranslation();
+  const isEmployeeId = /^\d{6}$/.test(email);
   const emailError = useMemo(
-    () => (email && !checkEmailValidity(email) ? { email: "auth.common.email.errors.invalid" } : undefined),
-    [email]
+    () =>
+      email && !isEmployeeId && !checkEmailValidity(email) ? { email: "auth.common.email.errors.invalid" } : undefined,
+     
+    [email, isEmployeeId]
   );
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -43,6 +46,7 @@ export const AuthEmailForm = observer(function AuthEmailForm(props: TAuthEmailFo
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     <form onSubmit={handleFormSubmit} className="space-y-4">
       <div className="space-y-1">
         <label htmlFor="email" className="text-13 text-tertiary font-medium">
@@ -63,12 +67,13 @@ export const AuthEmailForm = observer(function AuthEmailForm(props: TAuthEmailFo
           <Input
             id="email"
             name="email"
-            type="email"
+            type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t("auth.common.email.placeholder")}
             className={`disable-autofill-style h-10 w-full placeholder:text-placeholder autofill:bg-danger-primary border-0 focus:bg-none active:bg-transparent`}
             autoComplete="on"
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             ref={inputRef}
           />

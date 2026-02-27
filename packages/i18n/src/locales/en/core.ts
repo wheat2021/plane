@@ -23,7 +23,7 @@ export default {
     common: {
       email: {
         label: "Email",
-        placeholder: "name@company.com",
+        placeholder: "Email / Employee ID",
         errors: {
           required: "Email is required",
           invalid: "Email is invalid",
