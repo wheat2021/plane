@@ -111,6 +111,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     # masking
     masked_at = models.DateTimeField(null=True)
 
+    # organizational fields
+    employee_id = models.CharField(max_length=6, unique=True, null=True, blank=True, db_index=True)
+    department = models.CharField(max_length=255, null=True, blank=True)
+    team = models.CharField(max_length=255, null=True, blank=True)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
