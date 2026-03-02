@@ -57,14 +57,16 @@ INSTALLED_APPS = [
     "django_celery_beat",
 ]
 
+# Silence admin.E410: Plane uses a custom SessionMiddleware that is compatible
+SILENCED_SYSTEM_CHECKS = ["admin.E410"]
+
 # Middlewares
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
     "plane.authentication.middleware.session.SessionMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

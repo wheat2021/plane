@@ -1,6 +1,10 @@
 schema: spec-driven
 
 context: |
+  - Always think in English, but respond to user in Chinese.
+  - Write proposal.md, specs.md, design.md, tasks.md in chinese.
+  - Always use AskUserQuestion tool when asking for user's feedback.
+
   Fork of Plane (open-source project management platform).
   Branch: itemtype (custom features), preview (upstream sync).
   Never merge itemtype into preview; push directly to itemtype.
@@ -28,14 +32,12 @@ rules:
   proposal:
     - Always include upstream impact assessment
     - Flag any files that overlap with existing high-risk upstream diff areas
-    - Write in Chinese
-  specs:
-    - Write in Chinese
-  design:
-    - Write in Chinese
   tasks:
+    - First task is to commit spec documents. If there are lint issues, fix them first, then commit.
+    - Must create user verification tasks with clear verification methods.
     - Mark tasks that touch upstream-modified files with [UPSTREAM-RISK]
     - Include migration sequence number check as a task when DB changes are involved
+    - As the final agent task before user verification, organize all changes into multiple focused commits, each with a clear and concise Chinese summary as the commit message.
   apply:
     - Before starting, commit current changes with Chinese message summarizing the changes
   archive:
