@@ -1,4 +1,4 @@
-import IntlMessageFormat from "intl-messageformat";
+import { IntlMessageFormat } from "intl-messageformat";
 import { get, merge } from "lodash-es";
 import { makeAutoObservable, runInAction } from "mobx";
 // constants
@@ -6,7 +6,7 @@ import { FALLBACK_LANGUAGE, SUPPORTED_LANGUAGES, LANGUAGE_STORAGE_KEY, ETranslat
 // core translations imports
 import { enCore, locales } from "../locales";
 // types
-import type { TLanguage, ILanguageOption, ITranslations } from "../types";
+import type { TLanguage, ILanguageOption, ITranslations, ITranslation } from "../types";
 
 /**
  * Mobx store class for handling translations and language changes in the application
@@ -40,21 +40,28 @@ export class TranslationStore {
     // Initialize language
     this.initializeLanguage();
     // Load all the translations
-    this.loadTranslations();
+    void this.loadTranslations();
   }
 
   /** Initializes the language based on the local storage or browser language */
   private initializeLanguage() {
     if (typeof window === "undefined") return;
 
+    // 一次性迁移：将旧的英文默认设置重置为新的中文默认
+    const MIGRATION_KEY = "languageMigratedToZhCN";
+    if (!localStorage.getItem(MIGRATION_KEY)) {
+      localStorage.removeItem(LANGUAGE_STORAGE_KEY);
+      localStorage.setItem(MIGRATION_KEY, "1");
+    }
+
     const savedLocale = localStorage.getItem(LANGUAGE_STORAGE_KEY) as TLanguage;
     if (this.isValidLanguage(savedLocale)) {
-      this.setLanguage(savedLocale);
+      void this.setLanguage(savedLocale);
       return;
     }
 
     // Fallback to default language
-    this.setLanguage(FALLBACK_LANGUAGE);
+    void this.setLanguage(FALLBACK_LANGUAGE);
   }
 
   /** Loads the translations for the current language */
@@ -117,7 +124,7 @@ export class TranslationStore {
       const translations = await this.importLanguageFile(language);
       runInAction(() => {
         // Use lodash merge for deep merging
-        this.translations[language] = merge({}, this.coreTranslations[language] || {}, translations.default);
+        this.translations[language] = merge({}, this.coreTranslations[language] ?? {}, translations.default);
         // Add to loaded languages
         this.loadedLanguages.add(language);
         // Clear cache
@@ -153,10 +160,13 @@ export class TranslationStore {
       });
 
       const modules = await Promise.all(importPromises);
-      const merged = modules.reduce((acc: any, module: any) => merge(acc, module.default), {});
+      const merged = modules.reduce(
+        (acc: ITranslation, module: { default: ITranslation }) => merge(acc, module.default),
+        {} as ITranslation
+      );
       return { default: merged };
     } catch (error) {
-      throw new Error(`Failed to import and merge files for ${language}: ${error}`);
+      throw new Error(`Failed to import and merge files for ${language}: ${String(error)}`);
     }
   }
 
@@ -249,7 +259,7 @@ export class TranslationStore {
   async setLanguage(lng: TLanguage): Promise<void> {
     try {
       if (!this.isValidLanguage(lng)) {
-        throw new Error(`Invalid language: ${lng}`);
+        throw new Error(`Invalid language: ${String(lng)}`);
       }
 
       // Safeguard in case background loading failed
