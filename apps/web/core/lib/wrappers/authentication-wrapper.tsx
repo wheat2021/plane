@@ -84,6 +84,11 @@ export const AuthenticationWrapper = observer(function AuthenticationWrapper(pro
   if (pageType === EPageTypes.NON_AUTHENTICATED) {
     if (!currentUser?.id) return <>{children}</>;
     else {
+      // 强制改密优先于所有其他跳转
+      if (currentUser?.is_password_autoset || currentUser?.is_password_reset_required) {
+        router.push("/accounts/set-password");
+        return <></>;
+      }
       if (currentUserProfile?.id && isUserOnboard) {
         const currentRedirectRoute = getWorkspaceRedirectionUrl();
         router.push(currentRedirectRoute);
@@ -100,6 +105,11 @@ export const AuthenticationWrapper = observer(function AuthenticationWrapper(pro
       router.push(`/${pathname ? `?next_path=${pathname}` : ``}`);
       return <></>;
     } else {
+      // 强制改密优先于 onboarding
+      if (currentUser?.is_password_autoset || currentUser?.is_password_reset_required) {
+        router.push("/accounts/set-password");
+        return <></>;
+      }
       if (currentUser && currentUserProfile?.id && isUserOnboard) {
         const currentRedirectRoute = getWorkspaceRedirectionUrl();
         router.replace(currentRedirectRoute);
@@ -130,6 +140,11 @@ export const AuthenticationWrapper = observer(function AuthenticationWrapper(pro
 
   if (pageType === EPageTypes.AUTHENTICATED) {
     if (currentUser?.id) {
+      // 强制改密优先于访问任何认证页面
+      if (currentUser?.is_password_autoset || currentUser?.is_password_reset_required) {
+        router.push("/accounts/set-password");
+        return <></>;
+      }
       if (currentUserProfile && currentUserProfile?.id && isUserOnboard) return <>{children}</>;
       else {
         router.push(`/onboarding`);

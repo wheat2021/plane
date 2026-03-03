@@ -1,12 +1,11 @@
 "use client";
 
 // plane imports
-import { EAuthModes } from "@plane/constants";
 import { useSearchParams } from "next/navigation";
 // components
 import { ResetPasswordForm } from "@/components/account/auth-forms/reset-password";
 import { SetPasswordForm } from "@/components/account/auth-forms/set-password";
-import { AuthHeader } from "@/components/auth-screens/header";
+import { AuthHeaderBase } from "@/components/auth-screens/header";
 // helpers
 import { EPageTypes } from "@/helpers/authentication.helper";
 // layouts
@@ -25,7 +24,7 @@ function SetPasswordPage() {
     <DefaultLayout>
       <AuthenticationWrapper pageType={EPageTypes.SET_PASSWORD}>
         <div className="relative z-10 flex flex-col items-center w-screen h-screen overflow-hidden overflow-y-auto pt-6 pb-10 px-8">
-          <AuthHeader type={EAuthModes.SIGN_IN} />
+          <AuthHeaderBase pageTitle="设置密码" />
           {isEmailLinkFlow ? <ResetPasswordForm /> : <SetPasswordForm />}
         </div>
       </AuthenticationWrapper>
