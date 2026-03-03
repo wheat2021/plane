@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { observer } from "mobx-react";
 // plane imports
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
-import type { IWorkspaceMemberInvitation, TOnboardingStep, TOnboardingSteps, TUserProfile } from "@plane/types";
+import type { IWorkspaceMemberInvitation, TOnboardingStep } from "@plane/types";
 import { EOnboardingSteps } from "@plane/types";
 // hooks
-import { useWorkspace } from "@/hooks/store/use-workspace";
 import { useUser, useUserProfile } from "@/hooks/store/user";
 // local components
 import { OnboardingHeader } from "./header";
@@ -16,16 +15,10 @@ type Props = {
 };
 
 export const OnboardingRoot = observer(function OnboardingRoot({ invitations = [] }: Props) {
-  const [currentStep, setCurrentStep] = useState<TOnboardingStep>(EOnboardingSteps.PROFILE_SETUP);
+  const currentStep: TOnboardingStep = EOnboardingSteps.PROFILE_SETUP;
   // store hooks
   const { data: user } = useUser();
-  const { data: userProfile, updateUserProfile, finishUserOnboarding } = useUserProfile();
-  const { workspaces } = useWorkspace();
-
-  const workspacesList = Object.values(workspaces ?? {});
-
-  // Calculate total steps based on whether invitations are available
-  const hasInvitations = invitations.length > 0;
+  const { finishUserOnboarding } = useUserProfile();
 
   // complete onboarding
   const finishOnboarding = useCallback(async () => {
@@ -41,85 +34,20 @@ export const OnboardingRoot = observer(function OnboardingRoot({ invitations = [
     }
   }, [user, finishUserOnboarding]);
 
-  // handle step change
-  const stepChange = useCallback(
-    async (steps: Partial<TOnboardingSteps>) => {
-      if (!user) return;
-
-      const payload: Partial<TUserProfile> = {
-        onboarding_step: {
-          ...userProfile.onboarding_step,
-          ...steps,
-        },
-      };
-
-      await updateUserProfile(payload);
-    },
-    [user, userProfile, updateUserProfile]
-  );
-
+  // 内部部署：Profile Setup 完成后直接结束引导，跳过 Role/UseCase/Workspace/Invite 步骤
   const handleStepChange = useCallback(
-    (step: EOnboardingSteps, skipInvites?: boolean) => {
-      switch (step) {
-        case EOnboardingSteps.PROFILE_SETUP:
-          setCurrentStep(EOnboardingSteps.ROLE_SETUP);
-          break;
-        case EOnboardingSteps.ROLE_SETUP:
-          setCurrentStep(EOnboardingSteps.USE_CASE_SETUP);
-          break;
-        case EOnboardingSteps.USE_CASE_SETUP:
-          stepChange({ profile_complete: true });
-          if (workspacesList.length > 0) finishOnboarding();
-          else setCurrentStep(EOnboardingSteps.WORKSPACE_CREATE_OR_JOIN);
-          break;
-        case EOnboardingSteps.WORKSPACE_CREATE_OR_JOIN:
-          if (skipInvites) finishOnboarding();
-          else {
-            setCurrentStep(EOnboardingSteps.INVITE_MEMBERS);
-            stepChange({ workspace_create: true });
-          }
-          break;
-        case EOnboardingSteps.INVITE_MEMBERS:
-          stepChange({ workspace_invite: true });
-          finishOnboarding();
-          break;
+    (step: EOnboardingSteps) => {
+      if (step === EOnboardingSteps.PROFILE_SETUP) {
+        void finishOnboarding();
       }
     },
-    [stepChange, finishOnboarding, workspacesList]
+    [finishOnboarding]
   );
-
-  const updateCurrentStep = (step: EOnboardingSteps) => setCurrentStep(step);
-
-  useEffect(() => {
-    const handleInitialStep = () => {
-      if (
-        userProfile?.onboarding_step?.profile_complete &&
-        !userProfile?.onboarding_step?.workspace_create &&
-        !userProfile?.onboarding_step?.workspace_join
-      ) {
-        setCurrentStep(EOnboardingSteps.WORKSPACE_CREATE_OR_JOIN);
-      }
-      if (
-        userProfile?.onboarding_step?.profile_complete &&
-        userProfile?.onboarding_step?.workspace_create &&
-        !userProfile?.onboarding_step?.workspace_invite
-      ) {
-        setCurrentStep(EOnboardingSteps.INVITE_MEMBERS);
-      }
-    };
-
-    handleInitialStep();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div className="flex flex-col h-full">
       {/* Header with progress */}
-      <OnboardingHeader
-        currentStep={currentStep}
-        updateCurrentStep={updateCurrentStep}
-        hasInvitations={hasInvitations}
-      />
+      <OnboardingHeader />
 
       {/* Main content area */}
       <OnboardingStepRoot currentStep={currentStep} invitations={invitations} handleStepChange={handleStepChange} />

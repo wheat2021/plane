@@ -4,10 +4,6 @@ import type { IWorkspaceMemberInvitation } from "@plane/types";
 import { EOnboardingSteps } from "@plane/types";
 // local components
 import { ProfileSetupStep } from "./profile";
-import { RoleSetupStep } from "./role";
-import { InviteTeamStep } from "./team";
-import { UseCaseSetupStep } from "./usecase";
-import { WorkspaceSetupStep } from "./workspace";
 
 type Props = {
   currentStep: EOnboardingSteps;
@@ -15,18 +11,11 @@ type Props = {
   handleStepChange: (step: EOnboardingSteps, skipInvites?: boolean) => void;
 };
 
-function OnboardingStepContent({ currentStep, invitations, handleStepChange }: Props) {
+// 内部部署：仅保留 Profile Setup 步骤
+function OnboardingStepContent({ currentStep, handleStepChange }: Props) {
   switch (currentStep) {
     case EOnboardingSteps.PROFILE_SETUP:
       return <ProfileSetupStep handleStepChange={handleStepChange} />;
-    case EOnboardingSteps.ROLE_SETUP:
-      return <RoleSetupStep handleStepChange={handleStepChange} />;
-    case EOnboardingSteps.USE_CASE_SETUP:
-      return <UseCaseSetupStep handleStepChange={handleStepChange} />;
-    case EOnboardingSteps.WORKSPACE_CREATE_OR_JOIN:
-      return <WorkspaceSetupStep invitations={invitations ?? []} handleStepChange={handleStepChange} />;
-    case EOnboardingSteps.INVITE_MEMBERS:
-      return <InviteTeamStep handleStepChange={handleStepChange} />;
     default:
       return null;
   }

@@ -4,18 +4,18 @@
 
 ## 2. 默认语言改为中文
 
-- [ ] 2.1 [UPSTREAM-RISK] `packages/i18n/src/constants/language.ts`：将 `FALLBACK_LANGUAGE` 从 `"en"` 改为 `"zh-CN"`
+- [x] 2.1 [UPSTREAM-RISK] `packages/i18n/src/constants/language.ts`：将 `FALLBACK_LANGUAGE` 从 `"en"` 改为 `"zh-CN"`
 
 ## 3. Onboarding 流程精简
 
-- [ ] 3.1 [UPSTREAM-RISK] `apps/web/core/components/onboarding/root.tsx`：`handleStepChange` 中 `PROFILE_SETUP` case 改为直接调用 `finishOnboarding()`，删除 Role/UseCase/Workspace/Invite 的跳转逻辑
-- [ ] 3.2 [UPSTREAM-RISK] `apps/web/core/components/onboarding/steps/root.tsx`：删除 `ROLE_SETUP` 和 `USE_CASE_SETUP` 的 `case` 分支
-- [ ] 3.3 [UPSTREAM-RISK] `apps/web/core/components/onboarding/header.tsx`：进度条总步数固定为 `1`，`getCurrentStepNumber` 直接返回 `1`
+- [x] 3.1 [UPSTREAM-RISK] `apps/web/core/components/onboarding/root.tsx`：`handleStepChange` 中 `PROFILE_SETUP` case 改为直接调用 `finishOnboarding()`，删除 Role/UseCase/Workspace/Invite 的跳转逻辑
+- [x] 3.2 [UPSTREAM-RISK] `apps/web/core/components/onboarding/steps/root.tsx`：删除 `ROLE_SETUP` 和 `USE_CASE_SETUP` 的 `case` 分支
+- [x] 3.3 [UPSTREAM-RISK] `apps/web/core/components/onboarding/header.tsx`：进度条总步数固定为 `1`，`getCurrentStepNumber` 直接返回 `1`
 
 ## 4. 登录页清理
 
-- [ ] 4.1 [UPSTREAM-RISK] `apps/web/core/components/account/auth-forms/auth-root.tsx`：删除 `<TermsAndConditions>` 渲染调用及其 import
-- [ ] 4.2 [UPSTREAM-RISK] `apps/web/core/components/auth-screens/footer.tsx`：`AuthFooter` 函数返回 `null`
+- [x] 4.1 [UPSTREAM-RISK] `apps/web/core/components/account/auth-forms/auth-root.tsx`：删除 `<TermsAndConditions>` 渲染调用及其 import
+- [x] 4.2 [UPSTREAM-RISK] `apps/web/core/components/auth-screens/footer.tsx`：`AuthFooter` 函数返回 `null`
 
 ## 5. 提交代码
 
