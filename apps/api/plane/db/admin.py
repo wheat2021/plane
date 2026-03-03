@@ -127,8 +127,43 @@ class EmployeeUserAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.assign_workspace_view),
                 name="db_user_assign_workspace",
             ),
+            path(
+                "<path:object_id>/reset-password/",
+                self.admin_site.admin_view(self.reset_password_single_view),
+                name="db_user_reset_password",
+            ),
         ]
         return custom_urls + urls
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+        extra_context["reset_password_url"] = f"reset-password/"
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
+
+    # ------------------------------------------------------------------
+    # View: reset single user's password to employee_id
+    # ------------------------------------------------------------------
+
+    def reset_password_single_view(self, request, object_id):
+        try:
+            user = User.objects.get(pk=object_id)
+        except User.DoesNotExist:
+            self.message_user(request, "用户不存在。", messages.ERROR)
+            return redirect("admin:db_user_changelist")
+
+        if not user.employee_id:
+            self.message_user(request, f"{user.display_name or user.email} 无工号，无法重置密码。", messages.ERROR)
+        else:
+            user.set_password(user.employee_id)
+            user.is_password_autoset = True
+            user.is_password_reset_required = True
+            user.save(update_fields=["password", "is_password_autoset", "is_password_reset_required"])
+            self.message_user(
+                request,
+                f"已将 {user.display_name or user.email} 的密码重置为工号 {user.employee_id}，登录后需修改密码。",
+                messages.SUCCESS,
+            )
+        return redirect(f"../{object_id}/change/")
 
     # ------------------------------------------------------------------
     # Action: deactivate selected accounts
