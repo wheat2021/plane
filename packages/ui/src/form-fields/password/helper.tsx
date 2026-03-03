@@ -13,31 +13,31 @@ export const getStrengthInfo = (strength: E_PASSWORD_STRENGTH): StrengthInfo => 
   switch (strength) {
     case E_PASSWORD_STRENGTH.EMPTY:
       return {
-        message: "Please enter your password",
+        message: "请输入密码",
         textColor: "text-primary",
         activeFragments: 0,
       };
     case E_PASSWORD_STRENGTH.LENGTH_NOT_VALID:
       return {
-        message: "Password is too short",
+        message: "密码太短",
         textColor: "text-danger-primary",
         activeFragments: 1,
       };
     case E_PASSWORD_STRENGTH.STRENGTH_NOT_VALID:
       return {
-        message: "Password is weak",
+        message: "密码强度弱",
         textColor: "text-orange-500",
         activeFragments: 2,
       };
     case E_PASSWORD_STRENGTH.STRENGTH_VALID:
       return {
-        message: "Password is strong",
+        message: "密码强度高",
         textColor: "text-success-primary",
         activeFragments: 3,
       };
     default:
       return {
-        message: "Please enter your password",
+        message: "请输入密码",
         textColor: "text-primary",
         activeFragments: 0,
       };

@@ -51,31 +51,33 @@ export const ForgotPasswordForm = observer(function ForgotPasswordForm() {
   });
 
   const handleForgotPassword = async (formData: TForgotPasswordFormValues) => {
-    await authService
-      .sendResetPasswordLink({
-        email: formData.email,
-      })
-      .then(() => {
-        setToast({
-          type: TOAST_TYPE.SUCCESS,
-          title: t("auth.forgot_password.toast.success.title"),
-          message: t("auth.forgot_password.toast.success.message"),
-        });
-        setResendCodeTimer(30);
-      })
-      .catch((err) => {
-        setToast({
-          type: TOAST_TYPE.ERROR,
-          title: t("auth.forgot_password.toast.error.title"),
-          message: err?.error ?? t("auth.forgot_password.toast.error.message"),
-        });
+    try {
+      await authService.sendResetPasswordLink({ email: formData.email });
+      setToast({
+        type: TOAST_TYPE.SUCCESS,
+        title: t("auth.forgot_password.toast.success.title"),
+        message: t("auth.forgot_password.toast.success.message"),
       });
+      setResendCodeTimer(30);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? (err as Error & { error?: string }).error : undefined;
+      setToast({
+        type: TOAST_TYPE.ERROR,
+        title: t("auth.forgot_password.toast.error.title"),
+        message: message ?? t("auth.forgot_password.toast.error.message"),
+      });
+    }
   };
 
   return (
     <FormContainer>
-      <AuthFormHeader title="Reset password" description="Regain access to your account." />
-      <form onSubmit={handleSubmit(handleForgotPassword)} className="space-y-4">
+      <AuthFormHeader title="重置密码" description="找回您的账号访问权限。" />
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(handleForgotPassword)(e);
+        }}
+        className="space-y-4"
+      >
         <div className="space-y-1">
           <label className="text-13 font-medium text-tertiary" htmlFor="email">
             {t("auth.common.email.label")}

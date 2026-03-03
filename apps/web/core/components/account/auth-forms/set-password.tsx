@@ -60,7 +60,7 @@ export const SetPasswordForm = observer(function SetPasswordForm() {
 
   useEffect(() => {
     if (csrfToken === undefined)
-      authService.requestCSRFToken().then((data) => data?.csrf_token && setCsrfToken(data.csrf_token));
+      void authService.requestCSRFToken().then((data) => data?.csrf_token && setCsrfToken(data.csrf_token));
   }, [csrfToken]);
 
   const handleShowPassword = (key: keyof typeof showPassword) =>
@@ -105,8 +105,13 @@ export const SetPasswordForm = observer(function SetPasswordForm() {
 
   return (
     <FormContainer>
-      <AuthFormHeader title="Set password" description="Create a new password." />
-      <form className="space-y-4" onSubmit={(e) => handleSubmit(e)}>
+      <AuthFormHeader title="设置密码" description="创建新密码。" />
+      <form
+        className="space-y-4"
+        onSubmit={(e) => {
+          void handleSubmit(e);
+        }}
+      >
         <div className="space-y-1">
           <label className="text-13 text-tertiary font-medium" htmlFor="email">
             {t("auth.common.email.label")}
@@ -142,7 +147,6 @@ export const SetPasswordForm = observer(function SetPasswordForm() {
               onFocus={() => setIsPasswordInputFocused(true)}
               onBlur={() => setIsPasswordInputFocused(false)}
               autoComplete="on"
-              autoFocus
             />
             {showPassword.password ? (
               <EyeOff

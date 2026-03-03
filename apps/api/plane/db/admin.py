@@ -108,7 +108,7 @@ class EmployeeUserAdmin(admin.ModelAdmin):
         ),
     )
 
-    actions = ["deactivate_accounts", "import_csv_action", "assign_workspace_action"]
+    actions = ["deactivate_accounts", "reset_password_to_employee_id", "import_csv_action", "assign_workspace_action"]
 
     # ------------------------------------------------------------------
     # Custom admin URLs (for intermediate pages)
@@ -138,6 +138,28 @@ class EmployeeUserAdmin(admin.ModelAdmin):
     def deactivate_accounts(self, request, queryset):
         updated = queryset.update(is_active=False)
         self.message_user(request, f"已停用 {updated} 个账号。", messages.SUCCESS)
+
+    # ------------------------------------------------------------------
+    # Action: reset password to employee_id
+    # ------------------------------------------------------------------
+
+    @admin.action(description="重置密码为工号（需登录后修改）")
+    def reset_password_to_employee_id(self, request, queryset):
+        success = 0
+        skipped = 0
+        for user in queryset:
+            if not user.employee_id:
+                skipped += 1
+                continue
+            user.set_password(user.employee_id)
+            user.is_password_autoset = True
+            user.is_password_reset_required = True
+            user.save(update_fields=["password", "is_password_autoset", "is_password_reset_required"])
+            success += 1
+        msg = f"已重置 {success} 个账号的密码为工号。"
+        if skipped:
+            msg += f"跳过 {skipped} 个无工号账号。"
+        self.message_user(request, msg, messages.SUCCESS)
 
     # ------------------------------------------------------------------
     # Action: redirect to CSV import page
@@ -267,7 +289,7 @@ class EmployeeUserAdmin(admin.ModelAdmin):
     @admin.action(description="分配到 Workspace（跳转到确认页面）")
     def assign_workspace_action(self, request, queryset):
         # Store selected IDs in session
-        request.session["assign_workspace_user_ids"] = list(queryset.values_list("id", flat=True).order_by())
+        request.session["assign_workspace_user_ids"] = [str(uid) for uid in queryset.values_list("id", flat=True).order_by()]
         return redirect("admin:db_user_assign_workspace")
 
     # ------------------------------------------------------------------
