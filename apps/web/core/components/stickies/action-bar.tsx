@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { StickyNote as StickyIcon } from "lucide-react";
 // plane hooks
 import { useOutsideClickDetector } from "@plane/hooks";
+import { useTranslation } from "@plane/i18n";
 // plane ui
 import { RecentStickyIcon, StickyNoteIcon, PlusIcon, CloseIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
@@ -25,6 +26,7 @@ export const StickyActionBar = observer(function StickyActionBar() {
   const [showRecentSticky, setShowRecentSticky] = useState(false);
   // navigation
   const { workspaceSlug } = useParams();
+  const { t } = useTranslation();
   // refs
   const ref = useRef(null);
   // store hooks
@@ -94,7 +96,7 @@ export const StickyActionBar = observer(function StickyActionBar() {
             </button>
           </Tooltip>
         )}
-        <Tooltip tooltipContent="Add sticky" isMobile={false} position="left">
+        <Tooltip tooltipContent={t("stickies.add")} isMobile={false} position="left">
           <button
             className="btn btn--icon rounded-full w-10 h-10 flex items-center justify-center shadow-sm bg-surface-1"
             onClick={() => {

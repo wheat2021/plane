@@ -2804,6 +2804,10 @@ export default {
   enter_number_of_projects: "Enter number of projects",
   pin: "Pin",
   unpin: "Unpin",
+  more: "More",
+  hide: "Hide",
+  archived: "Archived",
+  add_page: "Add page",
   sidebar: {
     stickies: "Stickies",
     your_work: "Your work",

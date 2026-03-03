@@ -4,6 +4,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 // constants
 import { EPageAccess } from "@plane/constants";
 // plane types
+import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
 import { PageIcon } from "@plane/propel/icons";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
@@ -26,6 +27,7 @@ export const PagesListHeader = observer(function PagesListHeader() {
   const { workspaceSlug, projectId } = useParams();
   const searchParams = useSearchParams();
   const pageType = searchParams.get("type");
+  const { t } = useTranslation();
   // store hooks
   const { currentProjectDetails, loader } = useProject();
   const { canCurrentUserCreatePage, createPage } = usePageStore(EPageStoreType.PROJECT);
@@ -60,7 +62,7 @@ export const PagesListHeader = observer(function PagesListHeader() {
           <Breadcrumbs.Item
             component={
               <BreadcrumbLink
-                label="Pages"
+                label={t("sidebar.pages")}
                 href={`/${workspaceSlug}/projects/${currentProjectDetails?.id}/pages/`}
                 icon={<PageIcon className="h-4 w-4 text-tertiary" />}
                 isLast
@@ -73,7 +75,7 @@ export const PagesListHeader = observer(function PagesListHeader() {
       {canCurrentUserCreatePage && (
         <Header.RightItem>
           <Button variant="primary" size="lg" onClick={handleCreatePage} loading={isCreatingPage}>
-            {isCreatingPage ? "Adding" : "Add page"}
+            {isCreatingPage ? t("adding") : t("add_page")}
           </Button>
         </Header.RightItem>
       )}

@@ -1,6 +1,7 @@
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
 // plane imports
+import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
 import { RecentStickyIcon } from "@plane/propel/icons";
 import { Breadcrumbs, Header } from "@plane/ui";
@@ -14,6 +15,7 @@ import { useSticky } from "@/hooks/use-stickies";
 export const WorkspaceStickyHeader = observer(function WorkspaceStickyHeader() {
   const { workspaceSlug } = useParams();
   // hooks
+  const { t } = useTranslation();
   const { creatingSticky, toggleShowNewSticky } = useSticky();
   const { stickyOperations } = useStickyOperations({ workspaceSlug: workspaceSlug?.toString() });
 
@@ -26,7 +28,7 @@ export const WorkspaceStickyHeader = observer(function WorkspaceStickyHeader() {
               <Breadcrumbs.Item
                 component={
                   <BreadcrumbLink
-                    label={`Stickies`}
+                    label={t("sidebar.stickies")}
                     icon={<RecentStickyIcon className="size-5 rotate-90 text-secondary" />}
                   />
                 }
@@ -46,7 +48,7 @@ export const WorkspaceStickyHeader = observer(function WorkspaceStickyHeader() {
             }}
             loading={creatingSticky}
           >
-            Add sticky
+            {t("stickies.add")}
           </Button>
         </Header.RightItem>
       </Header>

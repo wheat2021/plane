@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
+import { useTranslation } from "@plane/i18n";
 import { ArchiveIcon, CycleIcon, ModuleIcon, WorkItemsIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
 import { EIssuesStoreType } from "@plane/types";
@@ -21,23 +22,23 @@ type TProps = {
 
 const PROJECT_ARCHIVES_BREADCRUMB_LIST: {
   [key: string]: {
-    label: string;
+    i18n_key: string;
     href: string;
     icon: React.FC<React.SVGAttributes<SVGElement> & { className?: string }>;
   };
 } = {
   issues: {
-    label: "Work items",
+    i18n_key: "sidebar.work_items",
     href: "/issues",
     icon: WorkItemsIcon,
   },
   cycles: {
-    label: "Cycles",
+    i18n_key: "sidebar.cycles",
     href: "/cycles",
     icon: CycleIcon,
   },
   modules: {
-    label: "Modules",
+    i18n_key: "sidebar.modules",
     href: "/modules",
     icon: ModuleIcon,
   },
@@ -48,6 +49,7 @@ export const ProjectArchivesHeader = observer(function ProjectArchivesHeader(pro
   // router
   const router = useAppRouter();
   const { workspaceSlug, projectId } = useParams();
+  const { t } = useTranslation();
   // store hooks
   const {
     issues: { getGroupIssueCount },
@@ -71,7 +73,7 @@ export const ProjectArchivesHeader = observer(function ProjectArchivesHeader(pro
               component={
                 <BreadcrumbLink
                   href={`/${workspaceSlug}/projects/${projectId}/archives/issues`}
-                  label="Archives"
+                  label={t("archives")}
                   icon={<ArchiveIcon className="h-4 w-4 text-tertiary" />}
                 />
               }
@@ -80,7 +82,7 @@ export const ProjectArchivesHeader = observer(function ProjectArchivesHeader(pro
               <Breadcrumbs.Item
                 component={
                   <BreadcrumbLink
-                    label={activeTabBreadcrumbDetail.label}
+                    label={t(activeTabBreadcrumbDetail.i18n_key)}
                     icon={<activeTabBreadcrumbDetail.icon className="h-4 w-4 text-tertiary" />}
                   />
                 }
@@ -90,7 +92,7 @@ export const ProjectArchivesHeader = observer(function ProjectArchivesHeader(pro
           {activeTab === "issues" && issueCount && issueCount > 0 ? (
             <Tooltip
               isMobile={isMobile}
-              tooltipContent={`There are ${issueCount} ${issueCount > 1 ? "work items" : "work item"} in project's archived`}
+              tooltipContent={`${t("issue.label", { count: issueCount })} ${issueCount}`}
               position="bottom"
             >
               <span className="cursor-default flex items-center text-center justify-center px-2.5 py-0.5 flex-shrink-0 bg-accent-primary/20 text-accent-primary text-11 font-semibold rounded-xl">

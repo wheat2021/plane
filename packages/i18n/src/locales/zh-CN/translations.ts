@@ -15,6 +15,7 @@ export default {
     intake: "收集",
     drafts: "草稿",
     favorites: "收藏",
+    stickies: "便签",
     pro: "专业版",
     upgrade: "升级",
   },
@@ -2621,4 +2622,8 @@ export default {
     close_button: "关闭导航面板",
     outline_floating_button: "打开大纲",
   },
+  more: "更多",
+  hide: "收起",
+  archived: "已归档",
+  add_page: "添加页面",
 } as const;

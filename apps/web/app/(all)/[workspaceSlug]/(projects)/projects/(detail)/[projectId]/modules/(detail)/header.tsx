@@ -11,6 +11,7 @@ import {
   EUserPermissionsLevel,
   WORK_ITEM_TRACKER_ELEMENTS,
 } from "@plane/constants";
+import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
 import { ModuleIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
@@ -53,6 +54,7 @@ export const ModuleIssuesHeader = observer(function ModuleIssuesHeader() {
   const router = useAppRouter();
   const { workspaceSlug, projectId, moduleId: routerModuleId } = useParams();
   const moduleId = routerModuleId ? routerModuleId.toString() : undefined;
+  const { t } = useTranslation();
   // hooks
   const { isMobile } = usePlatformOS();
   // store hooks
@@ -141,7 +143,7 @@ export const ModuleIssuesHeader = observer(function ModuleIssuesHeader() {
               <Breadcrumbs.Item
                 component={
                   <BreadcrumbLink
-                    label="Modules"
+                    label={t("sidebar.modules")}
                     href={`/${workspaceSlug}/projects/${projectId}/modules/`}
                     icon={<ModuleIcon className="h-4 w-4 text-tertiary" />}
                     isLast
