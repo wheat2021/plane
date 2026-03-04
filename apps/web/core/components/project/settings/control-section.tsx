@@ -2,13 +2,14 @@ import { useState } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "react-router";
 // plane imports
-import { PROJECT_TRACKER_ELEMENTS } from "@plane/constants";
+import { EUserPermissions, EUserPermissionsLevel, PROJECT_TRACKER_ELEMENTS } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
 // components
 import { SettingsBoxedControlItem } from "@/components/settings/boxed-control-item";
 // hooks
 import { useProject } from "@/hooks/store/use-project";
+import { useUserPermissions } from "@/hooks/store/user";
 // local imports
 import { ArchiveRestoreProjectModal } from "../archive-restore-modal";
 import { DeleteProjectModal } from "../delete-project-modal";
@@ -28,8 +29,11 @@ export const GeneralProjectSettingsControlSection = observer(function GeneralPro
   const { workspaceSlug } = useParams();
   // store hooks
   const { currentProjectDetails } = useProject();
+  const { allowPermissions } = useUserPermissions();
   // translation
   const { t } = useTranslation();
+  // derived values
+  const canArchiveProject = allowPermissions([EUserPermissions.ADMIN], EUserPermissionsLevel.WORKSPACE, workspaceSlug);
 
   if (!currentProjectDetails) return null;
 
@@ -51,16 +55,18 @@ export const GeneralProjectSettingsControlSection = observer(function GeneralPro
       />
       <div className="rounded-lg border border-subtle bg-layer-2">
         {/* Project Selector */}
-        <SettingsBoxedControlItem
-          className="rounded-b-none border-0 border-b"
-          title={t("archive")}
-          description="Archiving a project will unlist your project from your side navigation although you will still be able to access it from your projects page. You can restore the project or delete it whenever you want."
-          control={
-            <Button variant="secondary" onClick={() => setArchiveProject(true)}>
-              {t("archive")}
-            </Button>
-          }
-        />
+        {canArchiveProject && (
+          <SettingsBoxedControlItem
+            className="rounded-b-none border-0 border-b"
+            title={t("archive")}
+            description="Archiving a project will unlist your project from your side navigation although you will still be able to access it from your projects page. You can restore the project or delete it whenever you want."
+            control={
+              <Button variant="secondary" onClick={() => setArchiveProject(true)}>
+                {t("archive")}
+              </Button>
+            }
+          />
+        )}
         {/* Format Selector */}
         <SettingsBoxedControlItem
           className="rounded-t-none border-0"
