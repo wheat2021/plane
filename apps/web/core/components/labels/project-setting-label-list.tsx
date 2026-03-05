@@ -36,7 +36,7 @@ export const ProjectSettingsLabelList = observer(function ProjectSettingsLabelLi
   const { projectLabels, updateLabelPosition, projectLabelsTree, createLabel, updateLabel } = useLabel();
   const { allowPermissions } = useUserPermissions();
   // derived values
-  const isEditable = allowPermissions([EUserPermissions.ADMIN], EUserPermissionsLevel.PROJECT);
+  const isEditable = allowPermissions([EUserPermissions.ADMIN, EUserPermissions.MEMBER], EUserPermissionsLevel.PROJECT);
   const labelOperationsCallbacks: TLabelOperationsCallbacks = {
     createLabel: (data: Partial<IIssueLabel>) => createLabel(workspaceSlug?.toString(), projectId?.toString(), data),
     updateLabel: (labelId: string, data: Partial<IIssueLabel>) =>
@@ -55,7 +55,7 @@ export const ProjectSettingsLabelList = observer(function ProjectSettingsLabelLi
     dropAtEndOfList: boolean
   ) => {
     if (workspaceSlug && projectId) {
-      updateLabelPosition(
+      void updateLabelPosition(
         workspaceSlug?.toString(),
         projectId?.toString(),
         draggingLabelId,
@@ -108,14 +108,18 @@ export const ProjectSettingsLabelList = observer(function ProjectSettingsLabelLi
               assetClassName="size-20"
               title={t("settings_empty_state.labels.title")}
               description={t("settings_empty_state.labels.description")}
-              actions={[
-                {
-                  label: t("settings_empty_state.labels.cta_primary"),
-                  onClick: () => {
-                    newLabel();
-                  },
-                },
-              ]}
+              actions={
+                isEditable
+                  ? [
+                      {
+                        label: t("settings_empty_state.labels.cta_primary"),
+                        onClick: () => {
+                          newLabel();
+                        },
+                      },
+                    ]
+                  : []
+              }
               align="start"
               rootClassName="py-20"
             />
