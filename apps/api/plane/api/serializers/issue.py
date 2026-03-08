@@ -5,6 +5,8 @@ from django.db import IntegrityError
 
 #  Third party imports
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 
 # Module imports
 from plane.db.models import (
@@ -60,6 +62,21 @@ class IssueSerializer(BaseSerializer):
     )
     type_id = serializers.PrimaryKeyRelatedField(
         source="type", queryset=IssueType.objects.all(), required=False, allow_null=True
+    )
+
+    @extend_schema_field(OpenApiTypes.OBJECT)
+    def get_extra_properties(self, obj):
+        return obj.extra_properties
+
+    extra_properties = serializers.JSONField(
+        required=False,
+        allow_null=True,
+        help_text=(
+            "Custom key-value extension fields for the work item. "
+            "Keys must match the extra-property keys configured in workspace settings. "
+            "The server stores any provided keys without schema validation — "
+            "only keys configured in workspace settings will be rendered in the UI."
+        ),
     )
 
     class Meta:

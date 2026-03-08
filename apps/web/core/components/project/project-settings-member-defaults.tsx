@@ -107,16 +107,17 @@ export const ProjectSettingsMemberDefaults = observer(function ProjectSettingsMe
           type: TOAST_TYPE.SUCCESS,
           message: t("project_settings.general.toast.success"),
         });
+        return;
       })
       .catch((err) => {
         console.error(err);
       });
   };
 
-  const toggleGuestViewAllIssues = async (value: boolean) => {
+  const toggleGuestViewAllIssues = (value: boolean) => {
     if (!workspaceSlug || !projectId) return;
 
-    updateProject(workspaceSlug, projectId, {
+    void updateProject(workspaceSlug, projectId, {
       guest_view_all_features: value,
     })
       .then(() => {
@@ -125,6 +126,7 @@ export const ProjectSettingsMemberDefaults = observer(function ProjectSettingsMe
           type: TOAST_TYPE.SUCCESS,
           message: t("project_settings.general.toast.success"),
         });
+        return;
       })
       .catch((err) => {
         console.error(err);
@@ -133,7 +135,10 @@ export const ProjectSettingsMemberDefaults = observer(function ProjectSettingsMe
 
   return (
     <div className="flex flex-col gap-y-6 my-6">
-      <DefaultSettingItem title="Project Lead" description="Select the project lead for the project.">
+      <DefaultSettingItem
+        title={t("project_settings.members.project_lead")}
+        description={t("project_settings.members.select_project_lead_description")}
+      >
         {currentProjectDetails ? (
           <Controller
             control={control}
@@ -142,7 +147,7 @@ export const ProjectSettingsMemberDefaults = observer(function ProjectSettingsMe
               <MemberSelect
                 value={value}
                 onChange={(val: string) => {
-                  submitChanges({ project_lead: val });
+                  void submitChanges({ project_lead: val });
                 }}
                 isDisabled={!isAdmin}
               />
@@ -154,7 +159,10 @@ export const ProjectSettingsMemberDefaults = observer(function ProjectSettingsMe
           </Loader>
         )}
       </DefaultSettingItem>
-      <DefaultSettingItem title="Default Assignee" description="Select the default assignee for the project.">
+      <DefaultSettingItem
+        title={t("project_settings.members.default_assignee")}
+        description={t("project_settings.members.select_default_assignee_description")}
+      >
         {currentProjectDetails ? (
           <Controller
             control={control}
@@ -163,7 +171,7 @@ export const ProjectSettingsMemberDefaults = observer(function ProjectSettingsMe
               <MemberSelect
                 value={value}
                 onChange={(val: string) => {
-                  submitChanges({ default_assignee: val });
+                  void submitChanges({ default_assignee: val });
                 }}
                 isDisabled={!isAdmin}
               />
@@ -177,13 +185,13 @@ export const ProjectSettingsMemberDefaults = observer(function ProjectSettingsMe
       </DefaultSettingItem>
       {currentProjectDetails && (
         <DefaultSettingItem
-          title="Guest access"
-          description="This will allow guests to have view access to all the project work items."
+          title={t("project_settings.members.guest_super_permissions.title")}
+          description={t("project_settings.members.guest_super_permissions.sub_heading")}
         >
           <div className="flex items-center justify-end">
             <ToggleSwitch
               value={!!currentProjectDetails?.guest_view_all_features}
-              onChange={() => toggleGuestViewAllIssues(!currentProjectDetails?.guest_view_all_features)}
+              onChange={() => void toggleGuestViewAllIssues(!currentProjectDetails?.guest_view_all_features)}
               disabled={!isAdmin}
               size="sm"
             />

@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
@@ -102,7 +101,7 @@ export const CustomizeNavigationDialog = observer(function CustomizeNavigationDi
   // Handle checkbox toggle
   const handleWorkspaceItemToggle = useCallback(
     (itemKey: string, checked: boolean) => {
-      toggleWorkspaceItem(itemKey, checked);
+      void toggleWorkspaceItem(itemKey, checked);
     },
     [toggleWorkspaceItem]
   );
@@ -114,7 +113,7 @@ export const CustomizeNavigationDialog = observer(function CustomizeNavigationDi
         key: item.key,
         sortOrder: index,
       }));
-      updateWorkspaceItemOrder(itemsWithOrder);
+      void updateWorkspaceItemOrder(itemsWithOrder);
     },
     [updateWorkspaceItemOrder]
   );
@@ -126,7 +125,7 @@ export const CustomizeNavigationDialog = observer(function CustomizeNavigationDi
         key: item.key,
         sortOrder: index,
       }));
-      updatePersonalItemOrder(itemsWithOrder);
+      void updatePersonalItemOrder(itemsWithOrder);
     },
     [updatePersonalItemOrder]
   );
@@ -168,7 +167,7 @@ export const CustomizeNavigationDialog = observer(function CustomizeNavigationDi
     // If valid number, enforce minimum of 1
     if (!isNaN(numValue)) {
       const validValue = Math.max(1, numValue);
-      updateLimitedProjectsCount(validValue);
+      void updateLimitedProjectsCount(validValue);
     }
   };
 
@@ -179,10 +178,7 @@ export const CustomizeNavigationDialog = observer(function CustomizeNavigationDi
         <div className="flex justify-between px-6 pt-4">
           <div>
             <h2 className="text-18 font-semibold text-primary">{t("customize_navigation")}</h2>
-            <p className="mt-1 text-13 text-tertiary">
-              Selected items will always stay visible in your sidebar. You can still find the others anytime from the
-              More menu. These changes are personal to you and won&apos;t affect anyone else on your workspace.
-            </p>
+            <p className="mt-1 text-13 text-tertiary">{t("customize_navigation_description")}</p>
           </div>
           <button
             onClick={onClose}
@@ -209,7 +205,7 @@ export const CustomizeNavigationDialog = observer(function CustomizeNavigationDi
                     <GripVertical className="size-4 text-placeholder cursor-grab active:cursor-grabbing transition-colors" />
                     <Checkbox
                       checked={!!personalPreferences.items[item.key]?.enabled}
-                      onChange={(e) => togglePersonalItem(item.key, e.target.checked)}
+                      onChange={(e) => void togglePersonalItem(item.key, e.target.checked)}
                     />
                     <div className="flex items-center gap-2 flex-1">
                       {getSidebarNavigationItemIcon(item.key)}
@@ -267,14 +263,13 @@ export const CustomizeNavigationDialog = observer(function CustomizeNavigationDi
                       name="navigation-mode"
                       value="ACCORDION"
                       checked={projectPreferences.navigationMode === "ACCORDION"}
-                      onChange={() => updateNavigationMode("ACCORDION")}
+                      onChange={() => void updateNavigationMode("ACCORDION")}
                       className="size-4 text-accent-primary focus:ring-accent-strong mt-1"
+                      aria-label={t("accordion_navigation_control")}
                     />
                     <div className="flex-1">
                       <div className="text-13 text-primary">{t("accordion_navigation_control")}</div>
-                      <div className="text-11 text-secondary">
-                        Feature tabs will appear as nested items under project and acts as accordion.
-                      </div>
+                      <div className="text-11 text-secondary">{t("accordion_navigation_description")}</div>
                     </div>
                   </label>
 
@@ -284,14 +279,13 @@ export const CustomizeNavigationDialog = observer(function CustomizeNavigationDi
                       name="navigation-mode"
                       value="TABBED"
                       checked={projectPreferences.navigationMode === "TABBED"}
-                      onChange={() => updateNavigationMode("TABBED")}
+                      onChange={() => void updateNavigationMode("TABBED")}
+                      aria-label={t("horizontal_navigation_bar")}
                       className="size-4 text-accent-primary focus:ring-accent-strong mt-1"
                     />
                     <div className="flex-1">
                       <div className="text-13 text-primary">{t("horizontal_navigation_bar")}</div>
-                      <div className="text-11 text-secondary">
-                        Feature tabs will appear as horizontal tabs inside a project.
-                      </div>
+                      <div className="text-11 text-secondary">{t("horizontal_navigation_description")}</div>
                     </div>
                   </label>
                 </div>
@@ -301,7 +295,7 @@ export const CustomizeNavigationDialog = observer(function CustomizeNavigationDi
                   <label className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-surface-2 cursor-pointer">
                     <Checkbox
                       checked={projectPreferences.showLimitedProjects}
-                      onChange={(e) => updateShowLimitedProjects(e.target.checked)}
+                      onChange={(e) => void updateShowLimitedProjects(e.target.checked)}
                     />
                     <span className="text-13 text-primary">{t("show_limited_projects_on_sidebar")}</span>
                   </label>

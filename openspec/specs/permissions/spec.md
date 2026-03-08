@@ -36,8 +36,10 @@ Plane 采用基于角色的访问控制（RBAC），分为两个独立层级：*
 #### Scenario: Workspace Member 能力
 
 - **WHEN** 用户持有 Workspace Member 角色
-- **THEN** 该用户 SHALL 能够创建和修改 Project
+- **THEN** 该用户 SHALL 能够修改 Project（设置、成员管理等，须持有对应 Project 的 Admin 角色）
 - **THEN** 该用户 SHALL 能够查看 Analytics 和 Archives
+- **THEN** 该用户 SHALL NOT 能够创建 Project
+- **THEN** 该用户 SHALL NOT 能够归档或恢复归档 Project
 - **THEN** 该用户 SHALL NOT 能够修改 billing、webhooks 等敏感 Workspace 设置
 - **THEN** 该用户 SHALL NOT 能够修改其他成员的 Workspace 角色
 

@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import { Fragment, useMemo, useState } from "react";
 import { observer } from "mobx-react";
 import { useSearchParams } from "next/navigation";
@@ -57,6 +56,7 @@ export const ModuleAnalyticsProgress = observer(function ModuleAnalyticsProgress
   const isCurrentProjectEstimateEnabled = projectId && areEstimateEnabledByProjectId(projectId) ? true : false;
   const estimateDetails =
     isCurrentProjectEstimateEnabled && currentActiveEstimateId && estimateById(currentActiveEstimateId);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
   const isCurrentEstimateTypeIsPoints = estimateDetails && estimateDetails?.type === EEstimateSystem.POINTS;
   const completedIssues = moduleDetails?.completed_issues || 0;
   const totalIssues = moduleDetails?.total_issues || 0;
@@ -106,7 +106,7 @@ export const ModuleAnalyticsProgress = observer(function ModuleAnalyticsProgress
         await fetchModuleDetails(workspaceSlug, projectId, moduleId);
       }
       setLoader(false);
-    } catch (error) {
+    } catch (_error) {
       setLoader(false);
       setPlotType(moduleId, plotType);
     }
@@ -122,7 +122,7 @@ export const ModuleAnalyticsProgress = observer(function ModuleAnalyticsProgress
             {isModuleDateValid ? (
               <div className="relative w-full flex justify-between items-center gap-2">
                 <Disclosure.Button className="relative flex items-center gap-2 w-full">
-                  <div className="font-medium text-secondary text-13">{t("progress")}</div>
+                  <div className="font-medium text-secondary text-13">{t("common.progress")}</div>
                   {progressHeaderPercentage > 0 && (
                     <div className="flex h-5 w-9 items-center justify-center rounded-sm bg-amber-500/20 text-11 font-medium text-amber-500">{`${progressHeaderPercentage}%`}</div>
                   )}

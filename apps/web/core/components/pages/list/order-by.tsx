@@ -1,8 +1,9 @@
-import { ArrowDownWideNarrow, ArrowUpWideNarrow, Check } from "lucide-react";
+import { ArrowDownWideNarrow, ArrowUpWideNarrow } from "lucide-react";
 // plane imports
+import { useTranslation } from "@plane/i18n";
 import { getButtonStyling } from "@plane/propel/button";
 // types
-import { CheckIcon, ChevronDownIcon } from "@plane/propel/icons";
+import { CheckIcon } from "@plane/propel/icons";
 import type { TPageFiltersSortBy, TPageFiltersSortKey } from "@plane/types";
 import { CustomMenu } from "@plane/ui";
 
@@ -14,15 +15,16 @@ type Props = {
 
 const PAGE_SORTING_KEY_OPTIONS: {
   key: TPageFiltersSortKey;
-  label: string;
+  i18nKey: string;
 }[] = [
-  { key: "name", label: "Name" },
-  { key: "created_at", label: "Date created" },
-  { key: "updated_at", label: "Date modified" },
+  { key: "name", i18nKey: "name" },
+  { key: "created_at", i18nKey: "common.sort.created_on" },
+  { key: "updated_at", i18nKey: "common.sort.updated_on" },
 ];
 
 export function PageOrderByDropdown(props: Props) {
   const { onChange, sortBy, sortKey } = props;
+  const { t } = useTranslation();
 
   const orderByDetails = PAGE_SORTING_KEY_OPTIONS.find((option) => sortKey === option.key);
   const isDescending = sortBy === "desc";
@@ -32,7 +34,7 @@ export function PageOrderByDropdown(props: Props) {
       customButton={
         <div className={getButtonStyling("secondary", "lg")}>
           {!isDescending ? <ArrowUpWideNarrow className="size-3 " /> : <ArrowDownWideNarrow className="size-3 " />}
-          {orderByDetails?.label}
+          {orderByDetails ? t(orderByDetails.i18nKey) : ""}
         </div>
       }
       placement="bottom-end"
@@ -49,7 +51,7 @@ export function PageOrderByDropdown(props: Props) {
             })
           }
         >
-          {option.label}
+          {t(option.i18nKey)}
           {sortKey === option.key && <CheckIcon className="h-3 w-3" />}
         </CustomMenu.MenuItem>
       ))}
@@ -63,7 +65,7 @@ export function PageOrderByDropdown(props: Props) {
             });
         }}
       >
-        Ascending
+        {t("common.sort.asc")}
         {!isDescending && <CheckIcon className="h-3 w-3" />}
       </CustomMenu.MenuItem>
       <CustomMenu.MenuItem
@@ -75,7 +77,7 @@ export function PageOrderByDropdown(props: Props) {
             });
         }}
       >
-        Descending
+        {t("common.sort.desc")}
         {isDescending && <CheckIcon className="h-3 w-3" />}
       </CustomMenu.MenuItem>
     </CustomMenu>

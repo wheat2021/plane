@@ -749,6 +749,9 @@ export default {
     x_axis: "X-axis",
     y_axis: "Y-axis",
     metric: "Metric",
+    date: "Date",
+    current_work_items: "Current work items",
+    ideal_work_items: "Ideal work items",
   },
   form: {
     title: {
@@ -1740,9 +1743,11 @@ export default {
     members: {
       label: "Members",
       project_lead: "Project lead",
+      select_project_lead_description: "Select the project lead for the project.",
       default_assignee: "Default assignee",
+      select_default_assignee_description: "Select the default assignee for the project.",
       guest_super_permissions: {
-        title: "Grant view access to all work items for guest users:",
+        title: "Guest access",
         sub_heading: "This will allow guests to have view access to all the project work items.",
       },
       invite_members: {
@@ -2797,9 +2802,13 @@ export default {
   },
   // Navigation customization
   customize_navigation: "Customize navigation",
+  customize_navigation_description:
+    "Selected items will always stay visible in your sidebar. You can still find the others anytime from the More menu. These changes are personal to you and won't affect anyone else on your workspace.",
   personal: "Personal",
   accordion_navigation_control: "Accordion sidebar navigation",
+  accordion_navigation_description: "Feature tabs will appear as nested items under project and acts as accordion.",
   horizontal_navigation_bar: "Tabbed Navigation",
+  horizontal_navigation_description: "Feature tabs will appear as horizontal tabs inside a project.",
   show_limited_projects_on_sidebar: "Show limited projects on sidebar",
   enter_number_of_projects: "Enter number of projects",
   pin: "Pin",

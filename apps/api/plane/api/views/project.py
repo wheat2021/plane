@@ -18,7 +18,6 @@ from drf_spectacular.utils import OpenApiResponse, OpenApiRequest
 from plane.db.models import (
     Cycle,
     Intake,
-    ProjectUserProperty,
     Module,
     Project,
     DeployBoard,
@@ -58,6 +57,7 @@ from plane.utils.openapi import (
     DELETED_RESPONSE,
     ARCHIVED_RESPONSE,
     UNARCHIVED_RESPONSE,
+    ADMIN_ONLY_RESPONSE,
 )
 
 
@@ -198,6 +198,7 @@ class ProjectListCreateAPIEndpoint(BaseAPIView):
                 response=ProjectSerializer,
                 examples=[PROJECT_EXAMPLE],
             ),
+            403: ADMIN_ONLY_RESPONSE,
             404: WORKSPACE_NOT_FOUND_RESPONSE,
             409: PROJECT_NAME_TAKEN_RESPONSE,
         },

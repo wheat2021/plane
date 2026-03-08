@@ -1,6 +1,6 @@
 export default {
   sidebar: {
-    projects: "项目",
+    projects: "空间",
     pages: "页面",
     new_work_item: "新工作项",
     home: "主页",
@@ -10,8 +10,8 @@ export default {
     views: "视图",
     analytics: "分析",
     work_items: "工作项",
-    cycles: "周期",
-    modules: "模块",
+    cycles: "迭代",
+    modules: "项目",
     intake: "收集",
     drafts: "草稿",
     favorites: "收藏",
@@ -269,24 +269,24 @@ export default {
   general_settings: "常规设置",
   sign_out: "退出登录",
   signing_out: "正在退出登录",
-  active_cycles: "活动周期",
-  active_cycles_description: "监控各个项目的周期，跟踪高优先级工作项，并关注需要注意的周期。",
-  on_demand_snapshots_of_all_your_cycles: "所有周期的实时快照",
+  active_cycles: "活动迭代",
+  active_cycles_description: "监控各个空间的迭代，跟踪高优先级工作项，并关注需要注意的迭代。",
+  on_demand_snapshots_of_all_your_cycles: "所有迭代的实时快照",
   upgrade: "升级",
-  "10000_feet_view": "所有活动周期的全局视图。",
-  "10000_feet_view_description": "放大视角，一次性查看所有项目中正在进行的周期，而不是在每个项目中逐个查看周期。",
-  get_snapshot_of_each_active_cycle: "获取每个活动周期的快照。",
+  "10000_feet_view": "所有活动迭代的全局视图。",
+  "10000_feet_view_description": "放大视角，一次性查看所有空间中正在进行的迭代，而不是在每个空间中逐个查看迭代。",
+  get_snapshot_of_each_active_cycle: "获取每个活动迭代的快照。",
   get_snapshot_of_each_active_cycle_description:
-    "跟踪所有活动周期的高级指标，查看其进度状态，并了解与截止日期相关的范围。",
+    "跟踪所有活动迭代的高级指标，查看其进度状态，并了解与截止日期相关的范围。",
   compare_burndowns: "比较燃尽图。",
-  compare_burndowns_description: "通过查看每个周期的燃尽报告，监控每个团队的表现。",
+  compare_burndowns_description: "通过查看每个迭代的燃尽报告，监控每个团队的表现。",
   quickly_see_make_or_break_issues: "快速查看关键工作项。",
   quickly_see_make_or_break_issues_description:
-    "预览每个周期中与截止日期相关的高优先级工作项。一键查看每个周期的所有工作项。",
-  zoom_into_cycles_that_need_attention: "关注需要注意的周期。",
-  zoom_into_cycles_that_need_attention_description: "一键调查任何不符合预期的周期状态。",
+    "预览每个迭代中与截止日期相关的高优先级工作项。一键查看每个迭代的所有工作项。",
+  zoom_into_cycles_that_need_attention: "关注需要注意的迭代。",
+  zoom_into_cycles_that_need_attention_description: "一键调查任何不符合预期的迭代状态。",
   stay_ahead_of_blockers: "提前预防阻塞。",
-  stay_ahead_of_blockers_description: "发现从一个项目到另一个项目的挑战，并查看从其他视图中不易发现的周期间依赖关系。",
+  stay_ahead_of_blockers_description: "发现跨空间的挑战，并查看从其他视图中不易发现的迭代间依赖关系。",
   analytics: "分析",
   workspace_invites: "工作区邀请",
   enter_god_mode: "进入管理员模式",
@@ -294,7 +294,7 @@ export default {
   new_issue: "新工作项",
   your_work: "我的工作",
   drafts: "草稿",
-  projects: "项目",
+  projects: "空间",
   views: "视图",
   workspace: "工作区",
   archives: "归档",
@@ -313,30 +313,30 @@ export default {
   favorite_removed_successfully: "收藏移除成功",
   failed_to_create_favorite: "创建收藏失败",
   failed_to_rename_favorite: "重命名收藏失败",
-  project_link_copied_to_clipboard: "项目链接已复制到剪贴板",
+  project_link_copied_to_clipboard: "空间链接已复制到剪贴板",
   link_copied: "链接已复制",
-  add_project: "添加项目",
-  create_project: "创建项目",
-  failed_to_remove_project_from_favorites: "无法从收藏中移除项目。请重试。",
-  project_created_successfully: "项目创建成功",
-  project_created_successfully_description: "项目创建成功。您现在可以开始添加工作项了。",
-  project_name_already_taken: "项目名称已被使用。",
-  project_identifier_already_taken: "项目标识符已被使用。",
-  project_cover_image_alt: "项目封面图片",
+  add_project: "添加空间",
+  create_project: "创建空间",
+  failed_to_remove_project_from_favorites: "无法从收藏中移除空间。请重试。",
+  project_created_successfully: "空间创建成功",
+  project_created_successfully_description: "空间创建成功。您现在可以开始添加工作项了。",
+  project_name_already_taken: "空间名称已被使用。",
+  project_identifier_already_taken: "空间标识符已被使用。",
+  project_cover_image_alt: "空间封面图片",
   name_is_required: "名称为必填项",
   title_should_be_less_than_255_characters: "标题应少于255个字符",
-  project_name: "项目名称",
-  project_id_must_be_at_least_1_character: "项目ID至少需要1个字符",
-  project_id_must_be_at_most_5_characters: "项目ID最多只能有5个字符",
-  project_id: "项目ID",
-  project_id_tooltip_content: "帮助您唯一标识项目中的工作项。最多10个字符。",
+  project_name: "空间名称",
+  project_id_must_be_at_least_1_character: "空间ID至少需要1个字符",
+  project_id_must_be_at_most_5_characters: "空间ID最多只能有5个字符",
+  project_id: "空间ID",
+  project_id_tooltip_content: "帮助您唯一标识空间中的工作项。最多10个字符。",
   description_placeholder: "描述",
   only_alphanumeric_non_latin_characters_allowed: "仅允许字母数字和非拉丁字符。",
-  project_id_is_required: "项目ID为必填项",
+  project_id_is_required: "空间ID为必填项",
   project_id_allowed_char: "仅允许字母数字和非拉丁字符。",
-  project_id_min_char: "项目ID至少需要1个字符",
-  project_id_max_char: "项目ID最多只能有10个字符",
-  project_description_placeholder: "输入项目描述",
+  project_id_min_char: "空间ID至少需要1个字符",
+  project_id_max_char: "空间ID最多只能有10个字符",
+  project_description_placeholder: "输入空间描述",
   select_network: "选择网络",
   lead: "负责人",
   date_range: "日期范围",
@@ -345,39 +345,39 @@ export default {
   accessible_only_by_invite: "仅受邀者可访问",
   anyone_in_the_workspace_except_guests_can_join: "除访客外的工作区所有成员都可以加入",
   creating: "创建中",
-  creating_project: "正在创建项目",
-  adding_project_to_favorites: "正在将项目添加到收藏",
-  project_added_to_favorites: "项目已添加到收藏",
-  couldnt_add_the_project_to_favorites: "无法将项目添加到收藏。请重试。",
-  removing_project_from_favorites: "正在从收藏中移除项目",
-  project_removed_from_favorites: "项目已从收藏中移除",
-  couldnt_remove_the_project_from_favorites: "无法从收藏中移除项目。请重试。",
+  creating_project: "正在创建空间",
+  adding_project_to_favorites: "正在将空间添加到收藏",
+  project_added_to_favorites: "空间已添加到收藏",
+  couldnt_add_the_project_to_favorites: "无法将空间添加到收藏。请重试。",
+  removing_project_from_favorites: "正在从收藏中移除空间",
+  project_removed_from_favorites: "空间已从收藏中移除",
+  couldnt_remove_the_project_from_favorites: "无法从收藏中移除空间。请重试。",
   add_to_favorites: "添加到收藏",
   remove_from_favorites: "从收藏中移除",
-  publish_project: "发布项目",
+  publish_project: "发布空间",
   publish: "发布",
   copy_link: "复制链接",
-  leave_project: "离开项目",
-  join_the_project_to_rearrange: "加入项目以重新排列",
+  leave_project: "离开空间",
+  join_the_project_to_rearrange: "加入空间以重新排列",
   drag_to_rearrange: "拖动以重新排列",
   congrats: "恭喜！",
-  open_project: "打开项目",
+  open_project: "打开空间",
   issues: "工作项",
-  cycles: "周期",
-  modules: "模块",
+  cycles: "迭代",
+  modules: "项目",
   pages: "页面",
   intake: "收集",
   time_tracking: "时间跟踪",
   work_management: "工作管理",
-  projects_and_issues: "项目和工作项",
-  projects_and_issues_description: "在此项目中开启或关闭这些功能。",
-  cycles_description: "为每个项目设置时间框，并根据需要调整周期。一个周期可以是两周，下一个周期是一周。",
-  modules_description: "将工作组织为子项目，并指定专门的负责人和受理人。",
+  projects_and_issues: "空间和工作项",
+  projects_and_issues_description: "在此空间中开启或关闭这些功能。",
+  cycles_description: "为每个空间设置迭代时间框，每次迭代约三周，支持灵活调整。",
+  modules_description: "将工作组织成以特定业务目标为中心的项目，并指定专门的负责人和受理人。",
   views_description: "保存自定义排序、筛选和显示选项，或与团队共享。",
   pages_description: "创建和编辑自由格式的内容：笔记、文档，任何内容。",
   intake_description: "允许非成员提交 Bug、反馈和建议，且不会干扰您的工作流程。",
-  time_tracking_description: "记录在工作项和项目上花费的时间。",
-  work_management_description: "轻松管理您的工作和项目。",
+  time_tracking_description: "记录在工作项和空间上花费的时间。",
+  work_management_description: "轻松管理您的工作和空间。",
   documentation: "文档",
   message_support: "联系支持",
   contact_sales: "联系销售",
@@ -426,9 +426,9 @@ export default {
   updating: "更新中",
   create_new_issue: "创建新工作项",
   editor_is_not_ready_to_discard_changes: "编辑器尚未准备好放弃更改",
-  failed_to_move_issue_to_project: "无法将工作项移动到项目",
+  failed_to_move_issue_to_project: "无法将工作项移动到空间",
   create_more: "创建更多",
-  add_to_project: "添加到项目",
+  add_to_project: "添加到空间",
   discard: "放弃",
   duplicate_issue_found: "发现重复的工作项",
   duplicate_issues_found: "发现重复的工作项",
@@ -467,7 +467,7 @@ export default {
   delete: "删除",
   deleting: "删除中",
   make_a_copy: "创建副本",
-  move_to_project: "移动到项目",
+  move_to_project: "移动到空间",
   good: "早上好",
   morning: "早上好",
   afternoon: "下午好",
@@ -553,8 +553,8 @@ export default {
       quickstart_guide: "快速入门指南",
       not_right_now: "暂时不要",
       create_project: {
-        title: "创建项目",
-        description: "在Plane中，大多数事情都从项目开始。",
+        title: "创建空间",
+        description: "在这里管理您的工作空间。",
         cta: "开始使用",
       },
       invite_team: {
@@ -589,14 +589,14 @@ export default {
     recents: {
       title: "最近",
       empty: {
-        project: "访问项目后，您的最近项目将显示在这里。",
+        project: "访问空间后，您的最近空间将显示在这里。",
         page: "访问页面后，您的最近页面将显示在这里。",
         issue: "访问工作项后，您的最近工作项将显示在这里。",
-        default: "您还没有任何最近项目。",
+        default: "您还没有任何最近记录。",
       },
       filters: {
         all: "所有",
-        projects: "项目",
+        projects: "空间",
         pages: "页面",
         issues: "工作项",
       },
@@ -630,7 +630,7 @@ export default {
   },
   common: {
     all: "全部",
-    no_items_in_this_group: "此组中没有项目",
+    no_items_in_this_group: "此组中没有内容",
     drop_here_to_move: "拖放到此处以移动",
     states: "状态",
     state: "状态",
@@ -638,12 +638,12 @@ export default {
     state_group: "状态组",
     priorities: "优先级",
     priority: "优先级",
-    team_project: "团队项目",
-    project: "项目",
-    cycle: "周期",
-    cycles: "周期",
-    module: "模块",
-    modules: "模块",
+    team_project: "团队空间",
+    project: "空间",
+    cycle: "迭代",
+    cycles: "迭代",
+    module: "项目",
+    modules: "项目",
     labels: "标签",
     label: "标签",
     assignees: "负责人",
@@ -688,11 +688,11 @@ export default {
     general: "常规",
     features: "功能",
     automation: "自动化",
-    project_name: "项目名称",
-    project_id: "项目ID",
-    project_timezone: "项目时区",
+    project_name: "空间名称",
+    project_id: "空间ID",
+    project_timezone: "空间时区",
     created_on: "创建于",
-    update_project: "更新项目",
+    update_project: "更新空间",
     identifier_already_exists: "标识符已存在",
     add_more: "添加更多",
     defaults: "默认值",
@@ -836,7 +836,7 @@ export default {
     select: "选择",
     upgrade: "升级",
     add_seats: "添加席位",
-    projects: "项目",
+    projects: "空间",
     workspace: "工作区",
     workspaces: "工作区",
     team: "团队",
@@ -892,11 +892,15 @@ export default {
     paused: "暂停",
     no_of: "{entity} 的数量",
     resolved: "已解决",
+    overview: "概览",
   },
   chart: {
     x_axis: "X轴",
     y_axis: "Y轴",
     metric: "指标",
+    date: "日期",
+    current_work_items: "当前工作项",
+    ideal_work_items: "理想工作项",
   },
   form: {
     title: {
@@ -960,9 +964,9 @@ export default {
       press_enter: "按'Enter'添加另一个工作项",
       label: "添加工作项",
       cycle: {
-        failed: "无法将工作项添加到周期。请重试。",
-        success: "{count, plural, one {工作项} other {工作项}}已成功添加到周期。",
-        loading: "正在将{count, plural, one {工作项} other {工作项}}添加到周期",
+        failed: "无法将工作项添加到迭代。请重试。",
+        success: "{count, plural, one {工作项} other {工作项}}已成功添加到迭代。",
+        loading: "正在将{count, plural, one {工作项} other {工作项}}添加到迭代",
       },
       assignee: "添加负责人",
       start_date: "添加开始日期",
@@ -976,14 +980,14 @@ export default {
     remove: {
       label: "移除工作项",
       cycle: {
-        loading: "正在从周期中移除工作项",
-        success: "已成功从周期中移除工作项。",
-        failed: "无法从周期中移除工作项。请重试。",
+        loading: "正在从迭代中移除工作项",
+        success: "已成功从迭代中移除工作项。",
+        failed: "无法从迭代中移除工作项。请重试。",
       },
       module: {
-        loading: "正在从模块中移除工作项",
-        success: "已成功从模块中移除工作项。",
-        failed: "无法从模块中移除工作项。请重试。",
+        loading: "正在从项目中移除工作项",
+        success: "已成功从项目中移除工作项。",
+        failed: "无法从项目中移除工作项。请重试。",
       },
       parent: {
         label: "移除父工作项",
@@ -1083,7 +1087,7 @@ export default {
       confirm_message: "您确定要归档此工作项吗？所有已归档的工作项稍后可以恢复。",
       success: {
         label: "归档成功",
-        message: "您的归档可以在项目归档中找到。",
+        message: "您的归档可以在空间归档中找到。",
       },
       failed: {
         message: "无法归档工作项。请重试。",
@@ -1092,7 +1096,7 @@ export default {
     restore: {
       success: {
         title: "恢复成功",
-        message: "您的工作项可以在项目工作项中找到。",
+        message: "您的工作项可以在空间工作项中找到。",
       },
       failed: {
         message: "无法恢复工作项。请重试。",
@@ -1206,9 +1210,9 @@ export default {
       },
     },
     errors: {
-      snooze_permission: "只有项目管理员可以暂停/取消暂停工作项",
-      accept_permission: "只有项目管理员可以接受工作项",
-      decline_permission: "只有项目管理员可以拒绝工作项",
+      snooze_permission: "只有空间管理员可以暂停/取消暂停工作项",
+      accept_permission: "只有空间管理员可以接受工作项",
+      decline_permission: "只有空间管理员可以拒绝工作项",
     },
     actions: {
       accept: "接受",
@@ -1219,7 +1223,7 @@ export default {
       delete: "删除",
       open: "打开工作项",
       mark_as_duplicate: "标记为重复",
-      move: "将 {value} 移至项目工作项",
+      move: "将 {value} 移至空间工作项",
     },
     source: {
       "in-app": "应用内",
@@ -1310,14 +1314,14 @@ export default {
   workspace_dashboard: {
     empty_state: {
       general: {
-        title: "项目、活动和指标概览",
+        title: "空间、活动和指标概览",
         description:
-          "欢迎使用 Plane，我们很高兴您能来到这里。创建您的第一个项目并跟踪您的工作项，这个页面将转变为帮助您进展的空间。管理员还将看到帮助团队进展的项目。",
+          "欢迎来到 Plane。创建您的第一个空间并开始跟踪工作项，这个页面将展示您的工作全貌。管理员还将看到团队各空间的进展。",
         primary_button: {
-          text: "构建您的第一个项目",
+          text: "构建您的第一个空间",
           comic: {
-            title: "在 Plane 中一切都从项目开始",
-            description: "项目可以是产品路线图、营销活动或新车发布。",
+            title: "在 Plane 中一切从空间开始",
+            description: "空间是团队协作的基础单元，用于组织工作项、迭代和业务项目。",
           },
         },
       },
@@ -1329,10 +1333,10 @@ export default {
     open_tasks: "总开放任务",
     error: "获取数据时出现错误。",
     work_items_closed_in: "已关闭的工作项",
-    selected_projects: "已选择的项目",
+    selected_projects: "已选择的空间",
     total_members: "总成员数",
-    total_cycles: "总周期数",
-    total_modules: "总模块数",
+    total_cycles: "总迭代数",
+    total_modules: "总项目数",
     pending_work_items: {
       title: "待处理工作项",
       empty_state: "同事的待处理工作项分析将显示在这里。",
@@ -1368,13 +1372,13 @@ export default {
       },
       general: {
         title: "跟踪进度、工作量和分配。发现趋势，消除障碍，加速工作进展",
-        description: "查看范围与需求、估算和范围蔓延。获取团队成员和团队的性能，确保您的项目按时运行。",
+        description: "查看范围与需求、估算和范围蔓延。获取团队成员和团队的性能，确保您的空间按时运行。",
         primary_button: {
-          text: "开始您的第一个项目",
+          text: "开始您的第一个空间",
           comic: {
-            title: "分析功能在周期 + 模块中效果最佳",
+            title: "分析功能在迭代 + 项目中效果最佳",
             description:
-              "首先，将您的问题在周期中进行时间限制，如果可能的话，将跨越多个周期的问题分组到模块中。在左侧导航中查看这两个功能。",
+              "首先，将工作项在迭代中进行时间限制，如果可能的话，将跨越多个迭代的工作项分组到项目中。在左侧导航中查看这两个功能。",
           },
         },
       },
@@ -1382,14 +1386,14 @@ export default {
     created_vs_resolved: "已创建 vs 已解决",
     customized_insights: "自定义洞察",
     backlog_work_items: "待办的{entity}",
-    active_projects: "活跃项目",
+    active_projects: "活跃空间",
     trend_on_charts: "图表趋势",
-    all_projects: "所有项目",
-    summary_of_projects: "项目概览",
-    project_insights: "项目洞察",
+    all_projects: "所有空间",
+    summary_of_projects: "空间概览",
+    project_insights: "空间洞察",
     started_work_items: "已开始的{entity}",
     total_work_items: "{entity}总数",
-    total_projects: "项目总数",
+    total_projects: "空间总数",
     total_admins: "管理员总数",
     total_users: "用户总数",
     total_intake: "总收入",
@@ -1399,9 +1403,9 @@ export default {
     total: "{entity}总数",
   },
   workspace_projects: {
-    label: "{count, plural, one {项目} other {项目}}",
+    label: "{count, plural, one {空间} other {空间}}",
     create: {
-      label: "添加项目",
+      label: "添加空间",
     },
     network: {
       private: {
@@ -1415,8 +1419,8 @@ export default {
     },
     error: {
       permission: "您没有执行此操作的权限。",
-      cycle_delete: "删除周期失败",
-      module_delete: "删除模块失败",
+      cycle_delete: "删除迭代失败",
+      module_delete: "删除项目失败",
       issue_delete: "删除工作项失败",
     },
     state: {
@@ -1433,7 +1437,7 @@ export default {
       members_length: "成员数量",
     },
     scope: {
-      my_projects: "我的项目",
+      my_projects: "我的空间",
       archived_projects: "已归档",
     },
     common: {
@@ -1441,34 +1445,34 @@ export default {
     },
     empty_state: {
       general: {
-        title: "没有活动项目",
+        title: "没有活动空间",
         description:
-          "将每个项目视为目标导向工作的父级。项目是工作项、周期和模块所在的地方，与您的同事一起帮助您实现目标。创建新项目或筛选已归档的项目。",
+          "空间是工作项、迭代和业务项目所在的地方，与您的同事一起协作实现目标。创建新空间或筛选已归档的空间。",
         primary_button: {
-          text: "开始您的第一个项目",
+          text: "开始您的第一个空间",
           comic: {
-            title: "在 Plane 中一切都从项目开始",
-            description: "项目可以是产品路线图、营销活动或新车发布。",
+            title: "在 Plane 中一切从空间开始",
+            description: "空间是团队协作的基础单元，用于组织工作项、迭代和业务项目。",
           },
         },
       },
       no_projects: {
-        title: "没有项目",
-        description: "要创建工作项或管理您的工作，您需要创建一个项目或成为项目的一部分。",
+        title: "没有空间",
+        description: "要创建工作项或管理您的工作，您需要创建一个空间或成为空间的一部分。",
         primary_button: {
-          text: "开始您的第一个项目",
+          text: "开始您的第一个空间",
           comic: {
-            title: "在 Plane 中一切都从项目开始",
-            description: "项目可以是产品路线图、营销活动或新车发布。",
+            title: "在 Plane 中一切都从空间开始",
+            description: "空间用于组织团队的日常开发协作工作。",
           },
         },
       },
       filter: {
-        title: "没有匹配的项目",
-        description: "未检测到符合匹配条件的项目。\n创建一个新项目。",
+        title: "没有匹配的空间",
+        description: "未检测到符合匹配条件的空间。\n创建一个新空间。",
       },
       search: {
-        description: "未检测到符合匹配条件的项目。\n创建一个新项目",
+        description: "未检测到符合匹配条件的空间。\n创建一个新空间",
       },
     },
   },
@@ -1476,8 +1480,8 @@ export default {
     add_view: "添加视图",
     empty_state: {
       "all-issues": {
-        title: "项目中没有工作项",
-        description: "第一个项目完成！现在，将您的工作分解成可跟踪的工作项。让我们开始吧！",
+        title: "空间中没有工作项",
+        description: "开始将您的工作分解成可跟踪的工作项。让我们开始吧！",
         primary_button: {
           text: "创建新工作项",
         },
@@ -1624,8 +1628,12 @@ export default {
         view_plans: "查看计划",
       },
       exports: {
+        heading: "导出",
+        description: "以各种格式导出您的空间数据，并通过下载链接访问导出历史记录。",
         title: "导出",
         exporting: "导出中",
+        exporting_projects: "导出空间",
+        format: "格式",
         previous_exports: "以前的导出",
         export_separate_files: "将数据导出为单独的文件",
         filters_info: "应用筛选器以根据您的条件导出特定工作项。",
@@ -1714,6 +1722,40 @@ export default {
           },
         },
       },
+      extra_properties: {
+        title: "额外属性",
+        page_label: "{workspace} - 额外属性",
+        description: "定义可在此工作区工作项中使用的自定义属性。",
+        add_property: "添加属性",
+        empty_state: "暂未定义额外属性。创建一个以开始使用。",
+        create_success: "属性创建成功",
+        update_success: "属性更新成功",
+        delete_success: "属性删除成功",
+        create_error: "属性创建失败",
+        update_error: "属性更新失败",
+        delete_error: "属性删除失败",
+        form: {
+          label: "标签",
+          label_placeholder: "输入显示标签",
+          key: "键",
+          key_placeholder: "输入唯一键",
+          key_error: "键必须以字母开头，且只能包含字母、数字和下划线",
+          type: "类型",
+          description: "描述",
+          description_placeholder: "输入可选描述",
+          options: "选项",
+          option_value: "值",
+          option_label: "标签（可选）",
+          add_option: "添加选项",
+          true_value: "真值标签",
+          false_value: "假值标签",
+        },
+        delete_modal: {
+          title: "删除属性",
+          description: '您确定要删除"{name}"吗？此操作无法撤消。',
+          warning: "使用此属性的工作项将保留其值，但该属性将不再显示。",
+        },
+      },
     },
     empty_state: {
       api_tokens: {
@@ -1798,39 +1840,43 @@ export default {
   },
   project_settings: {
     general: {
-      enter_project_id: "输入项目 ID",
+      enter_project_id: "输入空间 ID",
       please_select_a_timezone: "请选择时区",
       archive_project: {
-        title: "归档项目",
+        title: "归档空间",
         description:
-          "归档项目将从您的侧边导航中取消列出您的项目，但您仍然可以从项目页面访问它。您可以随时恢复或删除项目。",
-        button: "归档项目",
+          "归档空间将从您的侧边导航中取消列出该空间，但您仍然可以从空间页面访问它。您可以随时恢复或删除空间。",
+        button: "归档空间",
       },
       delete_project: {
-        title: "删除项目",
-        description: "删除项目时，该项目内的所有数据和资源将被永久删除且无法恢复。",
-        button: "删除我的项目",
+        title: "删除空间",
+        description: "删除空间时，该空间内的所有数据和资源将被永久删除且无法恢复。",
+        button: "删除我的空间",
       },
       toast: {
-        success: "项目更新成功",
-        error: "项目无法更新。请重试。",
+        success: "空间更新成功",
+        error: "空间无法更新。请重试。",
       },
     },
     members: {
       label: "成员",
-      project_lead: "项目负责人",
+      project_lead: "空间负责人",
+      select_project_lead_description: "为此空间选择空间负责人。",
       default_assignee: "默认受理人",
+      select_default_assignee_description: "为此空间选择默认受理人。",
       guest_super_permissions: {
-        title: "为访客用户授予查看所有工作项的权限：",
-        sub_heading: "这将允许访客查看所有项目工作项。",
+        title: "访客权限",
+        sub_heading: "这将允许访客查看所有空间工作项。",
       },
       invite_members: {
         title: "邀请成员",
-        sub_heading: "邀请成员参与您的项目。",
+        sub_heading: "邀请成员参与您的空间。",
         select_co_worker: "选择同事",
       },
     },
     states: {
+      heading: "状态",
+      description: "定义和自定义工作流状态以跟踪工作项的进度。",
       describe_this_state_for_your_members: "为您的成员描述此状态。",
       empty_state: {
         title: "{groupKey} 组中没有状态",
@@ -1838,6 +1884,8 @@ export default {
       },
     },
     labels: {
+      heading: "标签",
+      description: "创建自定义标签以对工作项进行分类和组织",
       label_title: "标签标题",
       label_title_is_required: "标签标题为必填项",
       label_max_char: "标签名称不应超过255个字符",
@@ -1846,9 +1894,11 @@ export default {
       },
     },
     estimates: {
+      heading: "估算",
       label: "估算",
-      title: "为我的项目启用估算",
-      description: "它们有助于您传达团队的复杂性和工作量。",
+      title: "为我的空间启用估算",
+      description: "为每个工作项设置评估系统以跟踪和传达所需工作量。",
+      enable_description: "它们有助于您传达团队的复杂性和工作量。",
       no_estimate: "无估算",
       new: "新估算系统",
       create: {
@@ -1874,7 +1924,7 @@ export default {
         updated: {
           success: {
             title: "已更新估算",
-            message: "您项目中的估算点数已更新",
+            message: "您空间中的估算点数已更新",
           },
           error: {
             title: "无法更新估算",
@@ -1909,6 +1959,26 @@ export default {
         remove_empty: "估算不能为空。请在每个字段中输入值或删除没有值的字段。",
       },
     },
+    work_item_types: {
+      short_title: "工作项类型",
+      heading: "工作项类型",
+      description: "为此空间启用或禁用工作项类型，并设置新工作项的默认类型。",
+      enabled_success: "工作项类型已成功启用",
+      disabled_success: "工作项类型已成功禁用",
+      default_success: "默认工作项类型已成功更新",
+      set_as_default: "设为默认",
+      no_types_available: "此工作区中没有可用的工作项类型",
+      task_cannot_be_disabled: "任务类型不能被禁用",
+      issues_migrated: "{count} 个工作项已迁移到默认类型",
+      extra_properties: {
+        title: "额外属性",
+        empty_state: "此工作区中未定义额外属性。请在工作区设置中创建属性。",
+        bind_success: "属性已添加到此工作项类型",
+        unbind_success: "属性已从此工作项类型中移除",
+        required: "必填",
+        required_update_success: "必填状态已成功更新",
+      },
+    },
     automations: {
       label: "自动化",
       "auto-archive": {
@@ -1926,7 +1996,7 @@ export default {
     empty_state: {
       labels: {
         title: "尚无标签",
-        description: "创建标签以帮助组织和筛选项目中的工作项。",
+        description: "创建标签以帮助组织和筛选空间中的工作项。",
       },
       estimates: {
         title: "尚无估算系统",
@@ -1936,52 +2006,52 @@ export default {
     },
     features: {
       cycles: {
-        title: "周期",
-        short_title: "周期",
-        description: "在灵活的时间段内安排工作，以适应该项目独特的节奏和步调。",
-        toggle_title: "启用周期",
+        title: "迭代",
+        short_title: "迭代",
+        description: "在灵活的时间段内安排工作，以适应该空间独特的节奏和步调。",
+        toggle_title: "启用迭代",
         toggle_description: "在集中的时间段内规划工作。",
       },
       modules: {
-        title: "模块",
-        short_title: "模块",
-        description: "将工作组织成具有专门负责人和受让人的子项目。",
-        toggle_title: "启用模块",
-        toggle_description: "项目成员将能够创建和编辑模块。",
+        title: "项目",
+        short_title: "项目",
+        description: "将工作组织成聚焦于特定交付目标的业务项目，并指定专门的负责人和受理人。",
+        toggle_title: "启用项目",
+        toggle_description: "空间成员将能够创建和编辑项目。",
       },
       views: {
         title: "视图",
         short_title: "视图",
         description: "保存自定义排序、过滤器和显示选项，或与团队共享。",
         toggle_title: "启用视图",
-        toggle_description: "项目成员将能够创建和编辑视图。",
+        toggle_description: "空间成员将能够创建和编辑视图。",
       },
       pages: {
         title: "页面",
         short_title: "页面",
         description: "创建和编辑自由格式的内容：笔记、文档、任何内容。",
         toggle_title: "启用页面",
-        toggle_description: "项目成员将能够创建和编辑页面。",
+        toggle_description: "空间成员将能够创建和编辑页面。",
       },
       intake: {
         title: "接收",
         short_title: "接收",
         description: "让非成员分享错误、反馈和建议；而不会中断您的工作流程。",
         toggle_title: "启用接收",
-        toggle_description: "允许项目成员在应用中创建接收请求。",
+        toggle_description: "允许空间成员在应用中创建接收请求。",
       },
     },
   },
   project_cycles: {
-    add_cycle: "添加周期",
+    add_cycle: "添加迭代",
     more_details: "更多详情",
-    cycle: "周期",
-    update_cycle: "更新周期",
-    create_cycle: "创建周期",
-    no_matching_cycles: "没有匹配的周期",
-    remove_filters_to_see_all_cycles: "移除筛选器以查看所有周期",
-    remove_search_criteria_to_see_all_cycles: "移除搜索条件以查看所有周期",
-    only_completed_cycles_can_be_archived: "只能归档已完成的周期",
+    cycle: "迭代",
+    update_cycle: "更新迭代",
+    create_cycle: "创建迭代",
+    no_matching_cycles: "没有匹配的迭代",
+    remove_filters_to_see_all_cycles: "移除筛选器以查看所有迭代",
+    remove_search_criteria_to_see_all_cycles: "移除搜索条件以查看所有迭代",
+    only_completed_cycles_can_be_archived: "只能归档已完成的迭代",
     start_date: "开始日期",
     end_date: "结束日期",
     in_your_timezone: "在您的时区",
@@ -1989,7 +2059,7 @@ export default {
     date_range: "日期范围",
     add_date: "添加日期",
     active_cycle: {
-      label: "活动周期",
+      label: "活动迭代",
       progress: "进度",
       chart: "燃尽图",
       priority_issue: "优先工作项",
@@ -2000,10 +2070,10 @@ export default {
       labels: "标签",
     },
     upcoming_cycle: {
-      label: "即将到来的周期",
+      label: "即将到来的迭代",
     },
     completed_cycle: {
-      label: "已完成的周期",
+      label: "已完成的迭代",
     },
     status: {
       days_left: "剩余天数",
@@ -2014,68 +2084,68 @@ export default {
     },
     action: {
       restore: {
-        title: "恢复周期",
+        title: "恢复迭代",
         success: {
-          title: "周期已恢复",
-          description: "周期已被恢复。",
+          title: "迭代已恢复",
+          description: "迭代已被恢复。",
         },
         failed: {
-          title: "周期恢复失败",
-          description: "无法恢复周期。请重试。",
+          title: "迭代恢复失败",
+          description: "无法恢复迭代。请重试。",
         },
       },
       favorite: {
-        loading: "正在将周期添加到收藏",
+        loading: "正在将迭代添加到收藏",
         success: {
-          description: "周期已添加到收藏。",
+          description: "迭代已添加到收藏。",
           title: "成功！",
         },
         failed: {
-          description: "无法将周期添加到收藏。请重试。",
+          description: "无法将迭代添加到收藏。请重试。",
           title: "错误！",
         },
       },
       unfavorite: {
-        loading: "正在从收藏中移除周期",
+        loading: "正在从收藏中移除迭代",
         success: {
-          description: "周期已从收藏中移除。",
+          description: "迭代已从收藏中移除。",
           title: "成功！",
         },
         failed: {
-          description: "无法从收藏中移除周期。请重试。",
+          description: "无法从收藏中移除迭代。请重试。",
           title: "错误！",
         },
       },
       update: {
-        loading: "正在更新周期",
+        loading: "正在更新迭代",
         success: {
-          description: "周期更新成功。",
+          description: "迭代更新成功。",
           title: "成功！",
         },
         failed: {
-          description: "更新周期时出错。请重试。",
+          description: "更新迭代时出错。请重试。",
           title: "错误！",
         },
         error: {
-          already_exists: "在给定日期范围内已存在周期，如果您想创建草稿周期，可以通过移除两个日期来实现。",
+          already_exists: "在给定日期范围内已存在迭代，如果您想创建草稿迭代，可以通过移除两个日期来实现。",
         },
       },
     },
     empty_state: {
       general: {
-        title: "在周期中分组和时间框定您的工作。",
-        description: "将工作按时间框分解，从项目截止日期倒推设置日期，并作为团队取得切实的进展。",
+        title: "在迭代中分组和时间框定您的工作。",
+        description: "将工作按时间框分解，并作为团队取得切实的进展。",
         primary_button: {
-          text: "设置您的第一个周期",
+          text: "设置您的第一个迭代",
           comic: {
-            title: "周期是重复的时间框。",
-            description: "冲刺、迭代或您用于每周或每两周跟踪工作的任何其他术语都是一个周期。",
+            title: "迭代是固定时长的冲刺周期。",
+            description: "通过迭代（Sprint）对工作进行时间盒管理，追踪团队在固定周期内的交付进度。",
           },
         },
       },
       no_issues: {
-        title: "尚未向周期添加工作项",
-        description: "添加或创建您希望在此周期内时间框定和交付的工作项",
+        title: "尚未向迭代添加工作项",
+        description: "添加或创建您希望在此迭代内时间框定和交付的工作项",
         primary_button: {
           text: "创建新工作项",
         },
@@ -2084,16 +2154,16 @@ export default {
         },
       },
       completed_no_issues: {
-        title: "周期中没有工作项",
-        description: "周期中没有工作项。工作项已被转移或隐藏。要查看隐藏的工作项（如果有），请相应更新您的显示属性。",
+        title: "迭代中没有工作项",
+        description: "迭代中没有工作项。工作项已被转移或隐藏。要查看隐藏的工作项（如果有），请相应更新您的显示属性。",
       },
       active: {
-        title: "没有活动周期",
-        description: "活动周期包括其范围内包含今天日期的任何时期。在这里查找活动周期的进度和详细信息。",
+        title: "没有活动迭代",
+        description: "活动迭代包括其范围内包含今天日期的任何时期。在这里查找活动迭代的进度和详细信息。",
       },
       archived: {
-        title: "尚无已归档的周期",
-        description: "为了整理您的项目，归档已完成的周期。归档后可以在这里找到它们。",
+        title: "尚无已归档的迭代",
+        description: "为了整理您的空间，归档已完成的迭代。归档后可以在这里找到它们。",
       },
     },
   },
@@ -2102,7 +2172,7 @@ export default {
       no_issues: {
         title: "创建工作项并将其分配给某人，甚至是您自己",
         description:
-          "将工作项视为工作、任务或待完成的工作。工作项及其子工作项通常是基于时间的、分配给团队成员的可执行项。您的团队通过创建、分配和完成工作项来推动项目实现其目标。",
+          "将工作项视为工作、任务或待完成的工作。工作项及其子工作项通常是基于时间的、分配给团队成员的可执行项。您的团队通过创建、分配和完成工作项来推动空间实现其目标。",
         primary_button: {
           text: "创建您的第一个工作项",
           comic: {
@@ -2127,28 +2197,28 @@ export default {
     },
   },
   project_module: {
-    add_module: "添加模块",
-    update_module: "更新模块",
-    create_module: "创建模块",
-    archive_module: "归档模块",
-    restore_module: "恢复模块",
-    delete_module: "删除模块",
+    add_module: "添加项目",
+    update_module: "更新项目",
+    create_module: "创建项目",
+    archive_module: "归档项目",
+    restore_module: "恢复项目",
+    delete_module: "删除项目",
     empty_state: {
       general: {
-        title: "将项目里程碑映射到模块，轻松跟踪汇总工作。",
+        title: "将业务目标映射到项目，轻松跟踪汇总工作。",
         description:
-          "属于逻辑层次结构父级的一组工作项形成一个模块。将其视为按项目里程碑跟踪工作的方式。它们有自己的周期和截止日期以及分析功能，帮助您了解距离里程碑的远近。",
+          "一组专注于特定业务目标的工作项构成一个项目。它们有明确的开始和截止日期以及分析功能，帮助您了解距离目标的远近。",
         primary_button: {
-          text: "构建您的第一个模块",
+          text: "构建您的第一个项目",
           comic: {
-            title: "模块帮助按层次结构对工作进行分组。",
-            description: "购物车模块、底盘模块和仓库模块都是这种分组的好例子。",
+            title: "项目帮助将业务目标分解为可管理的工作单元。",
+            description: "例如《外汇期货做市系统改造》或《用户权限改版》都可以作为独立项目进行管理。",
           },
         },
       },
       no_issues: {
-        title: "模块中没有工作项",
-        description: "创建或添加您想作为此模块一部分完成的工作项",
+        title: "项目中没有工作项",
+        description: "创建或添加您想作为此项目一部分完成的工作项",
         primary_button: {
           text: "创建新工作项",
         },
@@ -2157,35 +2227,35 @@ export default {
         },
       },
       archived: {
-        title: "尚无已归档的模块",
-        description: "为了整理您的项目，归档已完成或已取消的模块。归档后可以在这里找到它们。",
+        title: "尚无已归档的项目",
+        description: "为了整理您的空间，归档已完成或已取消的项目。归档后可以在这里找到它们。",
       },
       sidebar: {
-        in_active: "此模块尚未激活。",
+        in_active: "此项目尚未激活。",
         invalid_date: "日期无效。请输入有效日期。",
       },
     },
     quick_actions: {
-      archive_module: "归档模块",
-      archive_module_description: "只有已完成或已取消的\n模块可以归档。",
-      delete_module: "删除模块",
+      archive_module: "归档项目",
+      archive_module_description: "只有已完成或已取消的\n项目可以归档。",
+      delete_module: "删除项目",
     },
     toast: {
       copy: {
-        success: "模块链接已复制到剪贴板",
+        success: "项目链接已复制到剪贴板",
       },
       delete: {
-        success: "模块删除成功",
-        error: "删除模块失败",
+        success: "项目删除成功",
+        error: "删除项目失败",
       },
     },
   },
   project_views: {
     empty_state: {
       general: {
-        title: "为您的项目保存筛选视图。根据需要创建任意数量",
+        title: "为您的空间保存筛选视图。根据需要创建任意数量",
         description:
-          "视图是您经常使用或想要轻松访问的一组已保存的筛选条件。项目中的所有同事都可以看到每个人的视图，并选择最适合他们需求的视图。",
+          "视图是您经常使用或想要轻松访问的一组已保存的筛选条件。空间中的所有同事都可以看到每个人的视图，并选择最适合他们需求的视图。",
         primary_button: {
           text: "创建您的第一个视图",
           comic: {
@@ -2209,7 +2279,7 @@ export default {
       general: {
         title: "写笔记、文档或完整的知识库。让 Plane 的 AI 助手 Galileo 帮助您开始",
         description:
-          "页面是 Plane 中的思维记录空间。记录会议笔记，轻松格式化，嵌入工作项，使用组件库进行布局，并将它们全部保存在项目上下文中。要快速完成任何文档，可以通过快捷键或点击按钮调用 Plane 的 AI Galileo。",
+          "页面是 Plane 中的思维记录空间。记录会议笔记，轻松格式化，嵌入工作项，使用组件库进行布局，并将它们全部保存在空间上下文中。要快速完成任何文档，可以通过快捷键或点击按钮调用 Plane 的 AI Galileo。",
         primary_button: {
           text: "创建您的第一个页面",
         },
@@ -2223,7 +2293,7 @@ export default {
       },
       public: {
         title: "尚无公共页面",
-        description: "在这里查看与项目中所有人共享的页面。",
+        description: "在这里查看与空间中所有人共享的页面。",
         primary_button: {
           text: "创建您的第一个页面",
         },
@@ -2318,13 +2388,13 @@ export default {
   active_cycle: {
     empty_state: {
       progress: {
-        title: "向周期添加工作项以查看其进度",
+        title: "向迭代添加工作项以查看其进度",
       },
       chart: {
-        title: "向周期添加工作项以查看燃尽图。",
+        title: "向迭代添加工作项以查看燃尽图。",
       },
       priority_issue: {
-        title: "一目了然地观察周期中处理的高优先级工作项。",
+        title: "一目了然地观察迭代中处理的高优先级工作项。",
       },
       assignee: {
         title: "为工作项添加负责人以查看按负责人划分的工作明细。",
@@ -2337,38 +2407,37 @@ export default {
   disabled_project: {
     empty_state: {
       inbox: {
-        title: "项目未启用收集功能。",
+        title: "空间未启用收集功能。",
         description:
-          "收集功能帮助您管理项目的传入请求，并将其添加为工作流中的工作项。从项目设置启用收集功能以管理请求。",
+          "收集功能帮助您管理空间的传入请求，并将其添加为工作流中的工作项。从空间设置启用收集功能以管理请求。",
         primary_button: {
           text: "管理功能",
         },
       },
       cycle: {
-        title: "此项目未启用周期功能。",
-        description:
-          "按时间框将工作分解，从项目截止日期倒推设置日期，并作为团队取得切实的进展。为您的项目启用周期功能以开始使用它们。",
+        title: "此空间未启用迭代功能。",
+        description: "按时间框将工作分解，作为团队取得切实的进展。为您的空间启用迭代功能以开始使用它们。",
         primary_button: {
           text: "管理功能",
         },
       },
       module: {
-        title: "项目未启用模块功能。",
-        description: "模块是项目的基本构建块。从项目设置启用模块以开始使用它们。",
+        title: "空间未启用项目功能。",
+        description: "项目是空间的基本构建块。从空间设置启用项目以开始使用它们。",
         primary_button: {
           text: "管理功能",
         },
       },
       page: {
-        title: "项目未启用页面功能。",
-        description: "页面是项目的基本构建块。从项目设置启用页面以开始使用它们。",
+        title: "空间未启用页面功能。",
+        description: "页面是空间的基本构建块。从空间设置启用页面以开始使用它们。",
         primary_button: {
           text: "管理功能",
         },
       },
       view: {
-        title: "项目未启用视图功能。",
-        description: "视图是项目的基本构建块。从项目设置启用视图以开始使用它们。",
+        title: "空间未启用视图功能。",
+        description: "视图是空间的基本构建块。从空间设置启用视图以开始使用它们。",
         primary_button: {
           text: "管理功能",
         },
@@ -2462,7 +2531,7 @@ export default {
     },
     member: {
       title: "成员",
-      description: "可以在项目、周期和模块内读取、写入、编辑和删除实体",
+      description: "可以在空间、迭代和项目内读取、写入、编辑和删除实体",
     },
     admin: {
       title: "管理员",
@@ -2565,12 +2634,12 @@ export default {
     },
   },
   cycle: {
-    label: "{count, plural, one {周期} other {周期}}",
-    no_cycle: "无周期",
+    label: "{count, plural, one {迭代} other {迭代}}",
+    no_cycle: "无迭代",
   },
   module: {
-    label: "{count, plural, one {模块} other {模块}}",
-    no_module: "无模块",
+    label: "{count, plural, one {项目} other {项目}}",
+    no_module: "无项目",
   },
   description_versions: {
     last_edited_by: "最后编辑者",
@@ -2626,4 +2695,27 @@ export default {
   hide: "收起",
   archived: "已归档",
   add_page: "添加页面",
+  // 导航自定义
+  customize_navigation: "自定义导航",
+  customize_navigation_description:
+    "选中的空间将始终在侧边栏中显示。您仍可随时从「更多」菜单中找到其他空间。这些更改仅对您个人生效，不会影响工作区中的其他成员。",
+  personal: "个人",
+  pin: "固定",
+  unpin: "取消固定",
+  accordion_navigation_control: "折叠侧边栏导航",
+  accordion_navigation_description: "功能标签将在空间下以嵌套方式显示，并以折叠形式运作。",
+  horizontal_navigation_bar: "标签式导航",
+  horizontal_navigation_description: "功能标签将在空间内以水平标签形式显示。",
+  show_limited_projects_on_sidebar: "在侧边栏显示有限数量的空间",
+  enter_number_of_projects: "输入空间数量",
+  // 工作项类型
+  work_item_type: "工作项类型",
+  // 成员表格列头
+  project_members: {
+    full_name: "全名",
+    display_name: "显示名称",
+    email: "电子邮件",
+    joining_date: "加入日期",
+    role: "角色",
+  },
 } as const;
