@@ -2,7 +2,7 @@
 
 - [x] 1.1 修改 `plane/settings/openapi.py`：将 TITLE 改为内部版本，DESCRIPTION 加入术语映射说明（空间/项目/迭代）
 - [x] 1.2 修改 `SPECTACULAR_SETTINGS["SERVERS"]`：读取 `os.environ.get("API_BASE_URL", "http://localhost:8000")` 动态设置服务器地址
-- [ ] 1.3 验证 `/api/v1/schema/` 可成功生成 OpenAPI YAML（启动 API 服务后访问端点确认）
+- [x] 1.3 验证 `/api/schema/` 可成功生成 OpenAPI YAML（实际路径为 `/api/schema/`，非 `/api/v1/schema/`；访问返回 200 确认）
 
 ## 2. v1 API 缺失注解补全
 
