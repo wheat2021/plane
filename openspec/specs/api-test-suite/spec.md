@@ -1,4 +1,10 @@
-## ADDED Requirements
+# API 测试套件规范
+
+## Purpose
+
+定义针对 Plane 内部实例的集成测试套件结构和场景要求，通过真实 HTTP 请求验证 API 行为，覆盖认证、核心资源 CRUD、权限边界等关键场景。
+
+## Requirements
 
 ### Requirement: pytest 测试套件基础设施
 

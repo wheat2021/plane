@@ -1,4 +1,10 @@
-## ADDED Requirements
+# 扩展功能 API 文档规范
+
+## Purpose
+
+定义内部扩展功能（扩展属性、工作项类型）的 API 文档要求，以及 API 使用入口文档的结构规范。
+
+## Requirements
 
 ### Requirement: 扩展属性 API 文档
 

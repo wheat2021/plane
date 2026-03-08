@@ -1,4 +1,10 @@
-## ADDED Requirements
+# API 文档规范
+
+## Purpose
+
+定义 Plane 内部实例的 OpenAPI 文档完整性与配置要求，确保 v1 API 端点在 Swagger UI 中有完整描述，并支持内部定制化配置。
+
+## Requirements
 
 ### Requirement: v1 OpenAPI 规范完整性
 
