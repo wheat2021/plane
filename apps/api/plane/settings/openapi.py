@@ -4,15 +4,25 @@ OpenAPI/Swagger configuration for drf-spectacular.
 This file contains the complete configuration for API documentation generation.
 """
 
+import os
+
 SPECTACULAR_SETTINGS = {
     # ========================================================================
     # Basic API Information
     # ========================================================================
-    "TITLE": "The Plane REST API",
+    "TITLE": "内部研发管理平台 REST API",
     "DESCRIPTION": (
-        "The Plane REST API\n\n"
-        "Visit our quick start guide and full API documentation at "
-        "[developers.plane.so](https://developers.plane.so/api-reference/introduction)."
+        "内部研发管理平台 REST API\n\n"
+        "**内部术语对照表：**\n\n"
+        "| API 术语 | 内部称呼 | 说明 |\n"
+        "|---------|---------|-----|\n"
+        "| `workspace` | 工作区 | 整个系统，唯一实例 |\n"
+        "| `project` | 空间 | 对应内部的「空间」概念 |\n"
+        "| `module` | 项目 | 对应内部的「项目」概念 |\n"
+        "| `cycle` | 迭代 | 对应内部的「迭代/Sprint」概念 |\n"
+        "| `work-item` / `issue` | 工作项 | 任务、Bug、里程碑等 |\n\n"
+        "**认证方式：** 所有 API 请求须在 Header 中携带 `X-Api-Key: <your-token>`。\n"
+        "Token 可在「Profile → API Tokens」页面创建。"
     ),
     "CONTACT": {
         "name": "Plane",
@@ -40,8 +50,10 @@ SPECTACULAR_SETTINGS = {
     # Server Configuration
     # ========================================================================
     "SERVERS": [
-        {"url": "http://localhost:8000", "description": "Local"},
-        {"url": "https://api.plane.so", "description": "Production"},
+        {
+            "url": os.environ.get("API_BASE_URL", "http://localhost:8000"),
+            "description": "API Server",
+        },
     ],
     # ========================================================================
     # API Tag Definitions
