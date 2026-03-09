@@ -36,9 +36,10 @@ rules:
     - Always include upstream impact assessment
     - Flag any files that overlap with existing high-risk upstream diff areas
   tasks:
-    - First task is to commit spec documents. If there are lint issues, fix them first, then commit.
-    - Must create user verification tasks with clear verification methods.
-    - Mark tasks that touch upstream-modified files with [UPSTREAM-RISK]
-    - Include migration sequence number check as a task when DB changes are involved
-    - As the final agent task before user verification, organize all changes into multiple focused commits, each with a clear and concise Chinese summary as the commit message.
-    - Always include a final commit task that stages and commits all implementation changes.
+    - "Task list MUST follow this section structure: 1. 提交变更文档, 2-N. 功能实现, N+1. 提交实现代码, N+2. 用户验证."
+    - "Section 1 '提交变更文档' MUST include a task to commit all openspec docs before coding starts."
+    - "Final implementation section '提交实现代码' MUST contain focused commit tasks grouped by functionality. Commit messages MUST be in Chinese and prefixed with '#FICC-9999#'."
+    - "Always include a final commit task that stages and commits all implementation changes in the '提交实现代码' section."
+    - "Final section '用户验证' MUST include specific verification steps and expected results for each change."
+    - "Mark tasks that touch upstream-modified files with [UPSTREAM-RISK]."
+    - "Include migration sequence number check as a task when DB changes are involved."
