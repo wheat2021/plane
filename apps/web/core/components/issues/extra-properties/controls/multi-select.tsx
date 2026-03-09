@@ -57,32 +57,22 @@ export const MultiSelectControl: FC<IMultiSelectControl> = (props) => {
       }}
       buttonContainerClassName="w-full text-left h-7.5"
       buttonClassName="w-full"
-      renderItem={({ value: itemValue, selected }) => {
-        const option = options.find((opt) => opt.value === itemValue);
-        const annotation = option?.data?.label as string | undefined;
-        return (
-          <div className="flex items-center gap-2 px-2 py-1.5">
-            <div
-              className={`size-4 rounded border flex items-center justify-center ${
-                selected ? "bg-primary border-primary" : "border-tertiary"
-              }`}
-            >
-              {selected && (
-                <svg className="size-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </div>
-            <span className="text-body-xs-regular">{itemValue}</span>
-            {annotation && (
-              <>
-                <span className="text-body-xs-regular text-custom-text-300">·</span>
-                <span className="text-body-xs-regular text-custom-text-300">{annotation}</span>
-              </>
+      renderItem={({ value: itemValue, selected }) => (
+        <div className="flex items-center gap-2 px-2 py-1.5">
+          <div
+            className={`size-4 rounded border flex items-center justify-center ${
+              selected ? "bg-primary border-primary" : "border-tertiary"
+            }`}
+          >
+            {selected && (
+              <svg className="size-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
             )}
           </div>
-        );
-      }}
+          <span className="text-body-xs-regular">{itemValue}</span>
+        </div>
+      )}
     />
   );
 };

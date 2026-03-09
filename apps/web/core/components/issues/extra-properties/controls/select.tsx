@@ -27,6 +27,7 @@ export const SelectControl: FC<ISelectControl> = (props) => {
       data: {
         value: opt.value,
         label: opt.label || opt.value,
+        annotation: opt.label || "",
       },
     }));
   }, [config.options]);
@@ -45,36 +46,21 @@ export const SelectControl: FC<ISelectControl> = (props) => {
       buttonContent={(_isOpen, val) => {
         const option = options.find((opt) => opt.value === val);
         if (!option) return <span className="text-body-xs-regular text-placeholder">Select...</span>;
-        const annotation = option.data?.label as string | undefined;
+        const annotation = option.data?.annotation as string;
         return (
-          <span className="text-body-xs-regular flex items-center gap-1 truncate">
-            <span>{option.value}</span>
-            {annotation && (
-              <>
-                <span className="text-custom-text-300">·</span>
-                <span className="text-custom-text-300 truncate">{annotation}</span>
-              </>
-            )}
+          <span className="text-body-xs-regular truncate">
+            {option.value}
+            {annotation && <span className="text-custom-text-300"> （{annotation}）</span>}
           </span>
         );
       }}
       buttonContainerClassName="w-full text-left h-7.5"
       buttonClassName="w-full"
-      renderItem={({ value: itemValue, selected }) => {
-        const option = options.find((opt) => opt.value === itemValue);
-        const annotation = option?.data?.label as string | undefined;
-        return (
-          <div className="flex items-center gap-2 px-2 py-1.5">
-            <span className={`text-body-xs-regular ${selected ? "font-medium" : ""}`}>{itemValue}</span>
-            {annotation && (
-              <>
-                <span className="text-body-xs-regular text-custom-text-300">·</span>
-                <span className="text-body-xs-regular text-custom-text-300">{annotation}</span>
-              </>
-            )}
-          </div>
-        );
-      }}
+      renderItem={({ value: itemValue, selected }) => (
+        <div className="flex items-center gap-2 px-2 py-1.5">
+          <span className={`text-body-xs-regular ${selected ? "font-medium" : ""}`}>{itemValue}</span>
+        </div>
+      )}
     />
   );
 };
