@@ -35,6 +35,7 @@ from plane.app.views import (
     WorkspaceIssueTypesEndpoint,
     ExtraPropertyConfigEndpoint,
     ExtraPropertyConfigDetailEndpoint,
+    ExtraPropertyConfigValuesEndpoint,
 )
 
 
@@ -183,6 +184,11 @@ urlpatterns = [
         "workspaces/<str:slug>/extra-properties/<uuid:pk>/",
         ExtraPropertyConfigDetailEndpoint.as_view(),
         name="extra-property-config-detail",
+    ),
+    path(
+        "workspaces/<str:slug>/extra-properties/<uuid:pk>/values/",
+        ExtraPropertyConfigValuesEndpoint.as_view(),
+        name="extra-property-config-values",
     ),
     path(
         "workspaces/<str:slug>/estimates/",

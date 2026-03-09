@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { observer } from "mobx-react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, AlertTriangle, Loader2 } from "lucide-react";
 import { useParams } from "react-router";
 // plane imports
 import { useTranslation } from "@plane/i18n";
@@ -36,13 +36,31 @@ const PROPERTY_TYPES: { value: TExtraPropertyType; label: string }[] = [
   { value: "checkbox", label: "Checkbox" },
 ];
 
+/**
+ * Static compatibility matrix for type changes.
+ * Returns true if values are format-compatible (no data loss risk).
+ */
+const isTypeCompatible = (from: TExtraPropertyType, to: TExtraPropertyType): boolean => {
+  if (from === to) return true;
+  const compatible: Record<string, Set<string>> = {
+    text: new Set(["textarea"]),
+    textarea: new Set(["text"]),
+    select: new Set(["text", "textarea", "multiselect"]),
+    multiselect: new Set(["multiselect"]),
+    checkbox: new Set(["text", "textarea", "checkbox"]),
+  };
+  return compatible[from]?.has(to) ?? false;
+};
+
 export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId, onClose }: Props) {
   // params
   const { workspaceSlug } = useParams();
   // state
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [impactLoading, setImpactLoading] = useState(false);
+  const [impactData, setImpactData] = useState<{ count: number; distinct_values: string[] } | null>(null);
   // store hooks
-  const { getConfigById, createConfig, updateConfig } = useExtraPropertyConfig();
+  const { getConfigById, createConfig, updateConfig, fetchConfigValues } = useExtraPropertyConfig();
   // i18n
   const { t } = useTranslation();
   // derived values
@@ -93,6 +111,39 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
       });
     }
   }, [existingConfig, reset]);
+
+  // Check impact when type changes in edit mode
+  const checkTypeChangeImpact = useCallback(
+    async (newType: TExtraPropertyType) => {
+      if (!isEditMode || !existingConfig || !workspaceSlug || !configId) return;
+      if (newType === existingConfig.type) {
+        setImpactData(null);
+        return;
+      }
+      if (isTypeCompatible(existingConfig.type, newType)) {
+        setImpactData(null);
+        return;
+      }
+      // Incompatible change — query impact
+      setImpactLoading(true);
+      try {
+        const data = await fetchConfigValues(workspaceSlug, configId);
+        setImpactData(data.count > 0 ? data : null);
+      } catch {
+        setImpactData(null);
+      } finally {
+        setImpactLoading(false);
+      }
+    },
+    [isEditMode, existingConfig, workspaceSlug, configId, fetchConfigValues]
+  );
+
+  // Watch type changes for impact check
+  useEffect(() => {
+    if (isEditMode && existingConfig) {
+      void checkTypeChangeImpact(selectedType);
+    }
+  }, [selectedType, isEditMode, existingConfig, checkTypeChangeImpact]);
 
   const onSubmit = async (data: FormValues) => {
     if (!workspaceSlug) return;
@@ -195,7 +246,6 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
                 value={field.value}
                 onChange={field.onChange}
                 label={PROPERTY_TYPES.find((t) => t.value === field.value)?.label ?? "Select type"}
-                disabled={isEditMode}
                 input
                 buttonClassName="w-full"
               >
@@ -207,6 +257,29 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
               </CustomSelect>
             )}
           />
+          {/* Type change impact warning banner */}
+          {isEditMode && impactLoading && (
+            <div className="mt-2 flex items-center gap-2 rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
+              <Loader2 className="size-4 animate-spin" />
+              <span>正在检查类型变更的影响范围…</span>
+            </div>
+          )}
+          {isEditMode && !impactLoading && impactData && (
+            <div className="mt-2 flex items-start gap-2 rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
+              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+              <div>
+                <p>
+                  类型变更将影响 <strong>{impactData.count}</strong> 个工作项的已有值。
+                </p>
+                {impactData.distinct_values.length > 0 && (
+                  <p className="mt-1 text-xs text-yellow-700">
+                    现有值：{impactData.distinct_values.slice(0, 10).join("、")}
+                    {impactData.distinct_values.length > 10 && " …"}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div>

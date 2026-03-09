@@ -18,6 +18,7 @@ export interface IExtraPropertyConfigStore {
   getConfigsByWorkspace: (workspaceSlug: string | null | undefined) => TExtraPropertyConfig[];
   // fetch actions
   fetchWorkspaceConfigs: (workspaceSlug: string) => Promise<TExtraPropertyConfig[]>;
+  fetchConfigValues: (workspaceSlug: string, configId: string) => Promise<{ count: number; distinct_values: string[] }>;
   // CRUD actions
   createConfig: (workspaceSlug: string, data: TExtraPropertyConfigPayload) => Promise<TExtraPropertyConfig>;
   updateConfig: (
@@ -95,6 +96,12 @@ export class ExtraPropertyConfigStore implements IExtraPropertyConfigStore {
     });
     return response;
   };
+
+  /**
+   * Fetches usage stats for an extra property config
+   */
+  fetchConfigValues = async (workspaceSlug: string, configId: string) =>
+    this.extraPropertyConfigService.getConfigValues(workspaceSlug, configId);
 
   /**
    * Creates a new extra property config

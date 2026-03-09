@@ -6,7 +6,7 @@ from rest_framework import status
 from plane.app.views.base import BaseAPIView
 from plane.app.serializers import ExtraPropertyConfigSerializer
 from plane.app.permissions import ROLE, allow_permission
-from plane.db.models import ExtraPropertyConfig, Workspace
+from plane.db.models import ExtraPropertyConfig, Issue, Workspace
 
 
 class ExtraPropertyConfigEndpoint(BaseAPIView):
@@ -108,3 +108,31 @@ class ExtraPropertyConfigDetailEndpoint(BaseAPIView):
 
         config.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ExtraPropertyConfigValuesEndpoint(BaseAPIView):
+    """
+    GET /api/workspaces/{slug}/extra-properties/{pk}/values/
+    Returns usage stats: count of issues using this property and distinct values.
+    """
+
+    @allow_permission([ROLE.ADMIN], level="WORKSPACE")
+    def get(self, request, slug, pk):
+        try:
+            config = ExtraPropertyConfig.objects.get(id=pk, workspace__slug=slug)
+        except ExtraPropertyConfig.DoesNotExist:
+            return Response({"error": "Extra property config not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        issues = Issue.objects.filter(
+            workspace__slug=slug,
+            extra_properties__has_key=config.key,
+        )
+        count = issues.count()
+        distinct_values = sorted(
+            {
+                str(v)
+                for v in issues.values_list(f"extra_properties__{config.key}", flat=True)
+                if v is not None
+            }
+        )
+        return Response({"count": count, "distinct_values": distinct_values}, status=status.HTTP_200_OK)

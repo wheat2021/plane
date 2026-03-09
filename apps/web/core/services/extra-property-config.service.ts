@@ -69,6 +69,23 @@ export class ExtraPropertyConfigService extends APIService {
   }
 
   /**
+   * Fetches usage stats for an extra property config
+   * @param workspaceSlug - The workspace slug
+   * @param configId - The extra property config id
+   * @returns Promise<{count: number, distinct_values: string[]}>
+   */
+  async getConfigValues(
+    workspaceSlug: string,
+    configId: string
+  ): Promise<{ count: number; distinct_values: string[] }> {
+    return this.get(`/api/workspaces/${workspaceSlug}/extra-properties/${configId}/values/`)
+      .then((response) => response?.data as { count: number; distinct_values: string[] })
+      .catch((error: { response?: { data?: unknown } }) => {
+        throw error?.response?.data;
+      });
+  }
+
+  /**
    * Deletes an extra property config
    * @param workspaceSlug - The workspace slug
    * @param configId - The config id

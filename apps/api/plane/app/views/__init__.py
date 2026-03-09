@@ -92,6 +92,7 @@ from .workspace.issue_type import WorkspaceIssueTypesEndpoint
 from .workspace.extra_property import (
     ExtraPropertyConfigEndpoint,
     ExtraPropertyConfigDetailEndpoint,
+    ExtraPropertyConfigValuesEndpoint,
 )
 
 from .state.base import StateViewSet, IntakeStateEndpoint
