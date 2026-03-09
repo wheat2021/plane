@@ -28,10 +28,11 @@ context: |
   Modified upstream files may conflict when rebasing onto preview.
   See spec upstream-diff sections for high/medium risk files.
 
+  Structure Rules:
+  - ALL changes MUST be created under the project root openspec/ directory (i.e., /openspec/changes/<change-name>/). NEVER create openspec directories inside sub-projects.
+  - The only valid openspec directory is the project root openspec/ at the repository root level.
+
 rules:
-  structure:
-    - ALL changes (including sub-project changes) MUST be created under the project root openspec/ directory (i.e., /openspec/changes/<change-name>/). NEVER create openspec directories inside sub-projects (e.g., apps/api/openspec/ is FORBIDDEN).
-    - The only valid openspec directory is the project root openspec/ at the repository root level.
   proposal:
     - Always include upstream impact assessment
     - Flag any files that overlap with existing high-risk upstream diff areas
