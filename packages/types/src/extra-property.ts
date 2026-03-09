@@ -8,7 +8,7 @@
 /**
  * Supported input control types for extra properties.
  */
-export type TExtraPropertyType = "text" | "textarea" | "select" | "multiselect" | "checkbox" | "markdown";
+export type TExtraPropertyType = "text" | "textarea" | "select" | "multiselect" | "checkbox";
 
 /**
  * Option for select/multiselect property types.

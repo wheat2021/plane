@@ -6,7 +6,6 @@ import { TextareaControl } from "./controls/textarea";
 import { SelectControl } from "./controls/select";
 import { MultiSelectControl } from "./controls/multi-select";
 import { CheckboxControl } from "./controls/checkbox";
-import { MarkdownControl } from "./controls/markdown";
 
 interface IExtraPropertyControl {
   config: TExtraPropertyConfig;
@@ -18,7 +17,7 @@ interface IExtraPropertyControl {
 }
 
 export const ExtraPropertyControl: FC<IExtraPropertyControl> = (props) => {
-  const { config, value, onChange, disabled, workspaceSlug, projectId } = props;
+  const { config, value, onChange, disabled } = props;
 
   switch (config.type) {
     case "text":
@@ -33,17 +32,6 @@ export const ExtraPropertyControl: FC<IExtraPropertyControl> = (props) => {
       );
     case "checkbox":
       return <CheckboxControl config={config} value={value} onChange={onChange} disabled={disabled} />;
-    case "markdown":
-      return (
-        <MarkdownControl
-          config={config}
-          value={value}
-          onChange={onChange}
-          disabled={disabled}
-          workspaceSlug={workspaceSlug}
-          projectId={projectId}
-        />
-      );
     default:
       return null;
   }

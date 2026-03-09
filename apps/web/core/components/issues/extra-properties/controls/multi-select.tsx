@@ -33,12 +33,7 @@ export const MultiSelectControl: FC<IMultiSelectControl> = (props) => {
 
   const selectedValues = Array.isArray(value) ? value : [];
 
-  const selectedLabels = selectedValues
-    .map((v) => {
-      const opt = options.find((o) => o.value === v);
-      return (opt?.data?.label as string) || v;
-    })
-    .join(", ");
+  const selectedLabels = selectedValues.join(", ");
 
   return (
     <MultiSelectDropdown
@@ -64,7 +59,7 @@ export const MultiSelectControl: FC<IMultiSelectControl> = (props) => {
       buttonClassName="w-full"
       renderItem={({ value: itemValue, selected }) => {
         const option = options.find((opt) => opt.value === itemValue);
-        const label = (option?.data?.label as string) || itemValue;
+        const annotation = option?.data?.label as string | undefined;
         return (
           <div className="flex items-center gap-2 px-2 py-1.5">
             <div
@@ -78,7 +73,13 @@ export const MultiSelectControl: FC<IMultiSelectControl> = (props) => {
                 </svg>
               )}
             </div>
-            <span className="text-body-xs-regular">{label}</span>
+            <span className="text-body-xs-regular">{itemValue}</span>
+            {annotation && (
+              <>
+                <span className="text-body-xs-regular text-custom-text-300">·</span>
+                <span className="text-body-xs-regular text-custom-text-300">{annotation}</span>
+              </>
+            )}
           </div>
         );
       }}

@@ -24,7 +24,6 @@ const getPropertyIcon = (type: TExtraPropertyConfig["type"]) => {
   switch (type) {
     case "text":
     case "textarea":
-    case "markdown":
       return HashPropertyIcon;
     case "select":
     case "multiselect":

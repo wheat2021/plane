@@ -44,17 +44,34 @@ export const SelectControl: FC<ISelectControl> = (props) => {
       sortByKey="label"
       buttonContent={(_isOpen, val) => {
         const option = options.find((opt) => opt.value === val);
-        const label = (option?.data?.label as string) || "Select...";
-        return <span className={`text-body-xs-regular ${option ? "" : "text-placeholder"}`}>{label}</span>;
+        if (!option) return <span className="text-body-xs-regular text-placeholder">Select...</span>;
+        const annotation = option.data?.label as string | undefined;
+        return (
+          <span className="text-body-xs-regular flex items-center gap-1 truncate">
+            <span>{option.value}</span>
+            {annotation && (
+              <>
+                <span className="text-custom-text-300">·</span>
+                <span className="text-custom-text-300 truncate">{annotation}</span>
+              </>
+            )}
+          </span>
+        );
       }}
       buttonContainerClassName="w-full text-left h-7.5"
       buttonClassName="w-full"
       renderItem={({ value: itemValue, selected }) => {
         const option = options.find((opt) => opt.value === itemValue);
-        const label = (option?.data?.label as string) || itemValue;
+        const annotation = option?.data?.label as string | undefined;
         return (
           <div className="flex items-center gap-2 px-2 py-1.5">
-            <span className={`text-body-xs-regular ${selected ? "font-medium" : ""}`}>{label}</span>
+            <span className={`text-body-xs-regular ${selected ? "font-medium" : ""}`}>{itemValue}</span>
+            {annotation && (
+              <>
+                <span className="text-body-xs-regular text-custom-text-300">·</span>
+                <span className="text-body-xs-regular text-custom-text-300">{annotation}</span>
+              </>
+            )}
           </div>
         );
       }}

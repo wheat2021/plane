@@ -25,7 +25,6 @@ const TYPE_LABELS: Record<string, string> = {
   select: "Select",
   multiselect: "Multi-Select",
   checkbox: "Checkbox",
-  markdown: "Markdown",
 };
 
 export const ExtraPropertyItem = observer(function ExtraPropertyItem({ config, onEdit }: Props) {
