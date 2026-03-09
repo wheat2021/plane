@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { BooleanPropertyIcon } from "@plane/propel/icons";
+import { Square, SquareCheck } from "lucide-react";
 import { Tooltip } from "@plane/propel/tooltip";
 import type { TExtraPropertyConfig, TExtraPropertyValue } from "@plane/types";
 import { cn } from "@plane/utils";
@@ -31,15 +31,15 @@ export const CompactCheckboxControl: FC<ICompactCheckboxControl> = (props) => {
         onClick={handleClick}
         disabled={disabled}
         className={cn(
-          "flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-sm border-[0.5px] border-strong",
-          "hover:bg-layer-1 transition-colors",
-          isChecked && "bg-accent-50 border-accent-strong",
+          "flex h-5 w-5 flex-shrink-0 items-center justify-center transition-colors",
           disabled && "cursor-not-allowed opacity-60"
         )}
       >
-        <BooleanPropertyIcon
-          className={cn("h-3 w-3 flex-shrink-0", isChecked ? "text-accent-primary" : "text-secondary")}
-        />
+        {isChecked ? (
+          <SquareCheck className="h-4 w-4 flex-shrink-0 text-accent-primary" />
+        ) : (
+          <Square className="h-4 w-4 flex-shrink-0 text-tertiary" />
+        )}
       </button>
     </Tooltip>
   );
