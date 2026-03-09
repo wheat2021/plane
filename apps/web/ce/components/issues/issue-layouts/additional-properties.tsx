@@ -2,8 +2,9 @@ import React, { useCallback, useMemo } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
 import { useTranslation } from "@plane/i18n";
-import { HashPropertyIcon, DropdownPropertyIcon, BooleanPropertyIcon } from "@plane/propel/icons";
+import { DropdownPropertyIcon, BooleanPropertyIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
+import { Type, AlignLeft } from "lucide-react";
 import type {
   IIssueDisplayProperties,
   TExtraDisplayProperties,
@@ -19,13 +20,17 @@ import { CompactExtraPropertyControl } from "@/components/issues/extra-propertie
 
 const getPropertyIcon = (type: string) => {
   switch (type) {
+    case "text":
+      return Type;
+    case "textarea":
+      return AlignLeft;
     case "select":
     case "multiselect":
       return DropdownPropertyIcon;
     case "checkbox":
       return BooleanPropertyIcon;
     default:
-      return HashPropertyIcon;
+      return Type;
   }
 };
 

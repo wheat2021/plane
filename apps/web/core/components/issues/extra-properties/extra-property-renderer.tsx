@@ -1,7 +1,8 @@
 import type { FC } from "react";
 import { observer } from "mobx-react";
 // icons
-import { HashPropertyIcon, BooleanPropertyIcon, DropdownPropertyIcon } from "@plane/propel/icons";
+import { BooleanPropertyIcon, DropdownPropertyIcon } from "@plane/propel/icons";
+import { Type, AlignLeft } from "lucide-react";
 // types
 import type { TExtraPropertyConfig, TExtraPropertyValue, TIssueExtraProperties } from "@plane/types";
 // components
@@ -25,15 +26,16 @@ interface IExtraPropertyRenderer {
 const getPropertyIcon = (type: TExtraPropertyConfig["type"]) => {
   switch (type) {
     case "text":
+      return Type;
     case "textarea":
-      return HashPropertyIcon;
+      return AlignLeft;
     case "select":
     case "multiselect":
       return DropdownPropertyIcon;
     case "checkbox":
       return BooleanPropertyIcon;
     default:
-      return HashPropertyIcon;
+      return Type;
   }
 };
 
