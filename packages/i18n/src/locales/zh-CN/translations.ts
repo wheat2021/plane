@@ -1745,7 +1745,7 @@ export default {
           description_placeholder: "输入可选描述",
           options: "选项",
           option_value: "值",
-          option_label: "标签（可选）",
+          option_label: "注释（可选）",
           add_option: "添加选项",
           true_value: "真值标签",
           false_value: "假值标签",

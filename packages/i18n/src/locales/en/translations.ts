@@ -1601,7 +1601,7 @@ export default {
           description_placeholder: "Enter optional description",
           options: "Options",
           option_value: "Value",
-          option_label: "Label (optional)",
+          option_label: "Annotation (optional)",
           add_option: "Add option",
           true_value: "True value label",
           false_value: "False value label",
