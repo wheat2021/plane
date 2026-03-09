@@ -75,9 +75,9 @@ export const ExtraPropertySettingsRoot = observer(function ExtraPropertySettings
         </Button>
       </div>
 
-      {isFormOpen && (
+      {isFormOpen && editingConfigId === null && (
         <div className="px-4">
-          <ExtraPropertyForm configId={editingConfigId} onClose={handleCloseForm} />
+          <ExtraPropertyForm configId={null} onClose={handleCloseForm} />
         </div>
       )}
 
@@ -88,7 +88,12 @@ export const ExtraPropertySettingsRoot = observer(function ExtraPropertySettings
       ) : (
         <div className="flex flex-col gap-2 px-4">
           {configs.map((config) => (
-            <ExtraPropertyItem key={config.id} config={config} onEdit={() => handleEdit(config.id)} />
+            <div key={config.id} className="flex flex-col gap-2">
+              <ExtraPropertyItem config={config} onEdit={() => handleEdit(config.id)} />
+              {isFormOpen && editingConfigId === config.id && (
+                <ExtraPropertyForm configId={config.id} onClose={handleCloseForm} />
+              )}
+            </div>
           ))}
         </div>
       )}
