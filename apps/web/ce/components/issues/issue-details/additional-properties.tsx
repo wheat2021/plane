@@ -45,10 +45,10 @@ export const WorkItemAdditionalSidebarProperties = observer((props: TWorkItemAdd
     }
   }, [workspaceSlug, projectId, workItemTypeId, bindingFetchedMap, fetchBindings]);
 
-  // Get configs via bindings
+  // Get configs via bindings, preserving binding sort_order
   const configs = useMemo(() => {
     if (!workItemTypeId) return [];
-    const bindings = getBindings(projectId, workItemTypeId);
+    const bindings = getBindings(projectId, workItemTypeId); // already sorted by binding.sort_order
     const configList: TExtraPropertyConfig[] = [];
     bindings.forEach((binding) => {
       const config = getConfigById(binding.extra_property_config);
@@ -56,7 +56,7 @@ export const WorkItemAdditionalSidebarProperties = observer((props: TWorkItemAdd
         configList.push(config);
       }
     });
-    return configList.sort((a, b) => a.sort_order - b.sort_order);
+    return configList;
   }, [workItemTypeId, projectId, getBindings, getConfigById]);
 
   // Handler for updating extra properties
