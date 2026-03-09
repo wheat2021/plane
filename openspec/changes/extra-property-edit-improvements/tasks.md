@@ -29,9 +29,9 @@
 
 ## 6. 提交实现代码
 
-- [ ] 6.1 提交后端变更：`#FICC-9999# feat(api): 新增 extra-property values 查询接口`（包含视图和 URL 配置）
-- [ ] 6.2 提交前端 service/store 变更：`#FICC-9999# feat(store): 新增 extra-property values 查询 action`
-- [ ] 6.3 提交前端 UI 变更：`#FICC-9999# feat(extra-properties): 编辑表单位置调整、类型变更检查、值合法性校验`（包含 root.tsx、form.tsx、extra-property-control.tsx）
+- [x] 6.1 提交后端变更：`#FICC-9999# feat(api): 新增 extra-property values 查询接口`（包含视图和 URL 配置）
+- [x] 6.2 提交前端 service/store 变更：`#FICC-9999# feat(store): 新增 extra-property values 查询 action`
+- [x] 6.3 提交前端 UI 变更：`#FICC-9999# feat(extra-properties): 编辑表单位置调整、类型变更检查、值合法性校验`（包含 root.tsx、form.tsx、extra-property-control.tsx）
 
 ## 7. 用户验证
 
