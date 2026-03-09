@@ -182,6 +182,7 @@ export default {
   name: "名称",
   description: "描述",
   search: "搜索",
+  search_commands: "搜索命令...",
   add_member: "添加成员",
   adding_members: "正在添加成员",
   remove_member: "移除成员",

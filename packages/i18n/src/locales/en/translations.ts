@@ -14,6 +14,7 @@ export default {
   name: "Name",
   description: "Description",
   search: "Search",
+  search_commands: "Search commands...",
   add_member: "Add member",
   adding_members: "Adding members",
   remove_member: "Remove member",
