@@ -28,17 +28,17 @@ export const CompactSelectControl: FC<ICompactSelectControl> = (props) => {
       value: opt.value,
       data: {
         value: opt.value,
-        label: opt.label || opt.value,
+        annotation: opt.label || "",
       },
     }));
   }, [config.options]);
 
   const selectedValue = (value as string) || "";
   const selectedOption = options.find((opt) => opt.value === selectedValue);
-  const displayLabel = (selectedOption?.data?.label as string) || "-";
+  const displayValue = selectedOption?.value || "-";
 
   return (
-    <Tooltip tooltipHeading={config.label} tooltipContent={displayLabel} isMobile={isMobile}>
+    <Tooltip tooltipHeading={config.label} tooltipContent={displayValue} isMobile={isMobile}>
       <div className="h-5">
         <SingleSelectDropdown
           value={selectedValue}
@@ -46,8 +46,8 @@ export const CompactSelectControl: FC<ICompactSelectControl> = (props) => {
           options={options}
           disabled={disabled}
           keyExtractor={(opt) => opt.value}
-          queryArray={["label", "value"]}
-          sortByKey="label"
+          queryArray={["value"]}
+          sortByKey="value"
           buttonContent={() => (
             <div
               className={cn(
@@ -57,20 +57,16 @@ export const CompactSelectControl: FC<ICompactSelectControl> = (props) => {
               )}
             >
               <DropdownPropertyIcon className="h-3 w-3 flex-shrink-0 text-secondary" />
-              <span className="text-caption-sm-regular truncate max-w-16">{displayLabel}</span>
+              <span className="text-caption-sm-regular truncate max-w-16">{displayValue}</span>
             </div>
           )}
           buttonContainerClassName="h-5"
           buttonClassName="h-5 p-0 border-0 bg-transparent hover:bg-transparent"
-          renderItem={({ value: itemValue, selected }) => {
-            const option = options.find((opt) => opt.value === itemValue);
-            const label = (option?.data?.label as string) || itemValue;
-            return (
-              <div className="flex items-center gap-2 px-2 py-1.5">
-                <span className={`text-body-xs-regular ${selected ? "font-medium" : ""}`}>{label}</span>
-              </div>
-            );
-          }}
+          renderItem={({ value: itemValue, selected }) => (
+            <div className="flex items-center gap-2 px-2 py-1.5">
+              <span className={`text-body-xs-regular ${selected ? "font-medium" : ""}`}>{itemValue}</span>
+            </div>
+          )}
         />
       </div>
     </Tooltip>

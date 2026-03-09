@@ -19,23 +19,10 @@ export const CompactExtraPropertyControl: FC<ICompactExtraPropertyControl> = (pr
   switch (config.type) {
     case "text":
     case "textarea":
-    case "markdown":
-      return (
-        <CompactTextControl
-          config={config}
-          value={value}
-          onChange={(val) => onChange(val)}
-          disabled={disabled}
-        />
-      );
+      return <CompactTextControl config={config} value={value} onChange={(val) => onChange(val)} disabled={disabled} />;
     case "select":
       return (
-        <CompactSelectControl
-          config={config}
-          value={value}
-          onChange={(val) => onChange(val)}
-          disabled={disabled}
-        />
+        <CompactSelectControl config={config} value={value} onChange={(val) => onChange(val)} disabled={disabled} />
       );
     case "multiselect":
       return (
@@ -48,12 +35,7 @@ export const CompactExtraPropertyControl: FC<ICompactExtraPropertyControl> = (pr
       );
     case "checkbox":
       return (
-        <CompactCheckboxControl
-          config={config}
-          value={value}
-          onChange={(val) => onChange(val)}
-          disabled={disabled}
-        />
+        <CompactCheckboxControl config={config} value={value} onChange={(val) => onChange(val)} disabled={disabled} />
       );
     default:
       return null;
