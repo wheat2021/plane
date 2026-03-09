@@ -50,7 +50,7 @@ export const SelectControl: FC<ISelectControl> = (props) => {
         return (
           <span className="text-body-xs-regular truncate">
             {option.value}
-            {annotation && <span className="text-custom-text-300"> （{annotation}）</span>}
+            {annotation && <span className="opacity-50"> （{annotation}）</span>}
           </span>
         );
       }}
