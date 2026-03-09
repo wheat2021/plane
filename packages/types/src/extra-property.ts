@@ -11,6 +11,16 @@
 export type TExtraPropertyType = "text" | "textarea" | "select" | "multiselect" | "checkbox";
 
 /**
+ * Extra input configuration for an option or checkbox state.
+ */
+export interface TExtraInput {
+  /** ID of the referenced ExtraPropertyConfig */
+  config: string;
+  /** Whether the condition property is required when visible */
+  required?: boolean;
+}
+
+/**
  * Option for select/multiselect property types.
  */
 export interface TExtraPropertyOption {
@@ -20,6 +30,8 @@ export interface TExtraPropertyOption {
   label?: string;
   /** Whether this option is selected by default */
   isDefault?: boolean;
+  /** Extra input config triggered when this option is selected */
+  extra_input?: TExtraInput | null;
 }
 
 /**
@@ -48,6 +60,10 @@ export interface TExtraPropertyConfig {
   true_value?: string;
   /** Display text for false value (checkbox type) */
   false_value?: string;
+  /** Extra input config triggered when checkbox is true */
+  true_extra_input?: TExtraInput | null;
+  /** Extra input config triggered when checkbox is false */
+  false_extra_input?: TExtraInput | null;
   /** Audit fields */
   created_at?: string;
   updated_at?: string;
@@ -95,6 +111,8 @@ export interface TIssueTypeExtraProperty {
   sort_order: number;
   /** Whether this property is required for issues of this type */
   is_required: boolean;
+  /** ID of the parent ExtraPropertyConfig that triggers this condition binding; null for normal bindings */
+  condition_config: string | null;
   /** Audit fields */
   created_at?: string;
   updated_at?: string;

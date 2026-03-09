@@ -16,6 +16,8 @@ export interface IExtraPropertyConfigStore {
   // computed actions
   getConfigById: (configId: string | null | undefined) => TExtraPropertyConfig | undefined;
   getConfigsByWorkspace: (workspaceSlug: string | null | undefined) => TExtraPropertyConfig[];
+  getExtraInputConfigs: (configId: string) => Set<string>;
+  getTriggerValues: (parentConfigId: string, childConfigId: string) => Set<string>;
   // fetch actions
   fetchWorkspaceConfigs: (workspaceSlug: string) => Promise<TExtraPropertyConfig[]>;
   fetchConfigValues: (workspaceSlug: string, configId: string) => Promise<{ count: number; distinct_values: string[] }>;
@@ -73,6 +75,38 @@ export class ExtraPropertyConfigStore implements IExtraPropertyConfigStore {
     const configIds = this.workspaceConfigsMap[workspaceSlug] || [];
     const configs = configIds.map((id) => this.configMap[id]).filter(Boolean);
     return configs.sort((a, b) => a.sort_order - b.sort_order);
+  });
+
+  /**
+   * Returns all extra_input config IDs referenced by a config's options/checkbox states
+   */
+  getExtraInputConfigs = computedFn((configId: string): Set<string> => {
+    const config = this.configMap[configId];
+    if (!config) return new Set();
+    const result = new Set<string>();
+    for (const opt of config.options ?? []) {
+      if (opt.extra_input?.config) result.add(opt.extra_input.config);
+    }
+    if (config.true_extra_input?.config) result.add(config.true_extra_input.config);
+    if (config.false_extra_input?.config) result.add(config.false_extra_input.config);
+    return result;
+  });
+
+  /**
+   * Returns the set of option values in parentConfigId that trigger childConfigId
+   */
+  getTriggerValues = computedFn((parentConfigId: string, childConfigId: string): Set<string> => {
+    const config = this.configMap[parentConfigId];
+    if (!config) return new Set();
+    const values = new Set<string>();
+    for (const opt of config.options ?? []) {
+      if (opt.extra_input?.config === childConfigId) values.add(opt.value);
+    }
+    if (config.type === "checkbox") {
+      if (config.true_extra_input?.config === childConfigId) values.add("true");
+      if (config.false_extra_input?.config === childConfigId) values.add("false");
+    }
+    return values;
   });
 
   /**

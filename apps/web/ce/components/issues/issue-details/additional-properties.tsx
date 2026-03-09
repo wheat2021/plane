@@ -23,7 +23,7 @@ export const WorkItemAdditionalSidebarProperties = observer((props: TWorkItemAdd
 
   // store hooks
   const { fetchedMap: configFetchedMap, fetchWorkspaceConfigs, getConfigById } = useExtraPropertyConfig();
-  const { fetchedMap: bindingFetchedMap, fetchBindings, getBindings } = useIssueTypeExtraProperty();
+  const { fetchedMap: bindingFetchedMap, fetchBindings, getBindings, isConditionMet } = useIssueTypeExtraProperty();
   const {
     issue: { getIssueById },
     updateIssue,
@@ -45,19 +45,25 @@ export const WorkItemAdditionalSidebarProperties = observer((props: TWorkItemAdd
     }
   }, [workspaceSlug, projectId, workItemTypeId, bindingFetchedMap, fetchBindings]);
 
-  // Get configs via bindings, preserving binding sort_order
-  const configs = useMemo(() => {
-    if (!workItemTypeId) return [];
-    const bindings = getBindings(projectId, workItemTypeId); // already sorted by binding.sort_order
+  // Get configs via bindings, preserving binding sort_order, filtering condition bindings
+  const { configs, requiredKeys } = useMemo(() => {
+    if (!workItemTypeId) return { configs: [] as TExtraPropertyConfig[], requiredKeys: new Set<string>() };
+    const bindings = getBindings(projectId, workItemTypeId);
     const configList: TExtraPropertyConfig[] = [];
+    const reqKeys = new Set<string>();
     bindings.forEach((binding) => {
+      // Skip condition bindings whose condition is not met
+      if (binding.condition_config && !isConditionMet(projectId, workItemTypeId, binding.id, issue?.extra_properties)) {
+        return;
+      }
       const config = getConfigById(binding.extra_property_config);
       if (config) {
         configList.push(config);
+        if (binding.is_required) reqKeys.add(config.key);
       }
     });
-    return configList;
-  }, [workItemTypeId, projectId, getBindings, getConfigById]);
+    return { configs: configList, requiredKeys: reqKeys };
+  }, [workItemTypeId, projectId, getBindings, getConfigById, isConditionMet, issue?.extra_properties]);
 
   // Handler for updating extra properties
   const handleChange = (key: string, value: TExtraPropertyValue) => {
@@ -87,6 +93,7 @@ export const WorkItemAdditionalSidebarProperties = observer((props: TWorkItemAdd
       isEditable={isEditable}
       workspaceSlug={workspaceSlug}
       projectId={projectId}
+      requiredKeys={requiredKeys}
     />
   );
 });

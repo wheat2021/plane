@@ -1606,6 +1606,10 @@ export default {
           add_option: "Add option",
           true_value: "True value label",
           false_value: "False value label",
+          extra_input: "Extra Input",
+          extra_input_none: "None",
+          extra_input_required: "Required",
+          extra_input_cycle_error: "Cannot save: circular reference detected",
         },
         delete_modal: {
           title: "Delete property",
@@ -1896,6 +1900,7 @@ export default {
         unbind_success: "Property removed from this work item type",
         required: "Required",
         required_update_success: "Required status updated successfully",
+        condition: "Condition",
       },
     },
     empty_state: {

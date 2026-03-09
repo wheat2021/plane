@@ -46,7 +46,13 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
   const { isMobile } = usePlatformOS();
 
   const { getConfigById, fetchWorkspaceConfigs } = useExtraPropertyConfig();
-  const { fetchedMap: bindingFetchedMap, fetchBindings, getConfigIdsByIssueType } = useIssueTypeExtraProperty();
+  const {
+    fetchedMap: bindingFetchedMap,
+    fetchBindings,
+    getConfigIdsByIssueType,
+    getBindings,
+    isConditionMet,
+  } = useIssueTypeExtraProperty();
 
   // Ensure configs are loaded when component mounts
   React.useEffect(() => {
@@ -102,7 +108,19 @@ export const WorkItemLayoutAdditionalProperties = observer(function WorkItemLayo
         const isValid = validConfigIds.has(configId);
         const currentValue = issue.extra_properties?.[config.key] ?? null;
 
-        if (!isValid) {
+        // Check condition met for condition bindings
+        const projId = projectId?.toString();
+        const typeId = issue.type_id;
+        let conditionSatisfied = true;
+        if (isValid && projId && typeId) {
+          const bindings = getBindings(projId, typeId);
+          const binding = bindings.find((b) => b.extra_property_config === configId);
+          if (binding?.condition_config) {
+            conditionSatisfied = isConditionMet(projId, typeId, binding.id, issue.extra_properties);
+          }
+        }
+
+        if (!isValid || !conditionSatisfied) {
           const PropertyIcon = getPropertyIcon(config.type);
           return (
             <Tooltip

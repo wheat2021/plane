@@ -202,7 +202,13 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
   const { handleRedirection } = useIssuePeekOverviewRedirection(isEpic);
   const { isMobile } = usePlatformOS();
   const { getConfigById, fetchWorkspaceConfigs } = useExtraPropertyConfig();
-  const { fetchedMap: bindingFetchedMap, fetchBindings, getConfigIdsByIssueType } = useIssueTypeExtraProperty();
+  const {
+    fetchedMap: bindingFetchedMap,
+    fetchBindings,
+    getConfigIdsByIssueType,
+    getBindings,
+    isConditionMet,
+  } = useIssueTypeExtraProperty();
 
   // handlers
   const handleIssuePeekOverview = (issue: TIssue) =>
@@ -442,10 +448,20 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
             const config = getConfigById(configId);
             if (!config) return null;
 
-            // If validConfigIds is empty, it means the work item type has no restrictions
-            // so all extra properties are available
             const isValid = validConfigIds.size === 0 || validConfigIds.has(configId);
             const currentValue = issueDetail.extra_properties?.[config.key] ?? null;
+
+            // Check condition met for condition bindings
+            const projId = projectId?.toString();
+            const typeId = issueDetail?.type_id;
+            let conditionSatisfied = true;
+            if (isValid && projId && typeId) {
+              const bindings = getBindings(projId, typeId);
+              const binding = bindings.find((b) => b.extra_property_config === configId);
+              if (binding?.condition_config) {
+                conditionSatisfied = isConditionMet(projId, typeId, binding.id, issueDetail.extra_properties);
+              }
+            }
 
             return (
               <td
@@ -453,7 +469,7 @@ const IssueRowDetails = observer(function IssueRowDetails(props: IssueRowDetails
                 className="h-11 min-w-36 text-13 after:absolute after:w-full after:bottom-[-1px] after:border after:border-subtle border-r-[1px] border-subtle"
               >
                 <div className="flex items-center px-2 py-2">
-                  {!isValid ? (
+                  {!isValid || !conditionSatisfied ? (
                     <div className="flex h-5 flex-shrink-0 items-center opacity-40 cursor-not-allowed">
                       <span className="text-caption-sm-regular text-secondary">—</span>
                     </div>

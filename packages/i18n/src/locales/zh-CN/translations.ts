@@ -1750,6 +1750,10 @@ export default {
           add_option: "添加选项",
           true_value: "真值标签",
           false_value: "假值标签",
+          extra_input: "额外输入",
+          extra_input_none: "无",
+          extra_input_required: "必填",
+          extra_input_cycle_error: "无法保存：检测到循环引用",
         },
         delete_modal: {
           title: "删除属性",
@@ -1978,6 +1982,7 @@ export default {
         unbind_success: "属性已从此工作项类型中移除",
         required: "必填",
         required_update_success: "必填状态已成功更新",
+        condition: "条件",
       },
     },
     automations: {

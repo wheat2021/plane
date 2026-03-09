@@ -100,6 +100,14 @@ class IssueTypeExtraProperty(BaseModel):
     )
     sort_order = models.FloatField(default=65535, help_text="Order of the property within the issue type")
     is_required = models.BooleanField(default=False, help_text="Whether this property is required for issues of this type")
+    condition_config = models.ForeignKey(
+        "db.ExtraPropertyConfig",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="condition_bindings",
+        help_text="Parent config that triggers this condition binding; null for normal bindings",
+    )
 
     class Meta:
         verbose_name = "Issue Type Extra Property"

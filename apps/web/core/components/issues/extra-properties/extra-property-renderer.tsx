@@ -16,6 +16,7 @@ interface IExtraPropertyRenderer {
   isEditable?: boolean;
   workspaceSlug?: string;
   projectId?: string;
+  requiredKeys?: Set<string>;
 }
 
 /**
@@ -37,7 +38,7 @@ const getPropertyIcon = (type: TExtraPropertyConfig["type"]) => {
 };
 
 export const ExtraPropertyRenderer: FC<IExtraPropertyRenderer> = observer((props) => {
-  const { configs, values, onChange, isEditable = true, workspaceSlug, projectId } = props;
+  const { configs, values, onChange, isEditable = true, workspaceSlug, projectId, requiredKeys } = props;
 
   if (!configs || configs.length === 0) {
     return null;
@@ -48,12 +49,13 @@ export const ExtraPropertyRenderer: FC<IExtraPropertyRenderer> = observer((props
       {configs.map((config) => {
         const Icon = getPropertyIcon(config.type);
         const currentValue = values?.[config.key] ?? null;
+        const isRequired = requiredKeys?.has(config.key) ?? false;
 
         return (
           <SidebarPropertyListItem
             key={config.id}
             icon={Icon}
-            label={config.label}
+            label={`${config.label}${isRequired ? " *" : ""}`}
             appendElement={
               config.description ? <ExtraPropertyDescriptionPopover description={config.description} /> : undefined
             }

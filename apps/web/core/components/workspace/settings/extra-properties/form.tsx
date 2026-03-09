@@ -8,7 +8,7 @@ import { useParams } from "react-router";
 // plane imports
 import { useTranslation } from "@plane/i18n";
 import type { TExtraPropertyConfigPayload, TExtraPropertyType } from "@plane/types";
-import { Button, CustomSelect, Input, TextArea } from "@plane/ui";
+import { Button, CustomSelect, Input, TextArea, ToggleSwitch } from "@plane/ui";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 // hooks
 import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
@@ -23,9 +23,13 @@ type FormValues = {
   label: string;
   type: TExtraPropertyType;
   description: string;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; extra_input_config?: string; extra_input_required?: boolean }[];
   true_value: string;
   false_value: string;
+  true_extra_input_config: string;
+  true_extra_input_required: boolean;
+  false_extra_input_config: string;
+  false_extra_input_required: boolean;
 };
 
 const PROPERTY_TYPES: { value: TExtraPropertyType; label: string }[] = [
@@ -60,7 +64,8 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
   const [impactLoading, setImpactLoading] = useState(false);
   const [impactData, setImpactData] = useState<{ count: number; distinct_values: string[] } | null>(null);
   // store hooks
-  const { getConfigById, createConfig, updateConfig, fetchConfigValues } = useExtraPropertyConfig();
+  const { getConfigById, getConfigsByWorkspace, createConfig, updateConfig, fetchConfigValues } =
+    useExtraPropertyConfig();
   // i18n
   const { t } = useTranslation();
   // derived values
@@ -81,9 +86,13 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
       label: "",
       type: "text",
       description: "",
-      options: [{ value: "", label: "" }],
+      options: [{ value: "", label: "", extra_input_config: "", extra_input_required: false }],
       true_value: "Yes",
       false_value: "No",
+      true_extra_input_config: "",
+      true_extra_input_required: false,
+      false_extra_input_config: "",
+      false_extra_input_required: false,
     },
   });
 
@@ -96,6 +105,38 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
   const showOptions = selectedType === "select" || selectedType === "multiselect";
   const showCheckboxValues = selectedType === "checkbox";
 
+  // Available configs for extra input dropdown (exclude self and cycle-forming)
+  const availableExtraInputConfigs = (() => {
+    const allConfigs = getConfigsByWorkspace(workspaceSlug as string) || [];
+    const filtered = allConfigs.filter((c) => c.id !== configId);
+    if (!configId) return filtered;
+    // Build dependency graph to detect cycles
+    const graph = new Map<string, Set<string>>();
+    for (const c of allConfigs) {
+      const targets = new Set<string>();
+      for (const opt of c.options ?? []) {
+        if (opt.extra_input?.config) targets.add(opt.extra_input.config);
+      }
+      if (c.true_extra_input?.config) targets.add(c.true_extra_input.config);
+      if (c.false_extra_input?.config) targets.add(c.false_extra_input.config);
+      graph.set(c.id, targets);
+    }
+    // Check if adding configId -> candidateId would create a cycle
+    const wouldCycle = (candidateId: string): boolean => {
+      const visited = new Set<string>();
+      const stack = [candidateId];
+      while (stack.length > 0) {
+        const node = stack.pop()!;
+        if (node === configId) return true;
+        if (visited.has(node)) continue;
+        visited.add(node);
+        for (const nb of graph.get(node) ?? []) stack.push(nb);
+      }
+      return false;
+    };
+    return filtered.filter((c) => !wouldCycle(c.id));
+  })();
+
   useEffect(() => {
     if (existingConfig) {
       reset({
@@ -104,10 +145,19 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
         type: existingConfig.type,
         description: existingConfig.description || "",
         options: existingConfig.options?.length
-          ? existingConfig.options.map((o) => ({ value: o.value, label: o.label || "" }))
-          : [{ value: "", label: "" }],
+          ? existingConfig.options.map((o) => ({
+              value: o.value,
+              label: o.label || "",
+              extra_input_config: o.extra_input?.config || "",
+              extra_input_required: o.extra_input?.required || false,
+            }))
+          : [{ value: "", label: "", extra_input_config: "", extra_input_required: false }],
         true_value: existingConfig.true_value || "Yes",
         false_value: existingConfig.false_value || "No",
+        true_extra_input_config: existingConfig.true_extra_input?.config || "",
+        true_extra_input_required: existingConfig.true_extra_input?.required || false,
+        false_extra_input_config: existingConfig.false_extra_input?.config || "",
+        false_extra_input_required: existingConfig.false_extra_input?.required || false,
       });
     }
   }, [existingConfig, reset]);
@@ -163,12 +213,31 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
           .map((o) => ({
             value: o.value,
             label: o.label || undefined,
+            extra_input: o.extra_input_config
+              ? { config: o.extra_input_config, required: o.extra_input_required || false }
+              : undefined,
           }));
       }
 
       if (showCheckboxValues) {
         payload.true_value = data.true_value;
         payload.false_value = data.false_value;
+        if (data.true_extra_input_config) {
+          payload.true_extra_input = {
+            config: data.true_extra_input_config,
+            required: data.true_extra_input_required || false,
+          };
+        } else {
+          payload.true_extra_input = null;
+        }
+        if (data.false_extra_input_config) {
+          payload.false_extra_input = {
+            config: data.false_extra_input_config,
+            required: data.false_extra_input_required || false,
+          };
+        } else {
+          payload.false_extra_input = null;
+        }
       }
 
       if (isEditMode && configId) {
@@ -307,28 +376,72 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
             </label>
             <div className="flex flex-col gap-2">
               {fields.map((field, index) => (
-                <div key={field.id} className="flex items-center gap-2">
-                  <Input
-                    {...register(`options.${index}.value` as const)}
-                    placeholder={t("workspace_settings.settings.extra_properties.form.option_value")}
-                    className="flex-1"
-                  />
-                  <Input
-                    {...register(`options.${index}.label` as const)}
-                    placeholder={t("workspace_settings.settings.extra_properties.form.option_label")}
-                    className="flex-1"
-                  />
-                  {fields.length > 1 && (
-                    <Button variant="link-neutral" size="sm" onClick={() => remove(index)}>
-                      <Trash2 className="size-4" />
-                    </Button>
-                  )}
+                <div key={field.id} className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      {...register(`options.${index}.value` as const)}
+                      placeholder={t("workspace_settings.settings.extra_properties.form.option_value")}
+                      className="flex-1"
+                    />
+                    <Input
+                      {...register(`options.${index}.label` as const)}
+                      placeholder={t("workspace_settings.settings.extra_properties.form.option_label")}
+                      className="flex-1"
+                    />
+                    {fields.length > 1 && (
+                      <Button variant="link-neutral" size="sm" onClick={() => remove(index)}>
+                        <Trash2 className="size-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 pl-1">
+                    <span className="text-xs text-custom-text-300">
+                      {t("workspace_settings.settings.extra_properties.form.extra_input")}
+                    </span>
+                    <Controller
+                      name={`options.${index}.extra_input_config` as const}
+                      control={control}
+                      render={({ field: f }) => (
+                        <CustomSelect
+                          value={f.value || ""}
+                          onChange={f.onChange}
+                          label={
+                            availableExtraInputConfigs.find((c) => c.id === f.value)?.label ||
+                            t("workspace_settings.settings.extra_properties.form.extra_input_none")
+                          }
+                          input
+                          buttonClassName="min-w-[140px] text-xs"
+                        >
+                          <CustomSelect.Option value="">
+                            {t("workspace_settings.settings.extra_properties.form.extra_input_none")}
+                          </CustomSelect.Option>
+                          {availableExtraInputConfigs.map((c) => (
+                            <CustomSelect.Option key={c.id} value={c.id}>
+                              {c.label}
+                            </CustomSelect.Option>
+                          ))}
+                        </CustomSelect>
+                      )}
+                    />
+                    {watch(`options.${index}.extra_input_config`) && (
+                      <>
+                        <span className="text-xs text-custom-text-300">
+                          {t("workspace_settings.settings.extra_properties.form.extra_input_required")}
+                        </span>
+                        <Controller
+                          name={`options.${index}.extra_input_required` as const}
+                          control={control}
+                          render={({ field: f }) => <ToggleSwitch value={!!f.value} onChange={f.onChange} size="sm" />}
+                        />
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
               <Button
                 variant="link-neutral"
                 size="sm"
-                onClick={() => append({ value: "", label: "" })}
+                onClick={() => append({ value: "", label: "", extra_input_config: "", extra_input_required: false })}
                 className="self-start"
               >
                 <Plus className="size-4 mr-1" />
@@ -339,18 +452,108 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
         )}
 
         {showCheckboxValues && (
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                {t("workspace_settings.settings.extra_properties.form.true_value")}
-              </label>
-              <Input {...register("true_value")} className="w-full" />
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  {t("workspace_settings.settings.extra_properties.form.true_value")}
+                </label>
+                <Input {...register("true_value")} className="w-full" />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  {t("workspace_settings.settings.extra_properties.form.false_value")}
+                </label>
+                <Input {...register("false_value")} className="w-full" />
+              </div>
             </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                {t("workspace_settings.settings.extra_properties.form.false_value")}
-              </label>
-              <Input {...register("false_value")} className="w-full" />
+            {/* True state extra input */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-custom-text-300">
+                {t("workspace_settings.settings.extra_properties.form.true_value")}{" "}
+                {t("workspace_settings.settings.extra_properties.form.extra_input")}
+              </span>
+              <Controller
+                name="true_extra_input_config"
+                control={control}
+                render={({ field: f }) => (
+                  <CustomSelect
+                    value={f.value || ""}
+                    onChange={f.onChange}
+                    label={
+                      availableExtraInputConfigs.find((c) => c.id === f.value)?.label ||
+                      t("workspace_settings.settings.extra_properties.form.extra_input_none")
+                    }
+                    input
+                    buttonClassName="min-w-[140px] text-xs"
+                  >
+                    <CustomSelect.Option value="">
+                      {t("workspace_settings.settings.extra_properties.form.extra_input_none")}
+                    </CustomSelect.Option>
+                    {availableExtraInputConfigs.map((c) => (
+                      <CustomSelect.Option key={c.id} value={c.id}>
+                        {c.label}
+                      </CustomSelect.Option>
+                    ))}
+                  </CustomSelect>
+                )}
+              />
+              {watch("true_extra_input_config") && (
+                <>
+                  <span className="text-xs text-custom-text-300">
+                    {t("workspace_settings.settings.extra_properties.form.extra_input_required")}
+                  </span>
+                  <Controller
+                    name="true_extra_input_required"
+                    control={control}
+                    render={({ field: f }) => <ToggleSwitch value={!!f.value} onChange={f.onChange} size="sm" />}
+                  />
+                </>
+              )}
+            </div>
+            {/* False state extra input */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-custom-text-300">
+                {t("workspace_settings.settings.extra_properties.form.false_value")}{" "}
+                {t("workspace_settings.settings.extra_properties.form.extra_input")}
+              </span>
+              <Controller
+                name="false_extra_input_config"
+                control={control}
+                render={({ field: f }) => (
+                  <CustomSelect
+                    value={f.value || ""}
+                    onChange={f.onChange}
+                    label={
+                      availableExtraInputConfigs.find((c) => c.id === f.value)?.label ||
+                      t("workspace_settings.settings.extra_properties.form.extra_input_none")
+                    }
+                    input
+                    buttonClassName="min-w-[140px] text-xs"
+                  >
+                    <CustomSelect.Option value="">
+                      {t("workspace_settings.settings.extra_properties.form.extra_input_none")}
+                    </CustomSelect.Option>
+                    {availableExtraInputConfigs.map((c) => (
+                      <CustomSelect.Option key={c.id} value={c.id}>
+                        {c.label}
+                      </CustomSelect.Option>
+                    ))}
+                  </CustomSelect>
+                )}
+              />
+              {watch("false_extra_input_config") && (
+                <>
+                  <span className="text-xs text-custom-text-300">
+                    {t("workspace_settings.settings.extra_properties.form.extra_input_required")}
+                  </span>
+                  <Controller
+                    name="false_extra_input_required"
+                    control={control}
+                    render={({ field: f }) => <ToggleSwitch value={!!f.value} onChange={f.onChange} size="sm" />}
+                  />
+                </>
+              )}
             </div>
           </div>
         )}

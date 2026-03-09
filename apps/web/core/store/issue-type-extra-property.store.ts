@@ -2,7 +2,7 @@ import { set } from "lodash-es";
 import { action, makeObservable, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
 // plane imports
-import type { TIssueTypeExtraProperty, TIssueTypeExtraPropertyPayload } from "@plane/types";
+import type { TIssueTypeExtraProperty, TIssueTypeExtraPropertyPayload, TIssueExtraProperties } from "@plane/types";
 // services
 import { IssueTypeExtraPropertyService } from "@/services/issue-type-extra-property.service";
 import type { CoreRootStore } from "./root.store";
@@ -20,6 +20,13 @@ export interface IIssueTypeExtraPropertyStore {
     issueTypeId: string | null | undefined
   ) => TIssueTypeExtraProperty[];
   getConfigIdsByIssueType: (projectId: string | null | undefined, issueTypeId: string | null | undefined) => string[];
+  isConditionBinding: (bindingId: string) => boolean;
+  isConditionMet: (
+    projectId: string,
+    issueTypeId: string,
+    bindingId: string,
+    issueExtraProperties: TIssueExtraProperties | undefined
+  ) => boolean;
   // fetch actions
   fetchBindings: (workspaceSlug: string, projectId: string, issueTypeId: string) => Promise<TIssueTypeExtraProperty[]>;
   // CRUD actions
@@ -96,6 +103,62 @@ export class IssueTypeExtraPropertyStore implements IIssueTypeExtraPropertyStore
   );
 
   /**
+   * Returns whether a binding is a condition binding
+   */
+  isConditionBinding = computedFn((bindingId: string): boolean => {
+    const binding = this.bindingMap[bindingId];
+    return binding?.condition_config != null;
+  });
+
+  /**
+   * Recursively checks if a condition binding's condition chain is satisfied
+   */
+  isConditionMet = computedFn(
+    (
+      projectId: string,
+      issueTypeId: string,
+      bindingId: string,
+      issueExtraProperties: TIssueExtraProperties | undefined
+    ): boolean => {
+      const binding = this.bindingMap[bindingId];
+      if (!binding || !binding.condition_config) return true; // normal binding always met
+
+      const parentConfigId = binding.condition_config;
+      const childConfigId = binding.extra_property_config;
+      const triggerValues = this.rootStore.extraPropertyConfig.getTriggerValues(parentConfigId, childConfigId);
+      if (triggerValues.size === 0) return true; // no trigger defined = always show
+
+      // Get parent config to find its key
+      const parentConfig = this.rootStore.extraPropertyConfig.getConfigById(parentConfigId);
+      if (!parentConfig) return false;
+
+      const parentValue = issueExtraProperties?.[parentConfig.key];
+
+      // Check if parent value matches any trigger value
+      let matched = false;
+      if (parentConfig.type === "checkbox") {
+        const boolStr = parentValue === true ? "true" : parentValue === false ? "false" : "";
+        matched = triggerValues.has(boolStr);
+      } else if (Array.isArray(parentValue)) {
+        matched = parentValue.some((v) => triggerValues.has(String(v)));
+      } else if (parentValue != null) {
+        matched = triggerValues.has(String(parentValue));
+      }
+
+      if (!matched) return false;
+
+      // Recursively check parent's condition chain
+      const parentBinding = this.getBindings(projectId, issueTypeId).find(
+        (b) => b.extra_property_config === parentConfigId
+      );
+      if (parentBinding && parentBinding.condition_config) {
+        return this.isConditionMet(projectId, issueTypeId, parentBinding.id, issueExtraProperties);
+      }
+      return true;
+    }
+  );
+
+  /**
    * Fetches bindings for a project + issue type
    */
   fetchBindings = async (workspaceSlug: string, projectId: string, issueTypeId: string) => {
@@ -132,7 +195,7 @@ export class IssueTypeExtraPropertyStore implements IIssueTypeExtraPropertyStore
   };
 
   /**
-   * Creates a new binding
+   * Creates a new binding, then re-fetches all bindings to capture auto-created condition bindings
    */
   createBinding = async (
     workspaceSlug: string,
@@ -146,22 +209,11 @@ export class IssueTypeExtraPropertyStore implements IIssueTypeExtraPropertyStore
       issueTypeId,
       data
     );
-    runInAction(() => {
-      set(this.bindingMap, response.id, response);
-      if (!this.projectIssueTypeBindingsMap[projectId]) {
-        set(this.projectIssueTypeBindingsMap, projectId, {});
-      }
-      const bindingIds = this.projectIssueTypeBindingsMap[projectId]?.[issueTypeId] || [];
-      set(this.projectIssueTypeBindingsMap[projectId], issueTypeId, [...bindingIds, response.id]);
-      // Populate config from nested detail if available
-      if (response.extra_property_config_detail) {
-        set(
-          this.rootStore.extraPropertyConfig.configMap,
-          response.extra_property_config,
-          response.extra_property_config_detail
-        );
-      }
-    });
+    // Re-fetch to capture auto-created condition bindings
+    if (this.fetchedMap[projectId]) {
+      delete this.fetchedMap[projectId][issueTypeId];
+    }
+    await this.fetchBindings(workspaceSlug, projectId, issueTypeId);
     return response;
   };
 
@@ -197,20 +249,14 @@ export class IssueTypeExtraPropertyStore implements IIssueTypeExtraPropertyStore
   };
 
   /**
-   * Deletes a binding
+   * Deletes a binding, then re-fetches to reflect cascade-deleted condition bindings
    */
   deleteBinding = async (workspaceSlug: string, projectId: string, issueTypeId: string, bindingId: string) => {
     await this.issueTypeExtraPropertyService.deleteBinding(workspaceSlug, projectId, issueTypeId, bindingId);
-    runInAction(() => {
-      delete this.bindingMap[bindingId];
-      const bindingIds = this.projectIssueTypeBindingsMap[projectId]?.[issueTypeId] || [];
-      if (this.projectIssueTypeBindingsMap[projectId]) {
-        set(
-          this.projectIssueTypeBindingsMap[projectId],
-          issueTypeId,
-          bindingIds.filter((id) => id !== bindingId)
-        );
-      }
-    });
+    // Re-fetch to reflect cascade-deleted condition bindings
+    if (this.fetchedMap[projectId]) {
+      delete this.fetchedMap[projectId][issueTypeId];
+    }
+    await this.fetchBindings(workspaceSlug, projectId, issueTypeId);
   };
 }

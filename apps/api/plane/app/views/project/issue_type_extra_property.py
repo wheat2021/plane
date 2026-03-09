@@ -7,6 +7,7 @@ from plane.app.views.base import BaseAPIView
 from plane.app.serializers import IssueTypeExtraPropertySerializer
 from plane.app.permissions import ROLE, allow_permission
 from plane.db.models import IssueTypeExtraProperty, Project, IssueType
+from plane.app.views.workspace.extra_property import _create_condition_bindings_for_config, _delete_condition_bindings_cascade
 
 
 class IssueTypeExtraPropertyEndpoint(BaseAPIView):
@@ -66,7 +67,12 @@ class IssueTypeExtraPropertyEndpoint(BaseAPIView):
             },
         )
         if serializer.is_valid():
-            serializer.save()
+            binding = serializer.save()
+            # Auto-create condition bindings for extra_input references
+            _create_condition_bindings_for_config(
+                binding.extra_property_config, project.id, issue_type.id, binding.sort_order
+            )
+            # Re-fetch to include any new condition bindings in response
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -98,6 +104,13 @@ class IssueTypeExtraPropertyDetailEndpoint(BaseAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        # Condition bindings: only sort_order is updatable
+        if binding.condition_config_id is not None and "is_required" in request.data:
+            return Response(
+                {"error": "is_required of condition bindings is controlled by the parent config's extra_input.required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         serializer = IssueTypeExtraPropertySerializer(
             binding,
             data=request.data,
@@ -122,6 +135,18 @@ class IssueTypeExtraPropertyDetailEndpoint(BaseAPIView):
                 {"error": "Extra property binding not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+        # Reject manual deletion of condition bindings
+        if binding.condition_config_id is not None:
+            return Response(
+                {"error": "Condition bindings are managed by their parent config and cannot be manually deleted."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Cascade delete condition bindings triggered by this binding's config
+        _delete_condition_bindings_cascade(
+            binding.extra_property_config_id, project_id, issue_type_id
+        )
 
         binding.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

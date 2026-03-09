@@ -32,6 +32,17 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         help_text="Display text for false value (checkbox type)",
     )
 
+    true_extra_input = serializers.DictField(
+        required=False,
+        allow_null=True,
+        help_text="Extra input config for checkbox true state",
+    )
+    false_extra_input = serializers.DictField(
+        required=False,
+        allow_null=True,
+        help_text="Extra input config for checkbox false state",
+    )
+
     class Meta:
         model = ExtraPropertyConfig
         fields = [
@@ -47,6 +58,8 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
             "default_value",
             "true_value",
             "false_value",
+            "true_extra_input",
+            "false_extra_input",
             # Audit fields
             "created_at",
             "updated_at",
@@ -65,19 +78,19 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
     def to_representation(self, instance):
         """Flatten config fields in the output."""
         data = super().to_representation(instance)
-        # Extract config values
         config = instance.config or {}
         data["options"] = config.get("options", [])
         data["default_value"] = config.get("default_value")
         data["true_value"] = config.get("true_value", "Yes")
         data["false_value"] = config.get("false_value", "No")
+        data["true_extra_input"] = config.get("true_extra_input")
+        data["false_extra_input"] = config.get("false_extra_input")
         return data
 
     def to_internal_value(self, data):
         """Pack flattened fields into config before validation."""
         internal_data = super().to_internal_value(data)
 
-        # Build config from flattened fields
         config = {}
         if "options" in data:
             config["options"] = data["options"]
@@ -87,8 +100,11 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
             config["true_value"] = data["true_value"]
         if "false_value" in data:
             config["false_value"] = data["false_value"]
+        if "true_extra_input" in data:
+            config["true_extra_input"] = data["true_extra_input"]
+        if "false_extra_input" in data:
+            config["false_extra_input"] = data["false_extra_input"]
 
-        # Merge with existing config if updating
         if self.instance:
             existing_config = self.instance.config or {}
             existing_config.update(config)
@@ -96,7 +112,6 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
 
         internal_data["config"] = config
 
-        # Remove flattened fields as they're now in config
         internal_data.pop("options", None)
         internal_data.pop("default_value", None)
         internal_data.pop("true_value", None)
@@ -114,10 +129,29 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
             )
         return value
 
+    def _validate_extra_input_ref(self, ref, field_name, workspace_id):
+        """Validate an extra_input reference dict."""
+        if ref is None:
+            return
+        if not isinstance(ref, dict) or "config" not in ref:
+            raise serializers.ValidationError(
+                {field_name: "extra_input must have a 'config' field."}
+            )
+        config_id = ref["config"]
+        if not ExtraPropertyConfig.objects.filter(
+            id=config_id, workspace_id=workspace_id
+        ).exists():
+            raise serializers.ValidationError(
+                {field_name: f"Referenced config {config_id} does not exist in this workspace."}
+            )
+
     def validate(self, attrs):
         """Validate type-specific configuration."""
         prop_type = attrs.get("type") or (self.instance.type if self.instance else None)
         config = attrs.get("config", {})
+        workspace_id = self.context.get("workspace_id") or (
+            self.instance.workspace_id if self.instance else None
+        )
 
         # Validate options for select/multiselect types
         if prop_type in ("select", "multiselect"):
@@ -126,12 +160,22 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
                 raise serializers.ValidationError(
                     {"options": "Options are required for select/multiselect types."}
                 )
-            # Validate each option has a value
             for i, option in enumerate(options):
                 if not isinstance(option, dict) or "value" not in option:
                     raise serializers.ValidationError(
                         {"options": f"Option at index {i} must have a 'value' field."}
                     )
+                if workspace_id and option.get("extra_input"):
+                    self._validate_extra_input_ref(
+                        option["extra_input"], f"options[{i}].extra_input", workspace_id
+                    )
+
+        # Validate checkbox extra_input references
+        if prop_type == "checkbox" and workspace_id:
+            for field in ("true_extra_input", "false_extra_input"):
+                ref = config.get(field)
+                if ref:
+                    self._validate_extra_input_ref(ref, field, workspace_id)
 
         return attrs
 
@@ -174,6 +218,7 @@ class IssueTypeExtraPropertySerializer(BaseSerializer):
             "extra_property_config_detail",
             "sort_order",
             "is_required",
+            "condition_config",
             "created_at",
             "updated_at",
         ]
@@ -182,6 +227,7 @@ class IssueTypeExtraPropertySerializer(BaseSerializer):
             "project",
             "issue_type",
             "extra_property_config_detail",
+            "condition_config",
             "created_at",
             "updated_at",
         ]

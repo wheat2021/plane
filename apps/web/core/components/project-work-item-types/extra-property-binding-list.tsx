@@ -66,6 +66,12 @@ export const ExtraPropertyBindingList = observer(function ExtraPropertyBindingLi
     [workspaceConfigs, bindings]
   );
 
+  // Separate normal and condition bindings for unbound list filtering
+  const conditionConfigIds = useMemo(
+    () => new Set(bindings.filter((b) => b.condition_config).map((b) => b.extra_property_config)),
+    [bindings]
+  );
+
   useEffect(() => {
     if (wsSlug && !isConfigFetched) {
       void fetchWorkspaceConfigs(wsSlug);
@@ -197,67 +203,83 @@ export const ExtraPropertyBindingList = observer(function ExtraPropertyBindingLi
               if (!config) return null;
               const isToggleLoading = loadingState.toggle.has(config.id);
               const isRequiredLoading = loadingState.required.has(config.id);
+              const isCondition = binding.condition_config != null;
               return (
                 <div
                   className={`flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-custom-background-80 ${
                     !isEditable ? "cursor-not-allowed opacity-60" : ""
-                  }`}
+                  } ${isCondition ? "ml-6" : ""}`}
                 >
                   <span className={`flex items-center gap-2 flex-1 ${isEditable ? "cursor-pointer" : ""}`}>
                     {isEditable && (
                       <GripVertical className="size-4 text-custom-text-300 cursor-grab active:cursor-grabbing flex-shrink-0" />
                     )}
-                    <Checkbox
-                      checked
-                      onChange={() => void handleToggleBinding(config.id)}
-                      disabled={!isEditable || isToggleLoading}
-                    />
+                    {isCondition ? (
+                      <div className="size-4 flex-shrink-0" />
+                    ) : (
+                      <Checkbox
+                        checked
+                        onChange={() => void handleToggleBinding(config.id)}
+                        disabled={!isEditable || isToggleLoading}
+                      />
+                    )}
                     <div className="flex flex-col">
-                      <span className="text-sm">{config.label}</span>
+                      <span className="text-sm flex items-center gap-1">
+                        {config.label}
+                        {isCondition && (
+                          <span className="text-xs text-custom-text-300 bg-custom-background-80 px-1.5 py-0.5 rounded">
+                            {t("project_settings.work_item_types.extra_properties.condition")}
+                          </span>
+                        )}
+                      </span>
                       <span className="text-xs text-custom-text-300">{config.type}</span>
                     </div>
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-custom-text-300">
-                      {t("project_settings.work_item_types.extra_properties.required")}
-                    </span>
-                    <ToggleSwitch
-                      value={binding.is_required}
-                      onChange={() => void handleToggleRequired(config.id, binding.id, binding.is_required)}
-                      disabled={!isEditable || isRequiredLoading}
-                      size="sm"
-                    />
-                  </div>
+                  {!isCondition && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-custom-text-300">
+                        {t("project_settings.work_item_types.extra_properties.required")}
+                      </span>
+                      <ToggleSwitch
+                        value={binding.is_required}
+                        onChange={() => void handleToggleRequired(config.id, binding.id, binding.is_required)}
+                        disabled={!isEditable || isRequiredLoading}
+                        size="sm"
+                      />
+                    </div>
+                  )}
                 </div>
               );
             }}
           />
         )}
-        {/* Unbound (unselected) items */}
-        {unboundConfigs.map((config) => {
-          const isToggleLoading = loadingState.toggle.has(config.id);
-          return (
-            <div
-              key={config.id}
-              className={`flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-custom-background-80 ${
-                !isEditable ? "cursor-not-allowed opacity-60" : ""
-              }`}
-            >
-              <span className={`flex items-center gap-2 flex-1 ${isEditable ? "cursor-pointer" : ""}`}>
-                {isEditable && <div className="size-4 flex-shrink-0" />}
-                <Checkbox
-                  checked={false}
-                  onChange={() => void handleToggleBinding(config.id)}
-                  disabled={!isEditable || isToggleLoading}
-                />
-                <div className="flex flex-col">
-                  <span className="text-sm">{config.label}</span>
-                  <span className="text-xs text-custom-text-300">{config.type}</span>
-                </div>
-              </span>
-            </div>
-          );
-        })}
+        {/* Unbound (unselected) items — exclude condition-bound configs */}
+        {unboundConfigs
+          .filter((config) => !conditionConfigIds.has(config.id))
+          .map((config) => {
+            const isToggleLoading = loadingState.toggle.has(config.id);
+            return (
+              <div
+                key={config.id}
+                className={`flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-custom-background-80 ${
+                  !isEditable ? "cursor-not-allowed opacity-60" : ""
+                }`}
+              >
+                <span className={`flex items-center gap-2 flex-1 ${isEditable ? "cursor-pointer" : ""}`}>
+                  {isEditable && <div className="size-4 flex-shrink-0" />}
+                  <Checkbox
+                    checked={false}
+                    onChange={() => void handleToggleBinding(config.id)}
+                    disabled={!isEditable || isToggleLoading}
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-sm">{config.label}</span>
+                    <span className="text-xs text-custom-text-300">{config.type}</span>
+                  </div>
+                </span>
+              </div>
+            );
+          })}
       </div>
     </div>
   );
