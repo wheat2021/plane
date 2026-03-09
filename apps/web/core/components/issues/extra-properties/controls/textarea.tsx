@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { TExtraPropertyConfig, TExtraPropertyValue } from "@plane/types";
 
 interface ITextareaControl {
@@ -36,23 +36,40 @@ export const TextareaControl: FC<ITextareaControl> = (props) => {
     }
   };
 
-  const handleFocus = () => {
-    setIsExpanded(true);
-  };
+  // Auto-focus textarea when expanded
+  useEffect(() => {
+    if (isExpanded) textareaRef.current?.focus();
+  }, [isExpanded]);
 
   return (
     <div className="w-full">
-      <textarea
-        ref={textareaRef}
-        value={localValue}
-        onChange={(e) => setLocalValue(e.target.value)}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        disabled={disabled}
-        placeholder={config.description || `Enter ${config.label}...`}
-        rows={isExpanded ? 3 : 1}
-        className="w-full px-2 py-1.5 text-body-xs-regular bg-transparent border border-transparent rounded hover:border-tertiary focus:border-primary focus:outline-none resize-none disabled:cursor-not-allowed disabled:opacity-60 transition-all"
-      />
+      {isExpanded ? (
+        <textarea
+          ref={textareaRef}
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
+          onBlur={handleBlur}
+          disabled={disabled}
+          placeholder={config.description || `Enter ${config.label}...`}
+          rows={3}
+          className="w-full px-2 py-1.5 text-body-xs-regular bg-transparent border border-tertiary rounded focus:border-primary focus:outline-none resize-none disabled:cursor-not-allowed disabled:opacity-60 transition-all"
+        />
+      ) : (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => !disabled && setIsExpanded(true)}
+          onKeyDown={(e) => {
+            if ((e.key === "Enter" || e.key === " ") && !disabled) {
+              e.preventDefault();
+              setIsExpanded(true);
+            }
+          }}
+          className="w-full px-2 py-1.5 text-body-xs-regular bg-transparent border border-transparent rounded hover:border-tertiary cursor-text disabled:cursor-not-allowed disabled:opacity-60 line-clamp-3"
+        >
+          {localValue || <span className="text-tertiary">{config.description || `Enter ${config.label}...`}</span>}
+        </div>
+      )}
     </div>
   );
 };
