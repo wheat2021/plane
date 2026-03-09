@@ -34,7 +34,6 @@ const PROPERTY_TYPES: { value: TExtraPropertyType; label: string }[] = [
   { value: "select", label: "Select" },
   { value: "multiselect", label: "Multi-Select" },
   { value: "checkbox", label: "Checkbox" },
-  { value: "markdown", label: "Markdown" },
 ];
 
 export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId, onClose }: Props) {
@@ -214,11 +213,17 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
           <label className="mb-1 block text-sm font-medium">
             {t("workspace_settings.settings.extra_properties.form.description")}
           </label>
-          <TextArea
-            {...register("description")}
-            placeholder={t("workspace_settings.settings.extra_properties.form.description_placeholder")}
-            className="w-full"
-            rows={2}
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <TextArea
+                {...field}
+                placeholder={t("workspace_settings.settings.extra_properties.form.description_placeholder")}
+                className="w-full"
+                rows={2}
+              />
+            )}
           />
         </div>
 
