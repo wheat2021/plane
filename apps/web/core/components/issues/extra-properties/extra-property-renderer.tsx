@@ -42,12 +42,12 @@ const DescriptionPopover: FC<{ description: string }> = ({ description }) => {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center text-custom-text-300 hover:text-custom-text-200 transition-colors"
+        className="flex items-center text-tertiary hover:text-secondary transition-colors"
       >
         <Info className="size-3" />
       </button>
       {open && (
-        <div className="absolute left-0 top-5 z-50 w-64 rounded-md border border-custom-border-200 bg-custom-background-100 p-2.5 shadow-md text-xs text-custom-text-200 leading-relaxed select-text">
+        <div className="absolute left-0 top-5 z-50 w-64 rounded-md border border-subtle bg-layer-2 p-2.5 shadow-lg text-xs text-secondary leading-relaxed select-text">
           {description}
         </div>
       )}
