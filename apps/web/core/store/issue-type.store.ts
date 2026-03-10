@@ -38,6 +38,14 @@ export interface IIssueTypeStore {
     projectId: string,
     projectIssueTypeId: string
   ) => Promise<{ migrated_count: number }>;
+  // Workspace CRUD actions
+  createWorkspaceIssueType: (workspaceSlug: string, data: Partial<TIssueType>) => Promise<TIssueType>;
+  updateWorkspaceIssueType: (
+    workspaceSlug: string,
+    issueTypeId: string,
+    data: Partial<TIssueType>
+  ) => Promise<TIssueType>;
+  deleteWorkspaceIssueType: (workspaceSlug: string, issueTypeId: string) => Promise<{ migrated_count: number }>;
 }
 
 export class IssueTypeStore implements IIssueTypeStore {
@@ -69,6 +77,10 @@ export class IssueTypeStore implements IIssueTypeStore {
       addProjectIssueType: action,
       updateProjectIssueType: action,
       removeProjectIssueType: action,
+      // Workspace CRUD actions
+      createWorkspaceIssueType: action,
+      updateWorkspaceIssueType: action,
+      deleteWorkspaceIssueType: action,
     });
     this.issueTypeService = new IssueTypeService();
     this.router = _rootStore.router;
@@ -196,6 +208,39 @@ export class IssueTypeStore implements IIssueTypeStore {
         });
       }
       set(this.projectIssueTypeMap, [projectId, projectIssueTypeId], response);
+    });
+    return response;
+  };
+
+  /**
+   * Creates a new workspace issue type
+   */
+  createWorkspaceIssueType = async (workspaceSlug: string, data: Partial<TIssueType>) => {
+    const response = await this.issueTypeService.createWorkspaceIssueType(workspaceSlug, data);
+    runInAction(() => {
+      set(this.issueTypeMap, [response.id], response);
+    });
+    return response;
+  };
+
+  /**
+   * Updates a workspace issue type
+   */
+  updateWorkspaceIssueType = async (workspaceSlug: string, issueTypeId: string, data: Partial<TIssueType>) => {
+    const response = await this.issueTypeService.updateWorkspaceIssueType(workspaceSlug, issueTypeId, data);
+    runInAction(() => {
+      set(this.issueTypeMap, [issueTypeId], { ...this.issueTypeMap[issueTypeId], ...response });
+    });
+    return response;
+  };
+
+  /**
+   * Deletes a workspace issue type (cascade migration)
+   */
+  deleteWorkspaceIssueType = async (workspaceSlug: string, issueTypeId: string) => {
+    const response = await this.issueTypeService.deleteWorkspaceIssueType(workspaceSlug, issueTypeId);
+    runInAction(() => {
+      delete this.issueTypeMap[issueTypeId];
     });
     return response;
   };

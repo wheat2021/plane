@@ -36,6 +36,57 @@ export class IssueTypeService extends APIService {
   }
 
   /**
+   * Creates a new workspace issue type
+   */
+  async createWorkspaceIssueType(workspaceSlug: string, data: Partial<TIssueType>): Promise<TIssueType> {
+    return this.post(`/api/workspaces/${workspaceSlug}/issue-types/`, data)
+      .then((response) => response?.data as TIssueType)
+      .catch((error: { response?: { data?: unknown } }) => {
+        throw error?.response?.data;
+      });
+  }
+
+  /**
+   * Updates a workspace issue type
+   */
+  async updateWorkspaceIssueType(
+    workspaceSlug: string,
+    issueTypeId: string,
+    data: Partial<TIssueType>
+  ): Promise<TIssueType> {
+    return this.patch(`/api/workspaces/${workspaceSlug}/issue-types/${issueTypeId}/`, data)
+      .then((response) => response?.data as TIssueType)
+      .catch((error: { response?: { data?: unknown } }) => {
+        throw error?.response?.data;
+      });
+  }
+
+  /**
+   * Deletes a workspace issue type (with cascade migration)
+   */
+  async deleteWorkspaceIssueType(workspaceSlug: string, issueTypeId: string): Promise<{ migrated_count: number }> {
+    return this.delete(`/api/workspaces/${workspaceSlug}/issue-types/${issueTypeId}/`)
+      .then((response) => response?.data as { migrated_count: number })
+      .catch((error: { response?: { data?: unknown } }) => {
+        throw error?.response?.data;
+      });
+  }
+
+  /**
+   * Gets usage summary for a workspace issue type before deletion
+   */
+  async getWorkspaceIssueTypeUsage(
+    workspaceSlug: string,
+    issueTypeId: string
+  ): Promise<{ affected_projects: number; affected_issues: number }> {
+    return this.get(`/api/workspaces/${workspaceSlug}/issue-types/${issueTypeId}/usage-summary/`)
+      .then((response) => response?.data as { affected_projects: number; affected_issues: number })
+      .catch((error: { response?: { data?: unknown } }) => {
+        throw error?.response?.data;
+      });
+  }
+
+  /**
    * Enables an issue type for a project
    * @param workspaceSlug - The workspace slug
    * @param projectId - The project id

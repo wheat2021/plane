@@ -10,7 +10,8 @@ export type TWorkspaceSettingsTabs =
   | "billing-and-plans"
   | "export"
   | "webhooks"
-  | "extra-properties";
+  | "extra-properties"
+  | "work-item-types";
 export type TWorkspaceSettingsItem = {
   key: TWorkspaceSettingsTabs;
   i18n_label: string;
