@@ -280,6 +280,10 @@ export const coreRoutes: RouteConfigEntry[] = [
             ":workspaceSlug/settings/extra-properties",
             "./(all)/[workspaceSlug]/(settings)/settings/(workspace)/extra-properties/page.tsx"
           ),
+          route(
+            ":workspaceSlug/settings/work-item-types",
+            "./(all)/[workspaceSlug]/(settings)/settings/(workspace)/work-item-types/page.tsx"
+          ),
         ]),
 
         // --------------------------------------------------------------------
