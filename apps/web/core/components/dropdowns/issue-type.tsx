@@ -12,7 +12,7 @@ import { ComboDropDown } from "@plane/ui";
 import { cn } from "@plane/utils";
 // hooks
 import { useDropdown } from "@/hooks/use-dropdown";
-import { getIssueTypeIcon } from "./issue-type-icon";
+import { getIssueTypeIconFromProps } from "./issue-type-icon";
 import { useIssueType } from "@/hooks/store/use-issue-type";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // constants
@@ -296,7 +296,7 @@ export const IssueTypeDropdown = observer(function IssueTypeDropdown(props: Prop
             return {
               id: pit.issue_type ?? detail?.id ?? "",
               name: detail?.name ?? "",
-              icon: getIssueTypeIcon(detail?.name ?? "", detail?.logo_props?.icon?.color),
+              icon: getIssueTypeIconFromProps(detail?.logo_props),
             };
           })
           .filter((o) => o.id && o.name) ?? []
@@ -307,7 +307,7 @@ export const IssueTypeDropdown = observer(function IssueTypeDropdown(props: Prop
       issueTypes?.map((issueType) => ({
         id: issueType.id,
         name: issueType.name,
-        icon: getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color),
+        icon: getIssueTypeIconFromProps(issueType.logo_props),
       })) ?? []
     );
   })();
@@ -318,9 +318,7 @@ export const IssueTypeDropdown = observer(function IssueTypeDropdown(props: Prop
   // Get selected issue type details
   const selectedIssueType = value ? getIssueTypeById(value) : null;
   const displayName = selectedIssueType?.name;
-  const displayIcon = selectedIssueType
-    ? getIssueTypeIcon(selectedIssueType.name, selectedIssueType.logo_props?.icon?.color)
-    : null;
+  const displayIcon = selectedIssueType ? getIssueTypeIconFromProps(selectedIssueType.logo_props) : null;
 
   const dropdownOnChange = (val: string | null) => {
     onChange(val);
