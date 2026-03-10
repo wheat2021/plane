@@ -1,6 +1,6 @@
 ## 1. 提交变更文档
 
-- [ ] 1.1 提交 openspec 变更文档（proposal、design、specs、tasks）到代码库
+- [x] 1.1 提交 openspec 变更文档（proposal、design、specs、tasks）到代码库
 
 ## 2. 后端数据模型与 Migration
 
@@ -71,12 +71,12 @@
 
 ## 12. 提交实现代码
 
-- [ ] 12.1 提交后端变更：`#FICC-9999# feat: 新增 is_system 字段及工作项类型 CRUD API`
-- [ ] 12.2 提交前端基础设施变更：`#FICC-9999# feat: 新增 Lucide 图标选择器和颜色选择器组件`
-- [ ] 12.3 提交 Store/Service 变更：`#FICC-9999# feat: 新增工作项类型 CRUD store 和 service 方法`
-- [ ] 12.4 提交图标渲染修复：`#FICC-9999# fix: 工作项类型图标从 logo_props 动态读取`
-- [ ] 12.5 提交工作区设置管理页：`#FICC-9999# feat: 新增工作区工作项类型管理页`
-- [ ] 12.6 提交 i18n 变更：`#FICC-9999# feat: 新增工作项类型管理页多语言支持`
+- [x] 12.1 提交后端变更：`#FICC-9999# feat: 新增 is_system 字段及工作项类型 CRUD API`
+- [x] 12.2 提交前端基础设施变更：`#FICC-9999# feat: 新增 Lucide 图标选择器和颜色选择器组件`
+- [x] 12.3 提交 Store/Service 变更：`#FICC-9999# feat: 新增工作项类型 CRUD store 和 service 方法`
+- [x] 12.4 提交图标渲染修复：`#FICC-9999# fix: 工作项类型图标从 logo_props 动态读取`
+- [x] 12.5 提交工作区设置管理页：`#FICC-9999# feat: 新增工作区工作项类型管理页`
+- [x] 12.6 提交 i18n 变更：`#FICC-9999# feat: 新增工作项类型管理页多语言支持`
 
 ## 13. 用户验证
 
