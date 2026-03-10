@@ -7,7 +7,7 @@ import type { TIssueType, TProjectIssueType } from "@plane/types";
 import { ToggleSwitch, Tooltip } from "@plane/ui";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 // components
-import { getIssueTypeIcon } from "@/components/dropdowns/issue-type-icon";
+import { getIssueTypeIconFromProps } from "@/components/dropdowns/issue-type-icon";
 import { ExtraPropertyBindingList } from "./extra-property-binding-list";
 
 type TWorkItemTypeItemProps = {
@@ -89,8 +89,6 @@ export const WorkItemTypeItem = observer(function WorkItemTypeItem(props: TWorkI
     }
   };
 
-  const iconColor = issueType.logo_props?.icon?.color;
-
   const handleToggleExpand = () => {
     if (!canExpand) return;
     setIsExpanded(!isExpanded);
@@ -111,10 +109,15 @@ export const WorkItemTypeItem = observer(function WorkItemTypeItem(props: TWorkI
           ) : (
             <div className="w-4" />
           )}
-          <div className="flex-shrink-0">{getIssueTypeIcon(issueType.name, iconColor, 18)}</div>
+          <div className="flex-shrink-0">{getIssueTypeIconFromProps(issueType.logo_props, 18)}</div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-medium text-custom-text-100">{issueType.name}</span>
+              {issueType.is_system && (
+                <span className="rounded bg-custom-background-80 px-2 py-0.5 text-xs text-custom-text-300">
+                  {t("common.system")}
+                </span>
+              )}
               {isDefault && (
                 <span className="rounded bg-custom-primary-100/20 px-2 py-0.5 text-xs text-custom-primary-100">
                   {t("common.default")}
