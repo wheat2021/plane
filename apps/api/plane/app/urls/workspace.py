@@ -33,6 +33,8 @@ from plane.app.views import (
     WorkspaceStickyViewSet,
     WorkspaceUserPreferenceViewSet,
     WorkspaceIssueTypesEndpoint,
+    WorkspaceIssueTypeDetailEndpoint,
+    WorkspaceIssueTypeUsageSummaryEndpoint,
     ExtraPropertyConfigEndpoint,
     ExtraPropertyConfigDetailEndpoint,
     ExtraPropertyConfigValuesEndpoint,
@@ -173,6 +175,16 @@ urlpatterns = [
         "workspaces/<str:slug>/issue-types/",
         WorkspaceIssueTypesEndpoint.as_view(),
         name="workspace-issue-types",
+    ),
+    path(
+        "workspaces/<str:slug>/issue-types/<uuid:pk>/",
+        WorkspaceIssueTypeDetailEndpoint.as_view(),
+        name="workspace-issue-type-detail",
+    ),
+    path(
+        "workspaces/<str:slug>/issue-types/<uuid:pk>/usage-summary/",
+        WorkspaceIssueTypeUsageSummaryEndpoint.as_view(),
+        name="workspace-issue-type-usage-summary",
     ),
     # Extra Property Configs (workspace level)
     path(

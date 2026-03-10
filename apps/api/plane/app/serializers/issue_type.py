@@ -16,9 +16,10 @@ class IssueTypeSerializer(BaseSerializer):
             "logo_props",
             "is_default",
             "is_active",
+            "is_system",
             "level",
         ]
-        read_only_fields = ["workspace"]
+        read_only_fields = ["workspace", "is_system"]
 
 
 class IssueTypeLiteSerializer(BaseSerializer):
