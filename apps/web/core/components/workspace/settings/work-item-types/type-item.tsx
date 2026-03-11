@@ -1,24 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import { observer } from "mobx-react";
 import { GripVertical, Pencil, Trash2 } from "lucide-react";
 // plane imports
 import { useTranslation } from "@plane/i18n";
-import type { TIssueType } from "@plane/types";
 // components
 import { getIssueTypeIconFromProps } from "@/components/dropdowns/issue-type-icon";
 import { WorkItemTypeForm } from "./type-form";
 import { WorkItemTypeDeleteModal } from "./delete-modal";
+// hooks
+import { useIssueType } from "@/hooks/store/use-issue-type";
 
 type TTypeItemProps = {
-  issueType: TIssueType;
+  issueTypeId: string;
   dragHandleProps?: Record<string, unknown>;
 };
 
-export function WorkItemTypeItem({ issueType, dragHandleProps }: TTypeItemProps) {
+export const WorkItemTypeItem = observer(function WorkItemTypeItem({ issueTypeId, dragHandleProps }: TTypeItemProps) {
+  const { getIssueTypeById } = useIssueType();
+  const issueType = getIssueTypeById(issueTypeId);
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  if (!issueType) return null;
 
   if (isEditing) {
     return <WorkItemTypeForm issueType={issueType} onClose={() => setIsEditing(false)} />;
@@ -85,4 +91,4 @@ export function WorkItemTypeItem({ issueType, dragHandleProps }: TTypeItemProps)
       )}
     </>
   );
-}
+});

@@ -2,9 +2,11 @@
 
 ### Requirement: Project settings Work Item Types page
 
-Previously: The expanded area displayed all workspace-defined extra properties as a checkbox list, with checked items indicating properties bound to this item type. No required configuration was available.
+Previously: The project settings Work Item Types page displays all workspace-defined issue types and allows project admins to enable/disable them and set a default. The expanded area shows extra property bindings.
 
-The project settings Work Item Types page SHALL extend each work item type card's expanded binding area to include a required toggle for each bound extra property.
+The project settings Work Item Types page SHALL continue to display all workspace-defined issue types (is_active=True) with enable/disable and default controls. The page SHALL NOT expose create/edit/delete controls for issue types themselves—those are managed exclusively in workspace settings.
+
+The page SHALL reflect `is_system=True` types with a system badge indicator, and SHALL display the type's actual icon from `logo_props` (not hardcoded by name).
 
 #### Scenario: Work item type card is expandable
 
@@ -41,6 +43,16 @@ The project settings Work Item Types page SHALL extend each work item type card'
 
 - **WHEN** a non-admin user views the work item types settings
 - **THEN** the expanded area (if shown) SHALL display bindings and required status as read-only without checkboxes or toggles
+
+#### Scenario: Type icon rendered from logo_props
+
+- **WHEN** a work item type card is displayed on the project settings page
+- **THEN** the type's icon SHALL be rendered from `logo_props.icon` (Lucide icon name + color), not hardcoded by type name
+
+#### Scenario: System type badge displayed
+
+- **WHEN** a work item type has `is_system=True`
+- **THEN** the type card SHALL display a system badge indicator alongside the type name
 
 ## ADDED Requirements
 

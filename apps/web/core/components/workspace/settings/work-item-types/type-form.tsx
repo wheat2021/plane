@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "react-router";
-import * as icons from "lucide-react";
+import { icons } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 // plane imports
 import { useTranslation } from "@plane/i18n";
@@ -104,7 +104,7 @@ export function WorkItemTypeForm({ issueType, onClose }: TTypeFormProps) {
 
   // Preview icon
   const iconKey = toPascalCase(form.iconName);
-  const PreviewIcon = (icons as unknown as Record<string, LucideIcon>)[iconKey];
+  const PreviewIcon = (icons as Record<string, LucideIcon>)[iconKey];
 
   return (
     <div className="rounded-lg border border-custom-border-200 bg-custom-background-100 p-4">

@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import type { TIssueIdentifierProps, TIssueTypeIdentifier } from "@plane/types";
 // components
 import { IssueTypeDropdown } from "@/components/dropdowns/issue-type";
-import { getIssueTypeIcon, getDefaultIssueTypeIcon } from "@/components/dropdowns/issue-type-icon";
+import { getIssueTypeIconFromProps, getDefaultIssueTypeIcon } from "@/components/dropdowns/issue-type-icon";
 import { IdentifierText } from "@/components/issues/issue-detail/identifier-text";
 // hooks
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
@@ -63,11 +63,7 @@ const IssueTypeIconDisplay = observer(function IssueTypeIconDisplay(props: TIssu
 
   const iconSize = size === "xs" ? 12 : size === "sm" ? 14 : size === "md" ? 16 : 18;
 
-  return (
-    <span className="flex-shrink-0">
-      {getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)}
-    </span>
-  );
+  return <span className="flex-shrink-0">{getIssueTypeIconFromProps(issueType.logo_props, iconSize)}</span>;
 });
 
 export const IssueTypeIdentifier = observer(function IssueTypeIdentifier(props: TIssueTypeIdentifier) {
@@ -93,9 +89,7 @@ export const IssueTypeIdentifier = observer(function IssueTypeIdentifier(props: 
   if (isReadOnly) {
     return (
       <span className="flex-shrink-0">
-        {issueType
-          ? getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)
-          : getDefaultIssueTypeIcon(iconSize)}
+        {issueType ? getIssueTypeIconFromProps(issueType.logo_props, iconSize) : getDefaultIssueTypeIcon(iconSize)}
       </span>
     );
   }
@@ -112,9 +106,7 @@ export const IssueTypeIdentifier = observer(function IssueTypeIdentifier(props: 
       showTooltip
       button={
         <span className="flex-shrink-0 cursor-pointer">
-          {issueType
-            ? getIssueTypeIcon(issueType.name, issueType.logo_props?.icon?.color, iconSize)
-            : getDefaultIssueTypeIcon(iconSize)}
+          {issueType ? getIssueTypeIconFromProps(issueType.logo_props, iconSize) : getDefaultIssueTypeIcon(iconSize)}
         </span>
       }
     />

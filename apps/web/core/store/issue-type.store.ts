@@ -93,7 +93,9 @@ export class IssueTypeStore implements IIssueTypeStore {
   get workspaceIssueTypes() {
     const workspaceSlug = this.router.workspaceSlug || "";
     if (!workspaceSlug || !this.fetchedMap[workspaceSlug]) return undefined;
-    return Object.values(this.issueTypeMap).filter((issueType) => issueType.is_active);
+    return Object.values(this.issueTypeMap)
+      .filter((issueType) => issueType.is_active)
+      .sort((a, b) => a.level - b.level);
   }
 
   /**
@@ -109,7 +111,9 @@ export class IssueTypeStore implements IIssueTypeStore {
    */
   getWorkspaceIssueTypes = computedFn((workspaceSlug: string | null | undefined) => {
     if (!workspaceSlug || !this.fetchedMap[workspaceSlug]) return undefined;
-    return Object.values(this.issueTypeMap).filter((issueType) => issueType.is_active);
+    return Object.values(this.issueTypeMap)
+      .filter((issueType) => issueType.is_active)
+      .sort((a, b) => a.level - b.level);
   });
 
   /**

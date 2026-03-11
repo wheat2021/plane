@@ -63,7 +63,7 @@ import { useProject } from "@/hooks/store/use-project";
 import { useProjectState } from "@/hooks/store/use-project-state";
 // plane web imports
 import { useFiltersOperatorConfigs } from "@/plane-web/hooks/rich-filters/use-filters-operator-configs";
-import { getIssueTypeIcon } from "@/components/dropdowns/issue-type-icon";
+import { getIssueTypeIconFromProps } from "@/components/dropdowns/issue-type-icon";
 
 export type TWorkItemFiltersEntityProps = {
   workspaceSlug: string;
@@ -411,12 +411,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
         isEnabled: isFilterEnabled("type_id") && issueTypes !== undefined && issueTypes.length > 0,
         filterIcon: Layers,
         issueTypes: issueTypes ?? [],
-        getOptionIcon: (issueType) =>
-          getIssueTypeIcon(
-            issueType.issue_type_detail.name,
-            issueType.issue_type_detail.logo_props?.icon?.color,
-            14
-          ),
+        getOptionIcon: (issueType) => getIssueTypeIconFromProps(issueType.issue_type_detail.logo_props, 14),
         ...operatorConfigs,
       }),
     [isFilterEnabled, issueTypes, operatorConfigs]

@@ -19,40 +19,35 @@ type TTypeListProps = {
 export const WorkItemTypeList = observer(function WorkItemTypeList({ issueTypes, isFormOpen }: TTypeListProps) {
   const { workspaceSlug } = useParams();
   const { updateWorkspaceIssueType } = useIssueType();
-  const [orderedTypes, setOrderedTypes] = useState<TIssueType[]>(issueTypes);
+  const [orderedIds, setOrderedIds] = useState<string[]>(issueTypes.map((t) => t.id));
 
-  // Update ordered list when issueTypes prop changes (unless we're mid-drag)
-  const isDraggingRef = { current: false };
-  if (
-    !isDraggingRef.current &&
-    JSON.stringify(issueTypes.map((t) => t.id)) !== JSON.stringify(orderedTypes.map((t) => t.id))
-  ) {
-    setOrderedTypes(issueTypes);
+  // Sync ordered ids when the source list changes (new items added/removed)
+  const currentIds = issueTypes.map((t) => t.id);
+  if (JSON.stringify(currentIds) !== JSON.stringify(orderedIds)) {
+    setOrderedIds(currentIds);
   }
 
   const handleDragEnd = useCallback(
     async (fromIndex: number, toIndex: number) => {
       if (fromIndex === toIndex || !workspaceSlug) return;
 
-      const newOrder = [...orderedTypes];
+      const newOrder = [...orderedIds];
       const [moved] = newOrder.splice(fromIndex, 1);
       newOrder.splice(toIndex, 0, moved);
-      setOrderedTypes(newOrder);
+      setOrderedIds(newOrder);
 
       try {
-        await Promise.all(
-          newOrder.map((item, idx) => updateWorkspaceIssueType(workspaceSlug, item.id, { level: idx }))
-        );
+        await Promise.all(newOrder.map((id, idx) => updateWorkspaceIssueType(workspaceSlug, id, { level: idx })));
       } catch {
         setToast({
           type: TOAST_TYPE.ERROR,
           title: "Error",
           message: "Failed to save order",
         });
-        setOrderedTypes(issueTypes);
+        setOrderedIds(currentIds);
       }
     },
-    [orderedTypes, issueTypes, workspaceSlug, updateWorkspaceIssueType]
+    [orderedIds, currentIds, workspaceSlug, updateWorkspaceIssueType]
   );
 
   // Simple drag-and-drop using HTML5 drag API
@@ -61,14 +56,11 @@ export const WorkItemTypeList = observer(function WorkItemTypeList({ issueTypes,
 
   return (
     <div className="flex flex-col gap-2">
-      {orderedTypes.map((issueType, index) => (
+      {orderedIds.map((id, index) => (
         <div
-          key={issueType.id}
+          key={id}
           draggable
-          onDragStart={() => {
-            setDragIndex(index);
-            isDraggingRef.current = true;
-          }}
+          onDragStart={() => setDragIndex(index)}
           onDragOver={(e) => {
             e.preventDefault();
             setDragOverIndex(index);
@@ -79,16 +71,15 @@ export const WorkItemTypeList = observer(function WorkItemTypeList({ issueTypes,
             }
             setDragIndex(null);
             setDragOverIndex(null);
-            isDraggingRef.current = false;
           }}
           className={`transition-opacity ${dragIndex === index ? "opacity-50" : "opacity-100"} ${
             dragOverIndex === index && dragIndex !== index ? "ring-1 ring-custom-primary-100 rounded-md" : ""
           }`}
         >
-          <WorkItemTypeItem issueType={issueType} />
+          <WorkItemTypeItem issueTypeId={id} />
         </div>
       ))}
-      {isFormOpen && orderedTypes.length === 0 && (
+      {isFormOpen && orderedIds.length === 0 && (
         <div className="flex items-center justify-center py-8 text-custom-text-400 text-sm">No types yet</div>
       )}
     </div>

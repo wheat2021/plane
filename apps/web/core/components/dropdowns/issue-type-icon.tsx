@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
-import * as icons from "lucide-react";
+import { icons , CircleCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { CircleCheck } from "lucide-react";
 import type { TIssueTypeLogoProps } from "@plane/types";
 
 // Default icon color (gray)
@@ -23,7 +22,7 @@ function toPascalCase(name: string): string {
  */
 function renderLucideIcon(iconName: string, size: number, color: string): ReactNode {
   const key = toPascalCase(iconName);
-  const IconComponent = (icons as unknown as Record<string, LucideIcon>)[key];
+  const IconComponent = (icons as Record<string, LucideIcon>)[key];
   if (!IconComponent) {
     return <CircleCheck size={size} color={color} strokeWidth={2} />;
   }

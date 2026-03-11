@@ -6,7 +6,7 @@ import { Controller } from "react-hook-form";
 import type { Control } from "react-hook-form";
 import { usePopper } from "react-popper";
 import { Combobox } from "@headlessui/react";
-import { FileText, BookOpen, Bug, Check } from "lucide-react";
+import { Check } from "lucide-react";
 // plane imports
 import type { EditorRefApi } from "@plane/editor";
 import { useTranslation } from "@plane/i18n";
@@ -19,6 +19,8 @@ import { cn } from "@plane/utils";
 import { useDropdown } from "@/hooks/use-dropdown";
 import { useIssueType } from "@/hooks/store/use-issue-type";
 import { usePlatformOS } from "@/hooks/use-platform-os";
+// components
+import { getIssueTypeIconFromProps } from "@/components/dropdowns/issue-type-icon";
 
 export type TIssueFields = TIssue & TBulkIssueProperties;
 
@@ -43,24 +45,6 @@ type TIssueTypeOption = {
   name: string;
   icon: ReactNode;
 };
-
-/**
- * Get icon for issue type based on name
- */
-function getIssueTypeIcon(name: string, color?: string): ReactNode {
-  const iconProps = { size: 14, color: color ?? "#6b7280", strokeWidth: 2 };
-
-  switch (name.toLowerCase()) {
-    case "requirement":
-      return <FileText {...iconProps} />;
-    case "story":
-      return <BookOpen {...iconProps} />;
-    case "bug":
-      return <Bug {...iconProps} />;
-    default:
-      return <FileText {...iconProps} />;
-  }
-}
 
 export const IssueTypeSelect = observer(function IssueTypeSelect<T extends Partial<TIssueFields>>(
   props: TIssueTypeSelectProps<T>
@@ -122,7 +106,7 @@ export const IssueTypeSelect = observer(function IssueTypeSelect<T extends Parti
         return {
           id: pit.issue_type ?? detail?.id ?? "",
           name: detail?.name ?? "",
-          icon: getIssueTypeIcon(detail?.name ?? "", detail?.logo_props?.icon?.color),
+          icon: getIssueTypeIconFromProps(detail?.logo_props),
         };
       })
       .filter((o) => o.id && o.name) ?? [];
@@ -154,9 +138,7 @@ export const IssueTypeSelect = observer(function IssueTypeSelect<T extends Parti
         /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
         const selectedIssueType = value ? getIssueTypeById(value as string) : null;
         const displayName = selectedIssueType?.name ?? placeholder;
-        const displayIcon = selectedIssueType
-          ? getIssueTypeIcon(selectedIssueType.name, selectedIssueType.logo_props?.icon?.color)
-          : null;
+        const displayIcon = selectedIssueType ? getIssueTypeIconFromProps(selectedIssueType.logo_props) : null;
 
         const dropdownOnChange = (val: string) => {
           onChange(val);

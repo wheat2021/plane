@@ -9,7 +9,7 @@ from django.db import transaction
 from plane.app.views.base import BaseAPIView
 from plane.app.serializers import IssueTypeSerializer
 from plane.app.permissions import ROLE, allow_permission
-from plane.db.models import IssueType, ProjectIssueType, Issue
+from plane.db.models import IssueType, ProjectIssueType, Issue, Workspace
 
 
 class WorkspaceIssueTypesEndpoint(BaseAPIView):
@@ -29,13 +29,13 @@ class WorkspaceIssueTypesEndpoint(BaseAPIView):
 
     @allow_permission([ROLE.ADMIN], level="WORKSPACE")
     def post(self, request, slug):
-        workspace = request.user.workspaces.get(slug=slug)
+        workspace = Workspace.objects.get(slug=slug)
         serializer = IssueTypeSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check for duplicate name (including soft-deleted)
-        if IssueType.objects.filter(workspace=workspace, name=serializer.validated_data["name"]).exists():
+        # Check for duplicate name among active types
+        if IssueType.objects.filter(workspace=workspace, name=serializer.validated_data["name"], is_active=True).exists():
             return Response(
                 {"name": ["该名称已被使用"]},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -66,7 +66,7 @@ class WorkspaceIssueTypeDetailEndpoint(BaseAPIView):
         # Check for duplicate name if name is being changed
         new_name = serializer.validated_data.get("name")
         if new_name and new_name != issue_type.name:
-            if IssueType.objects.filter(workspace__slug=slug, name=new_name).exclude(pk=pk).exists():
+            if IssueType.objects.filter(workspace__slug=slug, name=new_name, is_active=True).exclude(pk=pk).exists():
                 return Response(
                     {"name": ["该名称已被使用"]},
                     status=status.HTTP_400_BAD_REQUEST,
