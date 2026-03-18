@@ -68,6 +68,8 @@ import type { IExtraPropertyConfigStore } from "./extra-property-config.store";
 import { ExtraPropertyConfigStore } from "./extra-property-config.store";
 import type { IIssueTypeExtraPropertyStore } from "./issue-type-extra-property.store";
 import { IssueTypeExtraPropertyStore } from "./issue-type-extra-property.store";
+import type { IDefaultPropertyConfigStore } from "./default-property-config.store";
+import { DefaultPropertyConfigStore } from "./default-property-config.store";
 
 enableStaticRendering(typeof window === "undefined");
 
@@ -104,6 +106,7 @@ export class CoreRootStore {
   issueType: IIssueTypeStore;
   extraPropertyConfig: IExtraPropertyConfigStore;
   issueTypeExtraProperty: IIssueTypeExtraPropertyStore;
+  defaultPropertyConfig: IDefaultPropertyConfigStore;
 
   constructor() {
     this.router = new RouterStore();
@@ -138,6 +141,7 @@ export class CoreRootStore {
     this.issueType = new IssueTypeStore(this);
     this.extraPropertyConfig = new ExtraPropertyConfigStore(this);
     this.issueTypeExtraProperty = new IssueTypeExtraPropertyStore(this);
+    this.defaultPropertyConfig = new DefaultPropertyConfigStore();
   }
 
   resetOnSignOut() {

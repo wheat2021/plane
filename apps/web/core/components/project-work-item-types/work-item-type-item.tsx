@@ -8,6 +8,7 @@ import { ToggleSwitch, Tooltip } from "@plane/ui";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 // components
 import { getIssueTypeIconFromProps } from "@/components/dropdowns/issue-type-icon";
+import { DefaultPropertyConfigList } from "./default-property-config-list";
 import { ExtraPropertyBindingList } from "./extra-property-binding-list";
 
 type TWorkItemTypeItemProps = {
@@ -156,7 +157,12 @@ export const WorkItemTypeItem = observer(function WorkItemTypeItem(props: TWorkI
           </Tooltip>
         </div>
       </div>
-      {isExpanded && isEnabled && <ExtraPropertyBindingList issueTypeId={issueType.id} isEditable={isEditable} />}
+      {isExpanded && isEnabled && (
+        <>
+          <DefaultPropertyConfigList issueTypeId={issueType.id} />
+          <ExtraPropertyBindingList issueTypeId={issueType.id} isEditable={isEditable} />
+        </>
+      )}
     </div>
   );
 });
