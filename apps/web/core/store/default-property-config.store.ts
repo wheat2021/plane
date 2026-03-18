@@ -4,6 +4,8 @@ import { computedFn } from "mobx-utils";
 const STORAGE_KEY = "plane-default-prop-config";
 
 export const CONFIGURABLE_DEFAULT_PROPERTIES = [
+  { key: "title", label: "Title" },
+  { key: "description", label: "Description" },
   { key: "created_by", label: "Reporter" },
   { key: "assignee_ids", label: "Assignees" },
   { key: "priority", label: "Priority" },

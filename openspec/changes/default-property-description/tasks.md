@@ -26,9 +26,15 @@
 
 ## 7. 提交实现代码
 
-- [ ] 7.1 提交所有实现文件：`git commit -m "#FICC-9999# feat: 升级描述弹窗支持 Markdown 渲染"`
-- [ ] 7.2 提交设置页和 store：`git commit -m "#FICC-9999# feat: 新增默认属性 description 配置功能"`
-- [ ] 7.3 提交侧边栏改动：`git commit -m "#FICC-9999# feat: 侧边栏默认属性展示 description 图标"`
+- [x] 7.1 提交所有实现文件：`git commit -m "#FICC-9999# feat: 升级描述弹窗支持 Markdown 渲染"`
+- [x] 7.2 提交设置页和 store：`git commit -m "#FICC-9999# feat: 新增默认属性 description 配置功能"`
+- [x] 7.3 提交侧边栏改动：`git commit -m "#FICC-9999# feat: 侧边栏默认属性展示 description 图标"`
+
+## 9. 扩展 title / description 字段支持
+
+- [ ] 9.1 在 `default-property-config.store.ts` 的 `CONFIGURABLE_DEFAULT_PROPERTIES` 中追加 `title` 和 `description` 两项
+- [ ] 9.2 修改 `core/components/issues/issue-detail/main-content.tsx`：title 行末尾显示 ℹ️；description reaction 行旁边常驻 ℹ️
+- [ ] 9.3 提交：`git commit -m "#FICC-9999# feat: title/description 支持注释图标"`
 
 ## 8. 用户验证
 
