@@ -112,3 +112,4 @@ build/
 .react-router/
 temp/
 scripts/
+jira_data/
