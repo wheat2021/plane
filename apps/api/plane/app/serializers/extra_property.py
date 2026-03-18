@@ -42,6 +42,30 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         allow_null=True,
         help_text="Extra input config for checkbox false state",
     )
+    true_icon = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        help_text="Lucide icon name for checkbox true state",
+    )
+    true_icon_color = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        help_text="Hex color for checkbox true state icon",
+    )
+    false_icon = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        help_text="Lucide icon name for checkbox false state",
+    )
+    false_icon_color = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        help_text="Hex color for checkbox false state icon",
+    )
 
     class Meta:
         model = ExtraPropertyConfig
@@ -60,6 +84,10 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
             "false_value",
             "true_extra_input",
             "false_extra_input",
+            "true_icon",
+            "true_icon_color",
+            "false_icon",
+            "false_icon_color",
             # Audit fields
             "created_at",
             "updated_at",
@@ -85,6 +113,10 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         data["false_value"] = config.get("false_value", "No")
         data["true_extra_input"] = config.get("true_extra_input")
         data["false_extra_input"] = config.get("false_extra_input")
+        data["true_icon"] = config.get("true_icon")
+        data["true_icon_color"] = config.get("true_icon_color")
+        data["false_icon"] = config.get("false_icon")
+        data["false_icon_color"] = config.get("false_icon_color")
         return data
 
     def to_internal_value(self, data):
@@ -104,6 +136,14 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
             config["true_extra_input"] = data["true_extra_input"]
         if "false_extra_input" in data:
             config["false_extra_input"] = data["false_extra_input"]
+        if "true_icon" in data:
+            config["true_icon"] = data["true_icon"]
+        if "true_icon_color" in data:
+            config["true_icon_color"] = data["true_icon_color"]
+        if "false_icon" in data:
+            config["false_icon"] = data["false_icon"]
+        if "false_icon_color" in data:
+            config["false_icon_color"] = data["false_icon_color"]
 
         if self.instance:
             existing_config = self.instance.config or {}
@@ -116,6 +156,10 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         internal_data.pop("default_value", None)
         internal_data.pop("true_value", None)
         internal_data.pop("false_value", None)
+        internal_data.pop("true_icon", None)
+        internal_data.pop("true_icon_color", None)
+        internal_data.pop("false_icon", None)
+        internal_data.pop("false_icon_color", None)
 
         return internal_data
 

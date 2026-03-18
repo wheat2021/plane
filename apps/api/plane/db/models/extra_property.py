@@ -76,6 +76,26 @@ class ExtraPropertyConfig(BaseModel):
         """Get false value display for checkbox type."""
         return self.config.get("false_value", "No")
 
+    @property
+    def true_icon(self):
+        """Get icon name for true state (checkbox type)."""
+        return self.config.get("true_icon")
+
+    @property
+    def true_icon_color(self):
+        """Get icon color for true state (checkbox type)."""
+        return self.config.get("true_icon_color")
+
+    @property
+    def false_icon(self):
+        """Get icon name for false state (checkbox type)."""
+        return self.config.get("false_icon")
+
+    @property
+    def false_icon_color(self):
+        """Get icon color for false state (checkbox type)."""
+        return self.config.get("false_icon_color")
+
 
 class IssueTypeExtraProperty(BaseModel):
     """
