@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import { useEffect } from "react";
 import { observer } from "mobx-react";
 // plane imports
@@ -15,6 +14,9 @@ import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useMember } from "@/hooks/store/use-member";
 import { useProject } from "@/hooks/store/use-project";
 import { useUser } from "@/hooks/store/user";
+import { useDefaultPropertyConfig } from "@/hooks/store/use-default-property-config";
+// components
+import { ExtraPropertyDescriptionPopover } from "@/components/issues/extra-properties/description-popover";
 import useReloadConfirmations from "@/hooks/use-reload-confirmation";
 // plane web components
 import { DeDupeIssuePopoverRoot } from "@/plane-web/components/de-dupe/duplicate-popover";
@@ -53,12 +55,14 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
   } = useIssueDetail();
   const { getProjectById } = useProject();
   const { getUserDetails } = useMember();
+  const { getDescription } = useDefaultPropertyConfig();
   // reload confirmation
   const { setShowAlert } = useReloadConfirmations(isSubmitting === "submitting");
 
   useEffect(() => {
     if (isSubmitting === "submitted") {
       setShowAlert(false);
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises, @typescript-eslint/require-await
       setTimeout(async () => {
         setIsSubmitting("saved");
       }, 2000);
@@ -73,6 +77,7 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
   // debounced duplicate issues swr
   const { duplicateIssues } = useDebouncedDuplicateIssues(
     workspaceSlug,
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     projectDetails?.workspace.toString(),
     projectDetails?.id,
     {
@@ -83,6 +88,13 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
   );
 
   if (!issue || !issue.project_id) return <></>;
+
+  const mainPropAppend = (propertyKey: string) => {
+    if (!issue.type_id) return null;
+    const desc = getDescription(workspaceSlug, issue.type_id, propertyKey);
+    if (!desc) return null;
+    return <ExtraPropertyDescriptionPopover description={desc} />;
+  };
 
   const issueDescription =
     issue.description_html !== undefined || issue.description_html !== null
@@ -114,17 +126,21 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
           />
         )}
       </div>
-      <IssueTitleInput
-        workspaceSlug={workspaceSlug}
-        projectId={issue.project_id}
-        issueId={issue.id}
-        isSubmitting={isSubmitting}
-        setIsSubmitting={(value) => setIsSubmitting(value)}
-        issueOperations={issueOperations}
-        disabled={disabled || isArchived}
-        value={issue.name}
-        containerClassName="-ml-3"
-      />
+      <div className="flex items-start gap-1">
+        <IssueTitleInput
+          workspaceSlug={workspaceSlug}
+          projectId={issue.project_id}
+          issueId={issue.id}
+          isSubmitting={isSubmitting}
+          setIsSubmitting={(value) => setIsSubmitting(value)}
+          issueOperations={issueOperations}
+          disabled={disabled || isArchived}
+          value={issue.name}
+          containerClassName="-ml-3"
+          className="flex-1"
+        />
+        <div className="mt-1 flex-shrink-0">{mainPropAppend("title")}</div>
+      </div>
 
       <DescriptionInput
         issueSequenceId={issue.sequence_id}
@@ -147,15 +163,18 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
       />
 
       <div className="flex items-center justify-between gap-2">
-        {currentUser && (
-          <IssueReaction
-            workspaceSlug={workspaceSlug}
-            projectId={issue.project_id}
-            issueId={issueId}
-            currentUser={currentUser}
-            disabled={isArchived}
-          />
-        )}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {currentUser && (
+            <IssueReaction
+              workspaceSlug={workspaceSlug}
+              projectId={issue.project_id}
+              issueId={issueId}
+              currentUser={currentUser}
+              disabled={isArchived}
+            />
+          )}
+          {mainPropAppend("description")}
+        </div>
         {!disabled && (
           <DescriptionVersionsRoot
             className="flex-shrink-0"
