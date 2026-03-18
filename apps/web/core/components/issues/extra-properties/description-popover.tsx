@@ -1,7 +1,6 @@
 import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Info } from "lucide-react";
-import { MarkdownRenderer } from "@/components/ui/markdown-to-component";
 
 export const ExtraPropertyDescriptionPopover: FC<{ description: string }> = ({ description }) => {
   const [open, setOpen] = useState(false);
@@ -28,8 +27,8 @@ export const ExtraPropertyDescriptionPopover: FC<{ description: string }> = ({ d
         <Info className="size-3" />
       </button>
       {open && (
-        <div className="absolute left-0 top-5 z-50 w-80 rounded-md border border-subtle bg-layer-2 p-2.5 shadow-lg text-xs text-secondary leading-relaxed select-text max-h-48 overflow-y-auto">
-          <MarkdownRenderer markdown={description} />
+        <div className="absolute left-0 top-5 z-50 w-80 rounded-md border border-subtle bg-layer-2 p-2.5 shadow-lg text-xs text-secondary leading-relaxed select-text max-h-48 overflow-y-auto whitespace-pre-wrap">
+          {description}
         </div>
       )}
     </div>
