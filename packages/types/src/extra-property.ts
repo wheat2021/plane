@@ -64,6 +64,14 @@ export interface TExtraPropertyConfig {
   true_extra_input?: TExtraInput | null;
   /** Extra input config triggered when checkbox is false */
   false_extra_input?: TExtraInput | null;
+  /** Lucide icon name for checkbox true state */
+  true_icon?: string;
+  /** Hex color for checkbox true state icon */
+  true_icon_color?: string;
+  /** Lucide icon name for checkbox false state */
+  false_icon?: string;
+  /** Hex color for checkbox false state icon */
+  false_icon_color?: string;
   /** Audit fields */
   created_at?: string;
   updated_at?: string;
