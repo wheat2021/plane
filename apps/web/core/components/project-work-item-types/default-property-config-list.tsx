@@ -21,10 +21,6 @@ export const DefaultPropertyConfigList = observer(function DefaultPropertyConfig
 
   const handleChange = (key: string, value: string) => {
     setDrafts((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleBlur = (key: string) => {
-    const value = drafts[key] ?? getDescription(workspaceSlug, issueTypeId, key);
     setDescription(workspaceSlug, issueTypeId, key, value);
   };
 
@@ -44,7 +40,6 @@ export const DefaultPropertyConfigList = observer(function DefaultPropertyConfig
                 placeholder="Add description (supports Markdown)…"
                 value={value}
                 onChange={(e) => handleChange(key, e.target.value)}
-                onBlur={() => handleBlur(key)}
               />
             </div>
           );

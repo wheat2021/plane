@@ -1,4 +1,5 @@
-import { action, makeObservable, observable } from "mobx";
+import { set } from "lodash-es";
+import { action, makeObservable, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
 
 const STORAGE_KEY = "plane-default-prop-config";
@@ -45,9 +46,14 @@ export class DefaultPropertyConfigStore implements IDefaultPropertyConfigStore {
   private _loadFromStorage() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) this.data = JSON.parse(raw) as TStorageData;
+      const parsed = raw ? (JSON.parse(raw) as TStorageData) : {};
+      runInAction(() => {
+        this.data = parsed;
+      });
     } catch {
-      this.data = {};
+      runInAction(() => {
+        this.data = {};
+      });
     }
   }
 
@@ -64,9 +70,7 @@ export class DefaultPropertyConfigStore implements IDefaultPropertyConfigStore {
   });
 
   setDescription = (workspaceSlug: string, issueTypeId: string, propertyKey: string, description: string) => {
-    if (!this.data[workspaceSlug]) this.data[workspaceSlug] = {};
-    if (!this.data[workspaceSlug][issueTypeId]) this.data[workspaceSlug][issueTypeId] = {};
-    this.data[workspaceSlug][issueTypeId][propertyKey] = { description };
+    set(this.data, [workspaceSlug, issueTypeId, propertyKey], { description });
     this._saveToStorage();
   };
 }
