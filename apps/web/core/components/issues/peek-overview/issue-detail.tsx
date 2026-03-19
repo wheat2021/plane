@@ -89,11 +89,11 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
 
   if (!issue || !issue.project_id) return <></>;
 
-  const mainPropAppend = (propertyKey: string) => {
+  const mainPropAppend = (propertyKey: string, align?: "left" | "right") => {
     if (!issue.type_id) return null;
     const desc = getDescription(workspaceSlug, issue.type_id, propertyKey);
     if (!desc) return null;
-    return <ExtraPropertyDescriptionPopover description={desc} />;
+    return <ExtraPropertyDescriptionPopover description={desc} align={align} />;
   };
 
   const issueDescription =
@@ -127,19 +127,20 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
         )}
       </div>
       <div className="flex items-start gap-1">
-        <IssueTitleInput
-          workspaceSlug={workspaceSlug}
-          projectId={issue.project_id}
-          issueId={issue.id}
-          isSubmitting={isSubmitting}
-          setIsSubmitting={(value) => setIsSubmitting(value)}
-          issueOperations={issueOperations}
-          disabled={disabled || isArchived}
-          value={issue.name}
-          containerClassName="-ml-3"
-          className="flex-1"
-        />
-        <div className="mt-1 flex-shrink-0">{mainPropAppend("title")}</div>
+        <div className="flex-1 min-w-0">
+          <IssueTitleInput
+            workspaceSlug={workspaceSlug}
+            projectId={issue.project_id}
+            issueId={issue.id}
+            isSubmitting={isSubmitting}
+            setIsSubmitting={(value) => setIsSubmitting(value)}
+            issueOperations={issueOperations}
+            disabled={disabled || isArchived}
+            value={issue.name}
+            containerClassName="-ml-3"
+          />
+        </div>
+        <div className="mt-1 flex-shrink-0">{mainPropAppend("title", "right")}</div>
       </div>
 
       <DescriptionInput
@@ -173,7 +174,7 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
               disabled={isArchived}
             />
           )}
-          {mainPropAppend("description")}
+          <div className="mt-4">{mainPropAppend("description")}</div>
         </div>
         {!disabled && (
           <DescriptionVersionsRoot

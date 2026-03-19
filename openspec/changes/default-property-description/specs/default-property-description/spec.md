@@ -20,7 +20,7 @@
 
 - **WHEN** 用户将 description 清空（输入框置空）
 - **THEN** 系统 SHALL 将该属性的 description 保存为空字符串
-- **AND** 侧边栏 SHALL 不再显示 ℹ️ 图标
+- **AND** ℹ️ 图标 SHALL 不再显示
 
 ---
 
@@ -32,29 +32,24 @@
 
 - **WHEN** 用户展开某个已启用的 work item type
 - **THEN** 面板顶部 SHALL 显示 "Default Properties" 区块
-- **AND** 区块 SHALL 列出 10 个可配置默认属性：Reporter、Assignees、Priority、Labels、Start Date、Due Date、Estimate、Modules、Cycle、Parent
-- **AND** State 和 Issue Type 属性 SHALL NOT 出现在列表中
+- **AND** 区块 SHALL 列出 12 个可配置默认属性：Title、Description、Reporter、Assignees、Priority、Labels、Start Date、Due Date、Estimate、Modules、Cycle、Parent
+- **AND** State 和 Work Item Type 属性 SHALL NOT 出现在列表中
 
 #### Scenario: 编辑 description
 
 - **WHEN** 用户点击某个属性行的 description 输入区域
 - **THEN** 该行 SHALL 显示一个 textarea，允许用户输入多行文本（支持 Markdown 语法）
-- **AND** 输入框 SHALL 显示 placeholder "Add description..."
+- **AND** 输入框 SHALL 显示 placeholder "Add description (supports Markdown)…"
 
 #### Scenario: 自动保存
 
-- **WHEN** 用户修改 description 后 textarea 失去焦点（onBlur）
+- **WHEN** 用户修改 description 时（onChange 事件）
 - **THEN** 系统 SHALL 立即将新值保存到 localStorage
 - **AND** 不需要额外的"保存"按钮
 
-#### Scenario: 非编辑状态展示
-
-- **WHEN** description 不为空时
-- **THEN** 该行 SHALL 以截断文本形式显示 description 预览（非编辑状态）
-
 #### Scenario: 只读模式
 
-- **WHEN** 当前用户无编辑权限（isEditable 为 false）
+- **WHEN** 当前用户无编辑权限
 - **THEN** description 输入区域 SHALL 不可编辑
 
 ---
@@ -83,3 +78,51 @@
 
 - **WHEN** 某属性的 description 为空字符串
 - **THEN** 该属性的 ℹ️ 图标 SHALL NOT 显示
+
+---
+
+### Requirement: 主内容区 title/description 字段图标展示
+
+在 issue 详情主内容区（main-content 和 peek-overview），title 和 description 字段 SHALL 在有对应 description 配置时显示 ℹ️ 图标。
+
+#### Scenario: title 图标展示
+
+- **WHEN** issue.type_id 不为 null
+- **AND** 当前 issue type 的 "title" 属性有非空 description
+- **THEN** title 输入框右侧 SHALL 显示 ℹ️ 图标，弹窗向左展开
+
+#### Scenario: description 图标展示
+
+- **WHEN** issue.type_id 不为 null
+- **AND** 当前 issue type 的 "description" 属性有非空 description
+- **THEN** 描述区域下方（表情选择器旁）SHALL 显示 ℹ️ 图标
+
+#### Scenario: peek-overview 一致性
+
+- **WHEN** issue 在 peek-overview 模式下打开
+- **THEN** title 和 description 的 ℹ️ 图标 SHALL 与 main-content 显示行为一致
+
+---
+
+### Requirement: 创建表单 title/description 字段标签与图标
+
+在"Create new work item"表单中，title 和 description 字段 SHALL 显示标签行，风格与 Additional Properties 区块一致。
+
+#### Scenario: 标签行始终显示
+
+- **WHEN** 创建表单打开时
+- **THEN** title 输入框上方 SHALL 显示 "Title \*" 标签行（含必填星号）
+- **AND** description 编辑器上方 SHALL 显示 "Description" 标签行
+- **AND** 标签样式 SHALL 与 Additional Properties 区块的属性标签一致（`text-body-xs-medium text-secondary`）
+
+#### Scenario: 标签行图标（条件显示）
+
+- **WHEN** 当前选中的 work item type 为 title/description 配置了非空 description
+- **THEN** 对应标签行末尾 SHALL 显示 ℹ️ 图标
+- **WHEN** 无配置或 type_id 为 null
+- **THEN** ℹ️ 图标 SHALL NOT 显示，标签行仍正常显示
+
+#### Scenario: 多语言支持
+
+- **WHEN** 界面语言切换时
+- **THEN** "Title" 和 "Description" 标签 SHALL 通过 `t("title")` / `t("description")` i18n key 渲染
