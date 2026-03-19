@@ -625,7 +625,7 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
                                   <Plus size={14} className="text-custom-text-400" />
                                 )}
                               </Popover.Button>
-                              <Popover.Panel className="absolute z-50 mt-1 w-72 rounded-lg border border-custom-border-200 bg-custom-background-100 p-3 shadow-lg">
+                              <Popover.Panel className="absolute z-50 mt-1 w-72 rounded-lg border border-subtle bg-surface-1 p-3 shadow-raised-200">
                                 <IconColorPicker
                                   value={{ name: iconField.value || "", color: colorField.value || "#6b7280" }}
                                   onChange={(val) => {
@@ -681,7 +681,7 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
                                   <Plus size={14} className="text-custom-text-400" />
                                 )}
                               </Popover.Button>
-                              <Popover.Panel className="absolute z-50 mt-1 w-72 rounded-lg border border-custom-border-200 bg-custom-background-100 p-3 shadow-lg">
+                              <Popover.Panel className="absolute z-50 mt-1 w-72 rounded-lg border border-subtle bg-surface-1 p-3 shadow-raised-200">
                                 <IconColorPicker
                                   value={{ name: iconField.value || "", color: colorField.value || "#6b7280" }}
                                   onChange={(val) => {
