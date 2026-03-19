@@ -202,6 +202,34 @@ TypeScript 类型定义 SHALL 扩展以支持额外属性显示配置。
 - **WHEN** 视图 API 返回数据
 - **THEN** 响应类型 SHALL 包含 `extra_display_properties` 字段
 
+### Requirement: 描述弹窗支持 Markdown 渲染
+
+`ExtraPropertyDescriptionPopover` 组件 SHALL 以 Markdown 格式渲染 description 内容，并支持多行文本展示。
+
+#### Scenario: Markdown 格式渲染
+
+- **WHEN** 用户点击 ℹ️ 图标打开描述弹窗
+- **THEN** 弹窗 SHALL 使用内联 `SimpleMarkdown` 组件渲染 description 内容
+- **AND** 支持的格式 SHALL 包括：`**粗体**`、`*斜体*`、`- 无序列表项`、空行段落
+
+#### Scenario: 多行文本支持
+
+- **WHEN** description 包含换行符或多段文本
+- **THEN** 弹窗 SHALL 正确展示多行内容
+- **AND** 弹窗 SHALL 设置最大高度（max-h-48）并在超出时显示垂直滚动条
+
+#### Scenario: 弹窗宽度
+
+- **WHEN** 弹窗展示时
+- **THEN** 弹窗宽度 SHALL 为 w-80（320px）
+
+#### Scenario: 弹窗展开方向
+
+- **WHEN** 图标位于主内容区右侧边缘（如 title 图标）
+- **THEN** 弹窗 SHALL 向左展开（`align="right"`），避免被容器右边界裁剪
+- **WHEN** 图标位于左侧区域（如 description 旁、侧边栏）
+- **THEN** 弹窗 SHALL 向右展开（默认 `align="left"`）
+
 ## Technical Implementation Details
 
 本节记录实际实现中的关键技术细节，以确保文档与代码保持一致。
