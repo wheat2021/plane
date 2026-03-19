@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { icons , Square, SquareCheck } from "lucide-react";
+import { icons, Square, SquareCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Tooltip } from "@plane/propel/tooltip";
 import type { TExtraPropertyConfig, TExtraPropertyValue } from "@plane/types";
@@ -33,7 +33,9 @@ export const CompactCheckboxControl: FC<ICompactCheckboxControl> = (props) => {
   const isChecked = value === true;
   const displayValue = isChecked ? config.true_value || "Yes" : config.false_value || "No";
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (disabled) return;
     onChange(!isChecked);
   };
