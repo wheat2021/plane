@@ -1,10 +1,4 @@
-# Extra Properties
-
-## Purpose
-
-定义 workspace 级别的 ExtraPropertyConfig 模型、序列化器、前端 store 和 service 的核心规格。
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: ExtraPropertyConfig model scope
 
@@ -94,38 +88,3 @@ The ExtraPropertyConfigSerializer SHALL no longer accept or return `issue_type` 
 
 - **WHEN** a create or update request includes options with extra_input
 - **THEN** the serializer SHALL validate that each extra_input.config references a valid ExtraPropertyConfig in the same workspace
-
-### Requirement: Frontend store adapts to workspace scope
-
-The ExtraPropertyConfigStore SHALL index configs at workspace level. The `required` property SHALL NOT be present on config objects in the store. The store SHALL expose helper methods to extract extra_input relationships from config options.
-
-#### Scenario: Fetch all workspace configs
-
-- **WHEN** `fetchWorkspaceConfigs(workspaceSlug)` is called
-- **THEN** the store SHALL fetch all configs from `GET /workspaces/<slug>/extra-properties/` and populate `configMap`
-- **THEN** config objects in the store SHALL NOT contain a `required` field
-
-#### Scenario: Get config by ID
-
-- **WHEN** `getConfigById(id)` is called
-- **THEN** the store SHALL return the config from `configMap` regardless of issue type
-
-#### Scenario: 获取 config 的所有 extra_input 关联
-
-- **WHEN** `getExtraInputConfigs(configId)` is called
-- **THEN** SHALL 返回该 config 的所有 option/checkbox 状态关联的 extra_input config ID 集合
-
-#### Scenario: 获取触发某个 extra_input 的选项值集合
-
-- **WHEN** `getTriggerValues(parentConfigId, childConfigId)` is called
-- **THEN** SHALL 返回父属性中所有 extra_input.config 匹配 childConfigId 的选项 value 集合（含 checkbox 的 true/false）
-
-### Requirement: Frontend service adapts to new API paths
-
-The ExtraPropertyConfigService SHALL use workspace-scoped API paths. The service SHALL NOT send `required` in create or update payloads. The service SHALL support sending options with `extra_input` in create and update payloads.
-
-#### Scenario: Service method signatures
-
-- **WHEN** service methods are called
-- **THEN** `getConfigs(workspaceSlug)`, `createConfig(workspaceSlug, data)`, `updateConfig(workspaceSlug, configId, data)`, `deleteConfig(workspaceSlug, configId)` SHALL use `/workspaces/<slug>/extra-properties/` paths and SHALL NOT include `required` in request/response types
-- **AND** create/update payloads SHALL support options with `extra_input` field

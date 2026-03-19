@@ -99,6 +99,7 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
@@ -128,6 +129,10 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
   const selectedType = watch("type");
   const showOptions = selectedType === "select" || selectedType === "multiselect";
   const showCheckboxValues = selectedType === "checkbox";
+  const trueIconValue = watch("true_icon");
+  const trueIconColorValue = watch("true_icon_color");
+  const falseIconValue = watch("false_icon");
+  const falseIconColorValue = watch("false_icon_color");
 
   // Available configs for extra input dropdown (exclude self and cycle-forming)
   const availableExtraInputConfigs = (() => {
@@ -601,115 +606,115 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <span className="mb-1 block text-sm font-medium">True 图标</span>
-                <Controller
-                  name="true_icon"
-                  control={control}
-                  render={({ field: iconField }) => (
-                    <Controller
-                      name="true_icon_color"
-                      control={control}
-                      render={({ field: colorField }) => {
-                        const IconComp = iconField.value ? getLucideIcon(iconField.value) : null;
-                        return (
-                          <div className="flex items-center gap-2">
-                            <Popover className="relative">
-                              <Popover.Button
-                                as="button"
-                                type="button"
-                                title={iconField.value || "选择图标"}
-                                className="flex h-8 w-8 items-center justify-center rounded border border-dashed border-custom-border-300 hover:bg-custom-background-80 transition-colors"
-                              >
-                                {IconComp ? (
-                                  <IconComp size={16} color={colorField.value || "#6b7280"} strokeWidth={2} />
-                                ) : (
-                                  <Plus size={14} className="text-custom-text-400" />
-                                )}
-                              </Popover.Button>
-                              <Popover.Panel className="absolute z-50 mt-1 w-72 rounded-lg border border-subtle bg-surface-1 p-3 shadow-raised-200">
-                                <IconColorPicker
-                                  value={{ name: iconField.value || "", color: colorField.value || "#6b7280" }}
-                                  onChange={(val) => {
-                                    iconField.onChange(val.name || undefined);
-                                    colorField.onChange(val.color || undefined);
-                                  }}
-                                />
-                              </Popover.Panel>
-                            </Popover>
-                            {iconField.value && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  iconField.onChange(undefined);
-                                  colorField.onChange(undefined);
+                <div className="flex items-center gap-2">
+                  <Popover className="relative">
+                    <Popover.Button
+                      as="button"
+                      type="button"
+                      title={trueIconValue || "选择图标"}
+                      className="flex h-8 w-8 items-center justify-center rounded border border-dashed border-custom-border-300 hover:bg-custom-background-80 transition-colors"
+                    >
+                      {trueIconValue && getLucideIcon(trueIconValue) ? (
+                        (() => {
+                          const IconComp = getLucideIcon(trueIconValue)!;
+                          return <IconComp size={16} color={trueIconColorValue || "#6b7280"} strokeWidth={2} />;
+                        })()
+                      ) : (
+                        <Plus size={14} className="text-custom-text-400" />
+                      )}
+                    </Popover.Button>
+                    <Popover.Panel className="absolute z-50 mt-1 w-72 rounded-lg border border-subtle bg-surface-1 p-3 shadow-raised-200">
+                      <Controller
+                        name="true_icon"
+                        control={control}
+                        render={({ field: iconField }) => (
+                          <Controller
+                            name="true_icon_color"
+                            control={control}
+                            render={({ field: colorField }) => (
+                              <IconColorPicker
+                                value={{ name: iconField.value || "", color: colorField.value || "#6b7280" }}
+                                onChange={(val) => {
+                                  iconField.onChange(val.name || undefined);
+                                  colorField.onChange(val.color || undefined);
                                 }}
-                                className="text-custom-text-400 hover:text-custom-text-200"
-                                title="清除图标"
-                              >
-                                <X size={14} />
-                              </button>
+                              />
                             )}
-                          </div>
-                        );
+                          />
+                        )}
+                      />
+                    </Popover.Panel>
+                  </Popover>
+                  {trueIconValue && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setValue("true_icon", undefined);
+                        setValue("true_icon_color", undefined);
                       }}
-                    />
+                      className="text-custom-text-400 hover:text-custom-text-200"
+                      title="清除图标"
+                    >
+                      <X size={14} />
+                    </button>
                   )}
-                />
+                </div>
               </div>
               <div>
                 <span className="mb-1 block text-sm font-medium">False 图标</span>
-                <Controller
-                  name="false_icon"
-                  control={control}
-                  render={({ field: iconField }) => (
-                    <Controller
-                      name="false_icon_color"
-                      control={control}
-                      render={({ field: colorField }) => {
-                        const IconComp = iconField.value ? getLucideIcon(iconField.value) : null;
-                        return (
-                          <div className="flex items-center gap-2">
-                            <Popover className="relative">
-                              <Popover.Button
-                                as="button"
-                                type="button"
-                                title={iconField.value || "选择图标"}
-                                className="flex h-8 w-8 items-center justify-center rounded border border-dashed border-custom-border-300 hover:bg-custom-background-80 transition-colors"
-                              >
-                                {IconComp ? (
-                                  <IconComp size={16} color={colorField.value || "#6b7280"} strokeWidth={2} />
-                                ) : (
-                                  <Plus size={14} className="text-custom-text-400" />
-                                )}
-                              </Popover.Button>
-                              <Popover.Panel className="absolute z-50 mt-1 w-72 rounded-lg border border-subtle bg-surface-1 p-3 shadow-raised-200">
-                                <IconColorPicker
-                                  value={{ name: iconField.value || "", color: colorField.value || "#6b7280" }}
-                                  onChange={(val) => {
-                                    iconField.onChange(val.name || undefined);
-                                    colorField.onChange(val.color || undefined);
-                                  }}
-                                />
-                              </Popover.Panel>
-                            </Popover>
-                            {iconField.value && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  iconField.onChange(undefined);
-                                  colorField.onChange(undefined);
+                <div className="flex items-center gap-2">
+                  <Popover className="relative">
+                    <Popover.Button
+                      as="button"
+                      type="button"
+                      title={falseIconValue || "选择图标"}
+                      className="flex h-8 w-8 items-center justify-center rounded border border-dashed border-custom-border-300 hover:bg-custom-background-80 transition-colors"
+                    >
+                      {falseIconValue && getLucideIcon(falseIconValue) ? (
+                        (() => {
+                          const IconComp = getLucideIcon(falseIconValue)!;
+                          return <IconComp size={16} color={falseIconColorValue || "#6b7280"} strokeWidth={2} />;
+                        })()
+                      ) : (
+                        <Plus size={14} className="text-custom-text-400" />
+                      )}
+                    </Popover.Button>
+                    <Popover.Panel className="absolute z-50 mt-1 w-72 rounded-lg border border-subtle bg-surface-1 p-3 shadow-raised-200">
+                      <Controller
+                        name="false_icon"
+                        control={control}
+                        render={({ field: iconField }) => (
+                          <Controller
+                            name="false_icon_color"
+                            control={control}
+                            render={({ field: colorField }) => (
+                              <IconColorPicker
+                                value={{ name: iconField.value || "", color: colorField.value || "#6b7280" }}
+                                onChange={(val) => {
+                                  iconField.onChange(val.name || undefined);
+                                  colorField.onChange(val.color || undefined);
                                 }}
-                                className="text-custom-text-400 hover:text-custom-text-200"
-                                title="清除图标"
-                              >
-                                <X size={14} />
-                              </button>
+                              />
                             )}
-                          </div>
-                        );
+                          />
+                        )}
+                      />
+                    </Popover.Panel>
+                  </Popover>
+                  {falseIconValue && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setValue("false_icon", undefined);
+                        setValue("false_icon_color", undefined);
                       }}
-                    />
+                      className="text-custom-text-400 hover:text-custom-text-200"
+                      title="清除图标"
+                    >
+                      <X size={14} />
+                    </button>
                   )}
-                />
+                </div>
               </div>
             </div>
           </div>
