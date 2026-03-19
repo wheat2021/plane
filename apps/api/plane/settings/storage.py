@@ -38,13 +38,20 @@ class S3Storage(S3Boto3Storage):
                 endpoint_protocol = "https"
             else:
                 endpoint_protocol = request.scheme if request else "http"
+            # MINIO_PUBLIC_URL: browser-accessible MinIO URL for presigned URL generation.
+            # Use this in development where no reverse proxy routes /{bucket}/* to MinIO.
+            # In production (with Caddy), leave unset to use request.get_host() instead.
+            minio_public_url = os.environ.get("MINIO_PUBLIC_URL")
             # Create an S3 client for MinIO
             self.s3_client = boto3.client(
                 "s3",
                 aws_access_key_id=self.aws_access_key_id,
                 aws_secret_access_key=self.aws_secret_access_key,
                 region_name=self.aws_region,
-                endpoint_url=(f"{endpoint_protocol}://{request.get_host()}" if request else self.aws_s3_endpoint_url),
+                endpoint_url=(
+                    minio_public_url
+                    or (f"{endpoint_protocol}://{request.get_host()}" if request else self.aws_s3_endpoint_url)
+                ),
                 config=boto3.session.Config(signature_version="s3v4"),
             )
         else:
