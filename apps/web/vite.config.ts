@@ -14,9 +14,21 @@ const viteEnv = Object.keys(process.env)
     return a;
   }, {});
 
+// Dev defaults for vars no longer in .env (keep .env minimal)
+const viteDefaults: Record<string, string> = {
+  VITE_WEB_BASE_URL: "http://localhost:3000",
+  VITE_ADMIN_BASE_URL: "http://localhost:3001",
+  VITE_ADMIN_BASE_PATH: "/god-mode",
+  VITE_SPACE_BASE_URL: "http://localhost:3002",
+  VITE_SPACE_BASE_PATH: "/spaces",
+  VITE_LIVE_BASE_URL: "http://localhost:3100",
+  VITE_LIVE_BASE_PATH: "/live",
+};
+const mergedViteEnv = { ...viteDefaults, ...viteEnv };
+
 export default defineConfig(() => ({
   define: {
-    "process.env": JSON.stringify(viteEnv),
+    "process.env": JSON.stringify(mergedViteEnv),
   },
   build: {
     assetsInlineLimit: 0,

@@ -44,9 +44,37 @@ services:
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple/}
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
     restart: always
-    command: ./bin/docker-entrypoint-api.sh
     env_file:
-      - ./apps/api/.env
+      - .env
+    environment:
+      DEBUG: 0
+      CORS_ALLOWED_ORIGINS: "http://web:3000,http://admin:3000,http://space:3000"
+      POSTGRES_HOST: plane-db
+      POSTGRES_PORT: 5432
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@plane-db:5432/${POSTGRES_DB}"
+      REDIS_HOST: plane-redis
+      REDIS_PORT: 6379
+      REDIS_URL: "redis://plane-redis:6379/"
+      RABBITMQ_HOST: plane-mq
+      RABBITMQ_PORT: 5672
+      AMQP_URL: "amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@plane-mq:5672/${RABBITMQ_VHOST}"
+      USE_MINIO: 1
+      SIGNED_URL_EXPIRATION: 3600
+      GUNICORN_WORKERS: 2
+      HARD_DELETE_AFTER_DAYS: 60
+      FILE_SIZE_LIMIT: 5242880
+      API_KEY_RATE_LIMIT: "60/minute"
+      WEB_URL: "http://web:3000"
+      APP_BASE_URL: "http://web:3000"
+      APP_BASE_PATH: ""
+      ADMIN_BASE_URL: "http://admin:3000"
+      ADMIN_BASE_PATH: "/god-mode"
+      SPACE_BASE_URL: "http://space:3000"
+      SPACE_BASE_PATH: "/spaces"
+      LIVE_BASE_URL: "http://live:3000"
+      LIVE_BASE_PATH: "/live"
+      API_BASE_URL: "http://api:8000"
+    command: ./bin/docker-entrypoint-api.sh
     depends_on:
       - plane-db
       - plane-redis
@@ -61,9 +89,24 @@ services:
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple/}
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
     restart: always
-    command: ./bin/docker-entrypoint-worker.sh
     env_file:
-      - ./apps/api/.env
+      - .env
+    environment:
+      DEBUG: 0
+      POSTGRES_HOST: plane-db
+      POSTGRES_PORT: 5432
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@plane-db:5432/${POSTGRES_DB}"
+      REDIS_HOST: plane-redis
+      REDIS_PORT: 6379
+      REDIS_URL: "redis://plane-redis:6379/"
+      RABBITMQ_HOST: plane-mq
+      RABBITMQ_PORT: 5672
+      AMQP_URL: "amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@plane-mq:5672/${RABBITMQ_VHOST}"
+      USE_MINIO: 1
+      SIGNED_URL_EXPIRATION: 3600
+      HARD_DELETE_AFTER_DAYS: 60
+      FILE_SIZE_LIMIT: 5242880
+    command: ./bin/docker-entrypoint-worker.sh
     depends_on:
       - api
       - plane-db
@@ -79,9 +122,21 @@ services:
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple/}
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
     restart: always
-    command: ./bin/docker-entrypoint-beat.sh
     env_file:
-      - ./apps/api/.env
+      - .env
+    environment:
+      DEBUG: 0
+      POSTGRES_HOST: plane-db
+      POSTGRES_PORT: 5432
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@plane-db:5432/${POSTGRES_DB}"
+      REDIS_HOST: plane-redis
+      REDIS_PORT: 6379
+      REDIS_URL: "redis://plane-redis:6379/"
+      RABBITMQ_HOST: plane-mq
+      RABBITMQ_PORT: 5672
+      AMQP_URL: "amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@plane-mq:5672/${RABBITMQ_VHOST}"
+      USE_MINIO: 1
+    command: ./bin/docker-entrypoint-beat.sh
     depends_on:
       - api
       - plane-db
@@ -97,9 +152,16 @@ services:
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple/}
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
     restart: no
-    command: ./bin/docker-entrypoint-migrator.sh
     env_file:
-      - ./apps/api/.env
+      - .env
+    environment:
+      POSTGRES_HOST: plane-db
+      POSTGRES_PORT: 5432
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@plane-db:5432/${POSTGRES_DB}"
+      REDIS_HOST: plane-redis
+      REDIS_PORT: 6379
+      REDIS_URL: "redis://plane-redis:6379/"
+    command: ./bin/docker-entrypoint-migrator.sh
     depends_on:
       - plane-db
       - plane-redis
@@ -112,9 +174,11 @@ services:
       args:
         DOCKER_BUILDKIT: 1
     restart: always
+    env_file:
+      - .env
     environment:
       API_BASE_URL: http://api:8000
-      LIVE_SERVER_SECRET_KEY: ${LIVE_SERVER_SECRET_KEY:-fc892225e1b61ca99fd376dea18cb9fe61ae05c23c48de55cf4dd7663fa65239}
+      LIVE_SERVER_SECRET_KEY: ${LIVE_SERVER_SECRET_KEY}
       REDIS_URL: redis://plane-redis:6379/
     depends_on:
       - api
