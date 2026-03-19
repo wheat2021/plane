@@ -39,7 +39,14 @@ export const CompactSelectControl: FC<ICompactSelectControl> = (props) => {
 
   return (
     <Tooltip tooltipHeading={config.label} tooltipContent={displayValue} isMobile={isMobile}>
-      <div className="h-5">
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
+      <div
+        className="h-5"
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
         <SingleSelectDropdown
           value={selectedValue}
           onChange={onChange}

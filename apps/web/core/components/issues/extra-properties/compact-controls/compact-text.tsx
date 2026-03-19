@@ -22,7 +22,9 @@ export const CompactTextControl: FC<ICompactTextControl> = (props) => {
 
   const displayValue = (value as string) || "";
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (disabled) return;
     setLocalValue(displayValue);
     setIsEditing(true);
@@ -55,6 +57,10 @@ export const CompactTextControl: FC<ICompactTextControl> = (props) => {
         onChange={(e) => setLocalValue(e.target.value)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
         className="h-5 w-24 px-1 text-caption-sm-regular bg-layer-1 border border-primary rounded-sm focus:outline-none"
       />
     );
