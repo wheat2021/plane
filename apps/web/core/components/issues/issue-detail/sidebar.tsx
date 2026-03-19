@@ -66,7 +66,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
   } = useIssueDetail();
   const { getUserDetails } = useMember();
   const { getStateById } = useProjectState();
-  const { getDescription } = useDefaultPropertyConfig();
+  const defaultPropertyConfigStore = useDefaultPropertyConfig();
   const issue = getIssueById(issueId);
   if (!issue) return <></>;
 
@@ -79,7 +79,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
   // helper: return appendElement for a default property if issue has a type and description is set
   const defaultPropAppend = (propertyKey: string) => {
     if (!issue.type_id) return undefined;
-    const desc = getDescription(workspaceSlug, issue.type_id, propertyKey);
+    const desc = defaultPropertyConfigStore.getDescription(workspaceSlug, issue.type_id, propertyKey);
     if (!desc) return undefined;
     return <ExtraPropertyDescriptionPopover description={desc} />;
   };
