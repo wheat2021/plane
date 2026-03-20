@@ -129,3 +129,16 @@ from .draft import (
     DraftIssueSerializer,
     DraftIssueDetailSerializer,
 )
+
+from .extra_property import (
+    ExtraPropertyConfigSerializer,
+    ExtraPropertyConfigCreateSerializer,
+    IssueTypeExtraPropertySerializer,
+    IssueTypeExtraPropertyCreateSerializer,
+)
+
+from .issue_type import (
+    IssueTypeSerializer,
+    IssueTypeCreateSerializer,
+    ProjectIssueTypeSerializer,
+)

@@ -1,6 +1,8 @@
 from django.urls import path
 
 from plane.app.views import (
+    ProjectIssueTypeViewSet,
+    ProjectIssueTypeExtraPropertyViewSet,
     ProjectViewSet,
     DeployBoardViewSet,
     ProjectInvitationsViewset,
@@ -124,5 +126,27 @@ urlpatterns = [
         "workspaces/<str:slug>/projects/<uuid:project_id>/preferences/member/<uuid:member_id>/",
         ProjectMemberPreferenceEndpoint.as_view(),
         name="project-member-preference",
+    ),
+    # Project Work Item Types
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/work-item-types/",
+        ProjectIssueTypeViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-work-item-types",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/work-item-types/<uuid:pk>/",
+        ProjectIssueTypeViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"}),
+        name="project-work-item-type",
+    ),
+    # Project Issue Type Extra Properties (bindings)
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/work-item-types/<uuid:issue_type_id>/extra-properties/",
+        ProjectIssueTypeExtraPropertyViewSet.as_view({"get": "list", "post": "create"}),
+        name="project-issue-type-extra-properties",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/work-item-types/<uuid:issue_type_id>/extra-properties/<uuid:pk>/",
+        ProjectIssueTypeExtraPropertyViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"}),
+        name="project-issue-type-extra-property",
     ),
 ]

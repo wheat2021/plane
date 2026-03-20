@@ -234,3 +234,9 @@ from .notification.base import MarkAllReadNotificationViewSet
 from .user.base import AccountEndpoint, ProfileEndpoint, UserSessionEndpoint
 
 from .timezone.base import TimezoneEndpoint
+
+from .workspace.issue_type import WorkspaceIssueTypeViewSet
+from .workspace.extra_property import WorkspaceExtraPropertyConfigViewSet
+
+from .project.issue_type import ProjectIssueTypeViewSet
+from .project.issue_type_extra_property import ProjectIssueTypeExtraPropertyViewSet

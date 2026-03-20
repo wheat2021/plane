@@ -38,6 +38,8 @@ from plane.db.models import (
     IssueDescriptionVersion,
     ProjectMember,
     EstimatePoint,
+    ProjectIssueType,
+    IssueType,
 )
 from plane.utils.content_validator import (
     validate_html_content,
@@ -82,6 +84,9 @@ class IssueCreateSerializer(BaseSerializer):
     )
     parent_id = serializers.PrimaryKeyRelatedField(
         source="parent", queryset=Issue.objects.all(), required=False, allow_null=True
+    )
+    type_id = serializers.PrimaryKeyRelatedField(
+        source="type", queryset=IssueType.objects.all(), required=False, allow_null=True
     )
     label_ids = serializers.ListField(
         child=serializers.PrimaryKeyRelatedField(queryset=Label.objects.all()),
@@ -188,6 +193,13 @@ class IssueCreateSerializer(BaseSerializer):
             ).exists()
         ):
             raise serializers.ValidationError("Estimate point is not valid please pass a valid estimate_point_id")
+
+        # Validate type is enabled for the project
+        if attrs.get("type") and not ProjectIssueType.objects.filter(
+            project_id=self.context.get("project_id"),
+            issue_type_id=attrs.get("type").id,
+        ).exists():
+            raise serializers.ValidationError("Issue type is not enabled for this project")
 
         return attrs
 
@@ -756,11 +768,17 @@ class IssueIntakeSerializer(DynamicBaseSerializer):
 class IssueSerializer(DynamicBaseSerializer):
     # ids
     cycle_id = serializers.PrimaryKeyRelatedField(read_only=True)
+    type_id = serializers.PrimaryKeyRelatedField(
+        source="type", queryset=IssueType.objects.all(), required=False, allow_null=True
+    )
     module_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
 
     # Many to many
     label_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
     assignee_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
+
+    # Extra properties (JSON field)
+    extra_properties = serializers.JSONField(required=False, allow_null=True)
 
     # Count items
     sub_issues_count = serializers.IntegerField(read_only=True)

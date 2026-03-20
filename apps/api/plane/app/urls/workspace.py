@@ -2,6 +2,8 @@ from django.urls import path
 
 
 from plane.app.views import (
+    WorkspaceIssueTypeViewSet,
+    WorkspaceExtraPropertyConfigViewSet,
     UserWorkspaceInvitationsViewSet,
     WorkSpaceViewSet,
     WorkspaceJoinEndpoint,
@@ -252,5 +254,27 @@ urlpatterns = [
         "workspaces/<str:slug>/sidebar-preferences/",
         WorkspaceUserPreferenceViewSet.as_view(),
         name="workspace-user-preference",
+    ),
+    # Work Item Types
+    path(
+        "workspaces/<str:slug>/work-item-types/",
+        WorkspaceIssueTypeViewSet.as_view({"get": "list", "post": "create"}),
+        name="workspace-work-item-types",
+    ),
+    path(
+        "workspaces/<str:slug>/work-item-types/<uuid:pk>/",
+        WorkspaceIssueTypeViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"}),
+        name="workspace-work-item-type",
+    ),
+    # Extra Properties
+    path(
+        "workspaces/<str:slug>/extra-properties/",
+        WorkspaceExtraPropertyConfigViewSet.as_view({"get": "list", "post": "create"}),
+        name="workspace-extra-properties",
+    ),
+    path(
+        "workspaces/<str:slug>/extra-properties/<uuid:pk>/",
+        WorkspaceExtraPropertyConfigViewSet.as_view({"get": "retrieve", "patch": "partial_update", "delete": "destroy"}),
+        name="workspace-extra-property",
     ),
 ]

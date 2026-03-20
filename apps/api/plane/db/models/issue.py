@@ -163,6 +163,12 @@ class Issue(ProjectBaseModel):
         blank=True,
     )
 
+    extra_properties = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Additional properties based on issue type configuration",
+    )
+
     issue_objects = IssueManager()
 
     class Meta:
