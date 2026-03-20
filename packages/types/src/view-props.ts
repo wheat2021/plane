@@ -185,6 +185,8 @@ export interface IIssueFilters {
 
 export type TSupportedFilterForUpdate = IIssueDisplayFilterOptions | IIssueDisplayProperties | TIssueKanbanFilters;
 
+export type TExtraDisplayProperties = Record<string, boolean>;
+
 export interface ISubWorkItemFilters extends Omit<IIssueFilters, "richFilters"> {
   filters: IIssueFilterOptions;
 }

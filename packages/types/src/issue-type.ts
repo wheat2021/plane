@@ -1,0 +1,46 @@
+/**
+ * Logo properties for issue type icons
+ */
+export type TIssueTypeLogoProps = {
+  icon?: {
+    name: string;
+    color: string;
+  };
+  emoji?: {
+    value: string;
+  };
+};
+
+/**
+ * Issue type definition
+ */
+export type TIssueType = {
+  id: string;
+  workspace_id: string;
+  name: string;
+  description: string;
+  logo_props: TIssueTypeLogoProps;
+  is_default: boolean;
+  is_active: boolean;
+  is_system: boolean;
+  level: number;
+};
+
+/**
+ * Lite version of issue type for dropdowns
+ */
+export type TIssueTypeLite = Pick<TIssueType, "id" | "name" | "logo_props" | "is_default">;
+
+/**
+ * Project-level issue type configuration
+ */
+export type TProjectIssueType = {
+  id: string;
+  project: string;
+  issue_type: string;
+  issue_type_detail: TIssueType;
+  level: number;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+};
