@@ -1,0 +1,46 @@
+schema: spec-driven
+
+context: |
+  - Always think in English, but respond to user in Chinese.
+  - Write proposal.md, specs.md, design.md, tasks.md in chinese.
+  - Always use AskUserQuestion tool when asking for user's feedback.
+
+  Fork of Plane (open-source project management platform).
+  Branch: itemtype (custom features), preview (upstream sync).
+  Never merge itemtype into preview; push directly to itemtype.
+
+  Backend: Django REST (Python 3.11+, Ruff, apps/api/)
+  Frontend: React Router + MobX + TailwindCSS (TypeScript strict, apps/web/)
+  Monorepo: pnpm workspaces, turbo, tsdown
+  Packages: @plane/ui, @plane/types, @plane/services, @plane/shared-state, @plane/editor, @plane/i18n
+  DB: PostgreSQL, migrations in apps/api/plane/db/migrations/
+  Editor: TipTap-based (LiteTextEditor for lightweight rich text)
+
+  Conventions:
+  - MobX stores with computed properties and fetchedMap caching
+  - Service classes (Axios) wrapping REST endpoints
+  - CE edition components in apps/web/ce/
+  - i18next for translations
+  - Commit messages in Chinese, prefixed with #FICC-9999#
+  - Documentation in Chinese, placed in docs/
+
+  Key constraint: upstream sync risk.
+  Modified upstream files may conflict when rebasing onto preview.
+  See spec upstream-diff sections for high/medium risk files.
+
+  Structure Rules:
+  - ALL changes MUST be created under the project root openspec/ directory (i.e., /openspec/changes/<change-name>/). NEVER create openspec directories inside sub-projects.
+  - The only valid openspec directory is the project root openspec/ at the repository root level.
+
+rules:
+  proposal:
+    - Always include upstream impact assessment
+    - Flag any files that overlap with existing high-risk upstream diff areas
+  tasks:
+    - "Task list MUST follow this section structure: 1. 提交变更文档, 2-N. 功能实现, N+1. 提交实现代码, N+2. 用户验证."
+    - "Section 1 '提交变更文档' MUST include a task to commit all openspec docs before coding starts."
+    - "Final implementation section '提交实现代码' MUST contain focused commit tasks grouped by functionality. Commit messages MUST be in Chinese and prefixed with '#FICC-9999#'."
+    - "Always include a final commit task that stages and commits all implementation changes in the '提交实现代码' section."
+    - "Final section '用户验证' MUST include specific verification steps and expected results for each change."
+    - "Mark tasks that touch upstream-modified files with [UPSTREAM-RISK]."
+    - "Include migration sequence number check as a task when DB changes are involved."
