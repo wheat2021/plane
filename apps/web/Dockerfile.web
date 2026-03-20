@@ -7,42 +7,48 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 # *****************************************************************************
-# STAGE 1: Build the project
+# STAGE 1: Prune monorepo to extract web dependencies
 # *****************************************************************************
 FROM base AS builder
 RUN apk add --no-cache libc6-compat
-# Set working directory
 WORKDIR /app
 
+# Install turbo globally (cached layer when version unchanged)
 ARG TURBO_VERSION=2.6.3
-RUN corepack enable pnpm && pnpm add -g turbo@${TURBO_VERSION}
-COPY . .
+RUN --mount=type=cache,target=/pnpm/store \
+    corepack enable pnpm && pnpm add -g turbo@${TURBO_VERSION}
 
+# Copy source code and prune to extract web dependencies
+COPY . .
 RUN turbo prune --scope=web --docker
 
 # *****************************************************************************
 # STAGE 2: Install dependencies & build the project
 # *****************************************************************************
-# Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
 
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# First install the dependencies (as they change less often)
+# Copy pruned dependency manifests (cached when package.json unchanged)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN corepack enable pnpm
 
-# Copy full directory structure before fetch to ensure all package.json files are available
+# Copy pruned source code
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 
-# Fetch dependencies to cache store, then install offline with dev deps
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store pnpm fetch --store-dir=/pnpm/store
-RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store CI=true pnpm install --offline --frozen-lockfile --store-dir=/pnpm/store
+# Fetch and install dependencies with BuildKit cache mount
+# This caches downloaded packages across builds, even when lockfile changes
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm fetch --store-dir=/pnpm/store
 
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    CI=true pnpm install --offline --frozen-lockfile --store-dir=/pnpm/store
+
+# Build-time environment variables
 ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
@@ -67,9 +73,11 @@ ENV VITE_SPACE_BASE_PATH=$VITE_SPACE_BASE_PATH
 ARG VITE_WEB_BASE_URL=""
 ENV VITE_WEB_BASE_URL=$VITE_WEB_BASE_URL
 
+# Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV TURBO_TELEMETRY_DISABLED=1
 
+# Build the web application
 RUN pnpm turbo run build --filter=web
 
 # *****************************************************************************
