@@ -14,6 +14,7 @@ import type {
   IIssueFilters,
   IIssueFiltersResponse,
   IssuePaginationOptions,
+  TExtraDisplayProperties,
   TIssueKanbanFilters,
   TIssueParams,
   TStaticViewTypes,
@@ -59,6 +60,7 @@ export interface IIssueFilterHelperStore {
     defaultValues?: IIssueDisplayFilterOptions
   ): IIssueDisplayFilterOptions;
   computedDisplayProperties(filters: IIssueDisplayProperties): IIssueDisplayProperties;
+  computedExtraDisplayProperties(extraDisplayProperties: TExtraDisplayProperties | undefined): TExtraDisplayProperties;
 }
 
 export class IssueFilterHelperStore implements IIssueFilterHelperStore {
@@ -74,6 +76,7 @@ export class IssueFilterHelperStore implements IIssueFilterHelperStore {
     displayFilters: isEmpty(filters?.displayFilters) ? undefined : filters?.displayFilters,
     displayProperties: isEmpty(filters?.displayProperties) ? undefined : filters?.displayProperties,
     kanbanFilters: isEmpty(filters?.kanbanFilters) ? undefined : filters?.kanbanFilters,
+    extraDisplayProperties: isEmpty(filters?.extraDisplayProperties) ? undefined : filters?.extraDisplayProperties,
   });
 
   /**
@@ -189,6 +192,15 @@ export class IssueFilterHelperStore implements IIssueFilterHelperStore {
    */
   computedDisplayProperties = (displayProperties: IIssueDisplayProperties): IIssueDisplayProperties =>
     getComputedDisplayProperties(displayProperties);
+
+  /**
+   * @description This method is used to compute extra display properties
+   * @param {TExtraDisplayProperties | undefined} extraDisplayProperties
+   * @returns {TExtraDisplayProperties}
+   */
+  computedExtraDisplayProperties = (
+    extraDisplayProperties: TExtraDisplayProperties | undefined
+  ): TExtraDisplayProperties => extraDisplayProperties ?? {};
 
   handleIssuesLocalFilters = {
     fetchFiltersFromStorage: () => {

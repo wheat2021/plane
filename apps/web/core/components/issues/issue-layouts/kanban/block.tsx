@@ -18,11 +18,14 @@ import { cn, generateWorkItemLink } from "@plane/utils";
 // components
 import RenderIfVisible from "@/components/core/render-if-visible-HOC";
 import { HIGHLIGHT_CLASS, getIssueBlockId } from "@/components/issues/issue-layouts/utils";
+import { ExtraPropertyRenderer } from "@/components/issues/extra-properties";
 // helpers
 // hooks
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useKanbanView } from "@/hooks/store/use-kanban-view";
 import { useProject } from "@/hooks/store/use-project";
+import { useIssueTypeExtraProperty } from "@/hooks/store/use-issue-type-extra-property";
+import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
 import useIssuePeekOverviewRedirection from "@/hooks/use-issue-peek-overview-redirection";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // plane web components
@@ -187,6 +190,13 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
   const canEditIssueProperties = canEditProperties(issue?.project_id ?? undefined);
 
   const isDragAllowed = canDragIssuesInCurrentGrouping && !issue?.tempId && canEditIssueProperties;
+
+  // B2: extra properties - read directly from store
+  const { getConfigsForBinding } = useIssueTypeExtraProperty();
+  const { updateIssueExtraProperties } = useExtraPropertyConfig();
+  const extraPropertyConfigs = issue?.type_id && issue?.project_id
+    ? getConfigsForBinding(issue.project_id, issue.type_id)
+    : [];
   const projectIdentifier = getProjectIdentifierById(issue?.project_id);
 
   const workItemLink = generateWorkItemLink({
@@ -294,6 +304,19 @@ export const KanbanIssueBlock = observer(function KanbanIssueBlock(props: IssueB
               isReadOnly={!canEditIssueProperties}
               isEpic={isEpic}
             />
+            {extraPropertyConfigs.length > 0 && (
+              <ExtraPropertyRenderer
+                configs={extraPropertyConfigs}
+                values={issue.extra_properties ?? undefined}
+                onChange={(key, value) => {
+                  if (workspaceSlug && issue.project_id)
+                    void updateIssueExtraProperties(workspaceSlug.toString(), issue.project_id, issue.id, key, value);
+                }}
+                isEditable={canEditIssueProperties}
+                workspaceSlug={workspaceSlug?.toString()}
+                projectId={issue.project_id ?? undefined}
+              />
+            )}
           </RenderIfVisible>
         </ControlLink>
       </div>

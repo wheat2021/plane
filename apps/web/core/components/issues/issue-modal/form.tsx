@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import React, { useState, useRef, useEffect } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
@@ -11,7 +10,6 @@ import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import type { TIssue, TWorkspaceDraftIssue } from "@plane/types";
-import { EIssuesStoreType } from "@plane/types";
 // hooks
 import { ToggleSwitch } from "@plane/ui";
 import {
@@ -35,6 +33,8 @@ import {
 import { useIssueModal } from "@/hooks/context/use-issue-modal";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useProject } from "@/hooks/store/use-project";
+import { useDefaultPropertyConfig } from "@/hooks/store/use-default-property-config";
+import { ExtraPropertyDescriptionPopover } from "@/components/issues/extra-properties/description-popover";
 import { useProjectState } from "@/hooks/store/use-project-state";
 import { useWorkspaceDraftIssues } from "@/hooks/store/workspace-draft";
 import { usePlatformOS } from "@/hooks/use-platform-os";
@@ -68,6 +68,7 @@ export interface IssueFormProps {
   handleDraftAndClose?: () => void;
   isProjectSelectionDisabled?: boolean;
   showActionButtons?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dataResetProperties?: any[];
 }
 
@@ -133,6 +134,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
   } = useIssueDetail();
   const { fetchCycles } = useProjectIssueProperties();
   const { getStateById } = useProjectState();
+  const { getDescription } = useDefaultPropertyConfig();
 
   // form info
   const methods = useForm<TIssue>({
@@ -157,6 +159,14 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
     watch: watch,
   });
 
+  const formPropAppend = (propertyKey: string, align?: "left" | "right") => {
+    const typeId = watch("type_id");
+    if (!typeId || !workspaceSlug) return null;
+    const desc = getDescription(workspaceSlug.toString(), typeId, propertyKey);
+    if (!desc) return null;
+    return <ExtraPropertyDescriptionPopover description={desc} align={align} />;
+  };
+
   // derived values
   const projectDetails = projectId ? getProjectById(projectId) : undefined;
   const isDisabled = isSubmitting || isApplyingTemplate;
@@ -175,6 +185,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
         reset(getUpdateFormDataForReset(projectId, getValues()));
       }
     }
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     if (projectId && routeProjectId !== projectId) fetchCycles(workspaceSlug?.toString(), projectId);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -185,7 +196,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
     if (data) {
       reset({ ...DEFAULT_WORK_ITEM_FORM_VALUES, project_id: projectId, ...data });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps, @typescript-eslint/no-unsafe-assignment
   }, [...dataResetProperties]);
 
   // Update the issue type id when the project id changes
@@ -204,6 +215,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
 
   useEffect(() => {
     if (workItemTemplateId && editorRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       handleTemplateChange({
         workspaceSlug: workspaceSlug?.toString(),
         reset,
@@ -245,12 +257,14 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
         };
 
     // this condition helps to move the issues from draft to project issues
+    // eslint-disable-next-line no-prototype-builtins
     if (formData.hasOwnProperty("is_draft")) submitData.is_draft = formData.is_draft;
 
     await onSubmit(submitData, is_draft_issue)
       .then(() => {
         setGptAssistantModal(false);
         if (isCreateMoreToggleEnabled && workItemTemplateId) {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           handleTemplateChange({
             workspaceSlug: workspaceSlug?.toString(),
             reset,
@@ -266,6 +280,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
           });
           editorRef?.current?.clearEditor();
         }
+        return;
       })
       .catch((error) => {
         console.error(error);
@@ -312,6 +327,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
   // debounced duplicate issues swr
   const { duplicateIssues } = useDebouncedDuplicateIssues(
     workspaceSlug?.toString(),
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     projectDetails?.workspace.toString(),
     projectId ?? undefined,
     {
@@ -338,6 +354,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
     setSelectedParentIssue(
       convertWorkItemDataToSearchResponse(workspaceSlug?.toString(), issue, projectDetails, stateDetails)
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch, getIssueById, getProjectById, selectedParentIssue, getStateById]);
 
   // executing this useEffect when isDirty changes
@@ -376,6 +393,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
         <div className="rounded-lg w-full">
           <form
             ref={formRef}
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onSubmit={handleSubmit((data) => handleFormSubmit(data))}
             className="flex flex-col w-full"
           >
@@ -438,6 +456,11 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
                 </div>
               )}
               <div className="space-y-1">
+                <div className="flex items-center gap-1">
+                  <span className="text-body-xs-medium text-secondary">{t("title")}</span>
+                  <span className="text-red-500">*</span>
+                  {formPropAppend("title")}
+                </div>
                 <IssueTitleInput
                   control={control}
                   issueTitleRef={issueTitleRef}
@@ -454,6 +477,10 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
               )}
             >
               <div className="px-5">
+                <div className="flex items-center gap-1 mb-1">
+                  <span className="text-body-xs-medium text-secondary">{t("description")}</span>
+                  {formPropAppend("description")}
+                </div>
                 <IssueDescriptionEditor
                   control={control}
                   isDraft={isDraft}
@@ -509,6 +536,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
                   tabIndex={getIndex("create_more")}
                 >
                   {!data?.id && (
+                    // eslint-disable-next-line jsx-a11y/interactive-supports-focus
                     <div
                       className="inline-flex items-center gap-1.5 cursor-pointer"
                       onClick={() => onCreateMoreToggleChange(!isCreateMoreToggleEnabled)}
@@ -559,6 +587,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
                         variant="primary"
                         type="button"
                         loading={isMoving}
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
                         onClick={handleMoveToProjects}
                         disabled={isMoving}
                         size="lg"

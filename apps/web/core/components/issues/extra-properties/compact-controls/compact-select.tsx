@@ -1,0 +1,81 @@
+import type { FC } from "react";
+import { useMemo } from "react";
+import { DropdownPropertyIcon } from "@plane/propel/icons";
+import { Tooltip } from "@plane/propel/tooltip";
+import { Dropdown as SingleSelectDropdown } from "@plane/ui";
+import type { TExtraPropertyConfig, TExtraPropertyValue } from "@plane/types";
+import { cn } from "@plane/utils";
+import { usePlatformOS } from "@/hooks/use-platform-os";
+
+interface TDropdownOption {
+  data: Record<string, unknown>;
+  value: string;
+}
+
+interface ICompactSelectControl {
+  config: TExtraPropertyConfig;
+  value: TExtraPropertyValue;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}
+
+export const CompactSelectControl: FC<ICompactSelectControl> = (props) => {
+  const { config, value, onChange, disabled } = props;
+  const { isMobile } = usePlatformOS();
+
+  const options: TDropdownOption[] = useMemo(() => {
+    return (config.options || []).map((opt) => ({
+      value: opt.value,
+      data: {
+        value: opt.value,
+        annotation: opt.label || "",
+      },
+    }));
+  }, [config.options]);
+
+  const selectedValue = (value as string) || "";
+  const selectedOption = options.find((opt) => opt.value === selectedValue);
+  const displayValue = selectedOption?.value || "-";
+
+  return (
+    <Tooltip tooltipHeading={config.label} tooltipContent={displayValue} isMobile={isMobile}>
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
+      <div
+        className="h-5"
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
+        <SingleSelectDropdown
+          value={selectedValue}
+          onChange={onChange}
+          options={options}
+          disabled={disabled}
+          keyExtractor={(opt) => opt.value}
+          queryArray={["value"]}
+          sortByKey="value"
+          buttonContent={() => (
+            <div
+              className={cn(
+                "flex h-5 flex-shrink-0 items-center justify-center gap-1 overflow-hidden rounded-sm border-[0.5px] border-strong px-2 py-1",
+                "hover:bg-layer-1 transition-colors",
+                disabled && "cursor-not-allowed opacity-60"
+              )}
+            >
+              <DropdownPropertyIcon className="h-3 w-3 flex-shrink-0 text-secondary" />
+              <span className="text-caption-sm-regular truncate max-w-16">{displayValue}</span>
+            </div>
+          )}
+          buttonContainerClassName="h-5"
+          buttonClassName="h-5 p-0 border-0 bg-transparent hover:bg-transparent"
+          renderItem={({ value: itemValue, selected }) => (
+            <div className="flex items-center gap-2 px-2 py-1.5">
+              <span className={`text-body-xs-regular ${selected ? "font-medium" : ""}`}>{itemValue}</span>
+            </div>
+          )}
+        />
+      </div>
+    </Tooltip>
+  );
+};

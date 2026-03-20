@@ -5,11 +5,13 @@ import type {
   IIssueDisplayFilterOptions,
   IIssueDisplayProperties,
   ILayoutDisplayFiltersOptions,
+  TExtraDisplayProperties,
   TIssueGroupByOptions,
 } from "@plane/types";
 // components
 import {
   FilterDisplayProperties,
+  FilterExtraDisplayProperties,
   FilterExtraOptions,
   FilterGroupBy,
   FilterOrderBy,
@@ -19,8 +21,10 @@ import {
 type Props = {
   displayFilters: IIssueDisplayFilterOptions | undefined;
   displayProperties: IIssueDisplayProperties;
+  extraDisplayProperties?: TExtraDisplayProperties;
   handleDisplayFiltersUpdate: (updatedDisplayFilter: Partial<IIssueDisplayFilterOptions>) => void;
   handleDisplayPropertiesUpdate: (updatedDisplayProperties: Partial<IIssueDisplayProperties>) => void;
+  handleExtraDisplayPropertiesUpdate?: (updatedExtraDisplayProperties: TExtraDisplayProperties) => void;
   layoutDisplayFiltersOptions: ILayoutDisplayFiltersOptions | undefined;
   ignoreGroupedFilters?: Partial<TIssueGroupByOptions>[];
   cycleViewDisabled?: boolean;
@@ -32,8 +36,10 @@ export const DisplayFiltersSelection = observer(function DisplayFiltersSelection
   const {
     displayFilters,
     displayProperties,
+    extraDisplayProperties,
     handleDisplayFiltersUpdate,
     handleDisplayPropertiesUpdate,
+    handleExtraDisplayPropertiesUpdate,
     layoutDisplayFiltersOptions,
     ignoreGroupedFilters = [],
     cycleViewDisabled = false,
@@ -113,6 +119,16 @@ export const DisplayFiltersSelection = observer(function DisplayFiltersSelection
               })
             }
             orderByOptions={layoutDisplayFiltersOptions?.display_filters.order_by ?? []}
+          />
+        </div>
+      )}
+
+      {/* Extra display properties */}
+      {handleExtraDisplayPropertiesUpdate && (
+        <div className="py-2">
+          <FilterExtraDisplayProperties
+            extraDisplayProperties={extraDisplayProperties}
+            handleUpdate={handleExtraDisplayPropertiesUpdate}
           />
         </div>
       )}

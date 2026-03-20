@@ -16,11 +16,14 @@ import { cn, generateWorkItemLink } from "@plane/utils";
 // components
 import { MultipleSelectEntityAction } from "@/components/core/multiple-select";
 import { IssueProperties } from "@/components/issues/issue-layouts/properties";
+import { ExtraPropertyRenderer } from "@/components/issues/extra-properties";
 // helpers
 // hooks
 import { useAppTheme } from "@/hooks/store/use-app-theme";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useProject } from "@/hooks/store/use-project";
+import { useIssueTypeExtraProperty } from "@/hooks/store/use-issue-type-extra-property";
+import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
 import type { TSelectionHelper } from "@/hooks/use-multiple-select";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 // plane web components
@@ -104,6 +107,13 @@ export const IssueBlock = observer(function IssueBlock(props: IssueBlockProps) {
   const subIssuesCount = issue?.sub_issues_count ?? 0;
   const canEditIssueProperties = canEditProperties(issue?.project_id ?? undefined);
   const isDraggingAllowed = canDrag && canEditIssueProperties;
+
+  // B2: extra properties - read directly from store
+  const { getConfigsForBinding } = useIssueTypeExtraProperty();
+  const { updateIssueExtraProperties } = useExtraPropertyConfig();
+  const extraPropertyConfigs = issue?.type_id && issue?.project_id
+    ? getConfigsForBinding(issue.project_id, issue.type_id)
+    : [];
 
   const { isMobile } = usePlatformOS();
 
@@ -314,6 +324,19 @@ export const IssueBlock = observer(function IssueBlock(props: IssueBlockProps) {
                 activeLayout="List"
                 isEpic={isEpic}
               />
+              {extraPropertyConfigs.length > 0 && (
+                <ExtraPropertyRenderer
+                  configs={extraPropertyConfigs}
+                  values={issue.extra_properties ?? undefined}
+                  onChange={(key, value) => {
+                    if (workspaceSlug && issue.project_id)
+                      void updateIssueExtraProperties(workspaceSlug.toString(), issue.project_id, issue.id, key, value);
+                  }}
+                  isEditable={canEditIssueProperties}
+                  workspaceSlug={workspaceSlug?.toString()}
+                  projectId={issue.project_id ?? undefined}
+                />
+              )}
               <div
                 className={cn("hidden", {
                   "md:flex": isSidebarCollapsed,

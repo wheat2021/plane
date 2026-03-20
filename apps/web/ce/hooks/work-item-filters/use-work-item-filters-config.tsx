@@ -1,5 +1,6 @@
-import { useCallback, useMemo } from "react";
-import { AtSign, Briefcase } from "lucide-react";
+import { useCallback, useEffect, useMemo } from "react";
+import useSWR from "swr";
+import { AtSign, Briefcase, Layers } from "lucide-react";
 // plane imports
 import { Logo } from "@plane/propel/emoji-icon-picker";
 import {
@@ -26,6 +27,7 @@ import type {
   IModule,
   IProject,
   TWorkItemFilterProperty,
+  TProjectIssueType,
 } from "@plane/types";
 import { Avatar } from "@plane/ui";
 import {
@@ -33,7 +35,9 @@ import {
   getCreatedAtFilterConfig,
   getCreatedByFilterConfig,
   getCycleFilterConfig,
+  getExtraPropertyOptionFilterConfig,
   getFileURL,
+  getIssueTypeFilterConfig,
   getLabelFilterConfig,
   getMentionFilterConfig,
   getModuleFilterConfig,
@@ -49,6 +53,9 @@ import {
 } from "@plane/utils";
 // store hooks
 import { useCycle } from "@/hooks/store/use-cycle";
+import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
+import { useIssueType } from "@/hooks/store/use-issue-type";
+import { useIssueTypeExtraProperty } from "@/hooks/store/use-issue-type-extra-property";
 import { useLabel } from "@/hooks/store/use-label";
 import { useMember } from "@/hooks/store/use-member";
 import { useModule } from "@/hooks/store/use-module";
@@ -56,6 +63,7 @@ import { useProject } from "@/hooks/store/use-project";
 import { useProjectState } from "@/hooks/store/use-project-state";
 // plane web imports
 import { useFiltersOperatorConfigs } from "@/plane-web/hooks/rich-filters/use-filters-operator-configs";
+import { getIssueTypeIconFromProps } from "@/components/dropdowns/issue-type-icon";
 
 export type TWorkItemFiltersEntityProps = {
   workspaceSlug: string;
@@ -92,6 +100,28 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
   const { getModuleById } = useModule();
   const { getStateById } = useProjectState();
   const { getUserDetails } = useMember();
+  const { getProjectIssueTypes, fetchProjectIssueTypes } = useIssueType();
+  const { fetchedMap: extraPropertyConfigsFetchedMap, fetchWorkspaceConfigs, getConfigById } = useExtraPropertyConfig();
+  const {
+    fetchedMap: issueTypeExtraPropertyBindingsFetchedMap,
+    fetchBindings: fetchIssueTypeExtraPropertyBindings,
+    getConfigIdsByIssueType,
+  } = useIssueTypeExtraProperty();
+
+  // Fetch project issue types if not already fetched
+  useSWR(
+    workspaceSlug && projectId ? `PROJECT_ISSUE_TYPES_FILTER_${workspaceSlug}_${projectId}` : null,
+    workspaceSlug && projectId ? () => fetchProjectIssueTypes(workspaceSlug, projectId) : null,
+    { revalidateIfStale: false, revalidateOnFocus: false }
+  );
+
+  // Ensure workspace-level extra property configs are loaded
+  useEffect(() => {
+    if (!workspaceSlug) return;
+    if (extraPropertyConfigsFetchedMap[workspaceSlug]) return;
+    void fetchWorkspaceConfigs(workspaceSlug);
+  }, [workspaceSlug, extraPropertyConfigsFetchedMap, fetchWorkspaceConfigs]);
+
   // derived values
   const operatorConfigs = useFiltersOperatorConfigs({ workspaceSlug });
   const filtersToShow = useMemo(() => new Set(allowedFilters), [allowedFilters]);
@@ -131,6 +161,24 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
         : [],
     [projectIds, getProjectById]
   );
+  const issueTypes: TProjectIssueType[] | undefined = projectId ? getProjectIssueTypes(projectId) : undefined;
+
+  // Ensure issue type -> extra property bindings are loaded for this project
+  useEffect(() => {
+    if (!workspaceSlug || !projectId || !issueTypes || issueTypes.length === 0) return;
+    for (const issueType of issueTypes) {
+      const issueTypeId = issueType.issue_type;
+      if (!issueTypeId) continue;
+      if (issueTypeExtraPropertyBindingsFetchedMap[projectId]?.[issueTypeId]) continue;
+      void fetchIssueTypeExtraPropertyBindings(workspaceSlug, projectId, issueTypeId);
+    }
+  }, [
+    workspaceSlug,
+    projectId,
+    issueTypes,
+    issueTypeExtraPropertyBindingsFetchedMap,
+    fetchIssueTypeExtraPropertyBindings,
+  ]);
   const areAllConfigsInitialized = useMemo(() => isLoaderReady(projectLoader), [projectLoader]);
 
   /**
@@ -356,6 +404,57 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
     [isFilterEnabled, projects, operatorConfigs]
   );
 
+  // issue type filter config
+  const issueTypeFilterConfig = useMemo(
+    () =>
+      getIssueTypeFilterConfig<TWorkItemFilterProperty>("type_id")({
+        isEnabled: isFilterEnabled("type_id") && issueTypes !== undefined && issueTypes.length > 0,
+        filterIcon: Layers,
+        issueTypes: issueTypes ?? [],
+        getOptionIcon: (issueType) => getIssueTypeIconFromProps(issueType.issue_type_detail.logo_props, 14),
+        ...operatorConfigs,
+      }),
+    [isFilterEnabled, issueTypes, operatorConfigs]
+  );
+
+  // extra property filter configs - collect unique option/multiselect configs across all issue types
+  // NOTE: Avoid useMemo here since the underlying MobX store updates (bindings/configMap) should trigger recomputation.
+  const extraPropertyFilterConfigs: TFilterConfig<TWorkItemFilterProperty>[] = (() => {
+    if (!projectId || !issueTypes || issueTypes.length === 0) return [];
+
+    const seen = new Set<string>();
+    const configs: TFilterConfig<TWorkItemFilterProperty>[] = [];
+
+    for (const issueType of issueTypes) {
+      const configIds = getConfigIdsByIssueType(projectId, issueType.issue_type);
+      for (const configId of configIds) {
+        if (seen.has(configId)) continue;
+        seen.add(configId);
+        const config = getConfigById(configId);
+        if (!config || (config.type !== "select" && config.type !== "multiselect")) continue;
+        if (!config.options || config.options.length === 0) continue;
+
+        const key = `extra_property_${configId}` as TWorkItemFilterProperty;
+        configs.push(
+          getExtraPropertyOptionFilterConfig<TWorkItemFilterProperty>(key)({
+            isEnabled: true,
+            label: config.label,
+            options: config.options,
+            ...operatorConfigs,
+          })
+        );
+      }
+    }
+
+    return configs;
+  })();
+
+  // build extra property config map
+  const extraPropertyConfigMap: Record<string, TFilterConfig<TWorkItemFilterProperty>> = {};
+  for (const config of extraPropertyFilterConfigs) {
+    extraPropertyConfigMap[config.id] = config;
+  }
+
   return {
     areAllConfigsInitialized,
     configs: [
@@ -364,6 +463,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       assigneeFilterConfig,
       priorityFilterConfig,
       projectFilterConfig,
+      issueTypeFilterConfig,
       mentionFilterConfig,
       labelFilterConfig,
       cycleFilterConfig,
@@ -374,6 +474,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       updatedAtFilterConfig,
       createdByFilterConfig,
       subscriberFilterConfig,
+      ...extraPropertyFilterConfigs,
     ],
     configMap: {
       project_id: projectFilterConfig,
@@ -391,6 +492,8 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       target_date: targetDateFilterConfig,
       created_at: createdAtFilterConfig,
       updated_at: updatedAtFilterConfig,
+      type_id: issueTypeFilterConfig,
+      ...extraPropertyConfigMap,
     },
     isFilterEnabled,
     members: members ?? [],
