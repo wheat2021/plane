@@ -1,6 +1,25 @@
 import type { EUserPermissions, IJiraMetadata } from "@plane/types";
 
-const paramsToKey = (params: any) => {
+interface IssueParams {
+  state?: string;
+  state_group?: string;
+  priority?: string;
+  mentions?: string;
+  assignees?: string;
+  created_by?: string;
+  labels?: string;
+  start_date?: string;
+  target_date?: string;
+  sub_issue?: string;
+  project?: string;
+  layout?: string;
+  subscriber?: string;
+  type?: string;
+  group_by?: string;
+  order_by?: string;
+}
+
+const paramsToKey = (params: IssueParams) => {
   const {
     state,
     state_group,
@@ -17,32 +36,21 @@ const paramsToKey = (params: any) => {
     subscriber,
   } = params;
 
-  let projectKey = project ? project.split(",") : [];
-  let stateKey = state ? state.split(",") : [];
-  let stateGroupKey = state_group ? state_group.split(",") : [];
-  let priorityKey = priority ? priority.split(",") : [];
-  let mentionsKey = mentions ? mentions.split(",") : [];
-  let assigneesKey = assignees ? assignees.split(",") : [];
-  let createdByKey = created_by ? created_by.split(",") : [];
-  let labelsKey = labels ? labels.split(",") : [];
-  let subscriberKey = subscriber ? subscriber.split(",") : [];
+  const projectKey = project ? project.split(",").sort().join("_") : "";
+  const stateKey = state ? state.split(",").sort().join("_") : "";
+  const stateGroupKey = state_group ? state_group.split(",").sort().join("_") : "";
+  const priorityKey = priority ? priority.split(",").sort().join("_") : "";
+  const mentionsKey = mentions ? mentions.split(",").sort().join("_") : "";
+  const assigneesKey = assignees ? assignees.split(",").sort().join("_") : "";
+  const createdByKey = created_by ? created_by.split(",").sort().join("_") : "";
+  const labelsKey = labels ? labels.split(",").sort().join("_") : "";
+  const subscriberKey = subscriber ? subscriber.split(",").sort().join("_") : "";
   const startDateKey = start_date ?? "";
   const targetDateKey = target_date ?? "";
   const type = params.type ? params.type.toUpperCase() : "NULL";
   const groupBy = params.group_by ? params.group_by.toUpperCase() : "NULL";
   const orderBy = params.order_by ? params.order_by.toUpperCase() : "NULL";
   const layoutKey = layout ? layout.toUpperCase() : "";
-
-  // sorting each keys in ascending order
-  projectKey = projectKey.sort().join("_");
-  stateKey = stateKey.sort().join("_");
-  stateGroupKey = stateGroupKey.sort().join("_");
-  priorityKey = priorityKey.sort().join("_");
-  assigneesKey = assigneesKey.sort().join("_");
-  mentionsKey = mentionsKey.sort().join("_");
-  createdByKey = createdByKey.sort().join("_");
-  labelsKey = labelsKey.sort().join("_");
-  subscriberKey = subscriberKey.sort().join("_");
 
   return `${layoutKey}_${projectKey}_${stateGroupKey}_${stateKey}_${priorityKey}_${assigneesKey}_${mentionsKey}_${createdByKey}_${type}_${groupBy}_${orderBy}_${labelsKey}_${startDateKey}_${targetDateKey}_${sub_issue}_${subscriberKey}`;
 };
@@ -86,12 +94,14 @@ export const WORKSPACE_SIDEBAR_PREFERENCES = (workspaceSlug: string) =>
 export const WORKSPACE_PROJECT_NAVIGATION_PREFERENCES = (workspaceSlug: string) =>
   `WORKSPACE_PROJECT_NAVIGATION_PREFERENCES_${workspaceSlug.toUpperCase()}`;
 
+export const WORKSPACE_ISSUE_TYPES = (workspaceSlug: string) => `WORKSPACE_ISSUE_TYPES_${workspaceSlug.toUpperCase()}`;
+
 export const PROJECT_GITHUB_REPOSITORY = (projectId: string) => `PROJECT_GITHUB_REPOSITORY_${projectId.toUpperCase()}`;
 
 // cycles
 export const WORKSPACE_ACTIVE_CYCLES_LIST = (workspaceSlug: string, cursor: string, per_page: string) =>
   `WORKSPACE_ACTIVE_CYCLES_LIST_${workspaceSlug.toUpperCase()}_${cursor.toUpperCase()}_${per_page.toUpperCase()}`;
-export const CYCLE_ISSUES_WITH_PARAMS = (cycleId: string, params?: any) => {
+export const CYCLE_ISSUES_WITH_PARAMS = (cycleId: string, params?: IssueParams) => {
   if (!params) return `CYCLE_ISSUES_WITH_PARAMS_${cycleId.toUpperCase()}`;
 
   const paramsKey = paramsToKey(params);
@@ -154,10 +164,10 @@ export const APPLICATION_BY_CLIENT_ID = (clientId: string) => `APPLICATION_BY_CL
 export const APPLICATION_CATEGORIES_LIST = () => `APPLICATION_CATEGORIES_LIST`;
 
 // project level keys
-export const PROJECT_DETAILS = (workspaceSlug: string, projectId: string) =>
+export const PROJECT_DETAILS = (_workspaceSlug: string, projectId: string) =>
   `PROJECT_DETAILS_${projectId.toString().toUpperCase()}`;
 
-export const PROJECT_ME_INFORMATION = (workspaceSlug: string, projectId: string) =>
+export const PROJECT_ME_INFORMATION = (_workspaceSlug: string, projectId: string) =>
   `PROJECT_ME_INFORMATION_${projectId.toString().toUpperCase()}`;
 
 export const PROJECT_LABELS = (projectId: string, projectRole: EUserPermissions | undefined) =>
