@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect , Fragment } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
+import { createPortal } from "react-dom";
 import type { FC } from "react";
 import { Link2, Pencil, Plus, X } from "lucide-react";
 import { Popover, Transition } from "@headlessui/react";
@@ -38,6 +39,7 @@ export const ReferenceControl: FC<IReferenceControl> = (props) => {
   const [popperEl, setPopperEl] = useState<HTMLDivElement | null>(null);
   const { styles, attributes } = usePopper(referenceEl, popperEl, {
     placement: "bottom-start",
+    strategy: "fixed",
     modifiers: [{ name: "offset", options: { offset: [0, 4] } }],
   });
 
@@ -164,168 +166,173 @@ export const ReferenceControl: FC<IReferenceControl> = (props) => {
             {renderLinks()}
           </Popover.Button>
 
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-100"
-            enterFrom="opacity-0 translate-y-1"
-            enterTo="opacity-100 translate-y-0"
-            leave="transition ease-in duration-75"
-            leaveFrom="opacity-100 translate-y-0"
-            leaveTo="opacity-0 translate-y-1"
-          >
-            <Popover.Panel
-              ref={setPopperEl}
-              style={styles.popper}
-              {...attributes.popper}
-              className="z-30 w-80 rounded-md border border-strong bg-layer-2 shadow-lg"
+          {createPortal(
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-100"
+              enterFrom="opacity-0 translate-y-1"
+              enterTo="opacity-100 translate-y-0"
+              leave="transition ease-in duration-75"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 translate-y-1"
             >
-              {/* Header */}
-              <div className="flex items-center justify-between px-3 py-2 border-b border-strong">
-                <span className="text-body-xs-medium text-primary flex items-center gap-1.5">
-                  <Link2 className="h-3.5 w-3.5" />
-                  {config.label}
-                </span>
-              </div>
+              <Popover.Panel
+                ref={setPopperEl}
+                style={styles.popper}
+                {...attributes.popper}
+                className="z-30 w-80 rounded-md border border-strong bg-layer-2 shadow-lg"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-3 py-2 border-b border-strong">
+                  <span className="text-body-xs-medium text-primary flex items-center gap-1.5">
+                    <Link2 className="h-3.5 w-3.5" />
+                    {config.label}
+                  </span>
+                </div>
 
-              {/* Link list */}
-              <div className="max-h-60 overflow-y-auto">
-                {links.length === 0 && !isAddingNew && (
-                  <p className="text-body-xs-regular text-tertiary px-3 py-3">暂无链接</p>
-                )}
-                {links.map((link, index) => (
-                  <div key={index} className="border-b border-strong last:border-b-0">
-                    {editingIndex === index ? (
-                      /* Editing row */
-                      <div className="px-3 py-2 space-y-1.5">
-                        <div>
-                          <input
-                            ref={editDisplayRef}
-                            type="text"
-                            value={editForm.display}
-                            onChange={(e) => setEditForm((f) => ({ ...f, display: e.target.value, displayError: "" }))}
-                            placeholder="显示名称"
-                            className={cn(
-                              "w-full text-body-xs-regular bg-layer-1 border rounded px-2 py-1 focus:outline-none",
-                              editForm.displayError ? "border-red-500" : "border-strong focus:border-primary"
+                {/* Link list */}
+                <div className="max-h-60 overflow-y-auto">
+                  {links.length === 0 && !isAddingNew && (
+                    <p className="text-body-xs-regular text-tertiary px-3 py-3">暂无链接</p>
+                  )}
+                  {links.map((link, index) => (
+                    <div key={index} className="border-b border-strong last:border-b-0">
+                      {editingIndex === index ? (
+                        /* Editing row */
+                        <div className="px-3 py-2 space-y-1.5">
+                          <div>
+                            <input
+                              ref={editDisplayRef}
+                              type="text"
+                              value={editForm.display}
+                              onChange={(e) =>
+                                setEditForm((f) => ({ ...f, display: e.target.value, displayError: "" }))
+                              }
+                              placeholder="显示名称"
+                              className={cn(
+                                "w-full text-body-xs-regular bg-layer-1 border rounded px-2 py-1 focus:outline-none",
+                                editForm.displayError ? "border-red-500" : "border-strong focus:border-primary"
+                              )}
+                            />
+                            {editForm.displayError && (
+                              <p className="text-caption-xs-regular text-red-500 mt-0.5">{editForm.displayError}</p>
                             )}
+                          </div>
+                          <input
+                            type="text"
+                            value={editForm.url}
+                            onChange={(e) => setEditForm((f) => ({ ...f, url: e.target.value }))}
+                            placeholder="URL"
+                            className="w-full text-body-xs-regular bg-layer-1 border border-strong rounded px-2 py-1 focus:outline-none focus:border-primary"
                           />
-                          {editForm.displayError && (
-                            <p className="text-caption-xs-regular text-red-500 mt-0.5">{editForm.displayError}</p>
-                          )}
+                          <div className="flex justify-end gap-2 pt-0.5">
+                            <button
+                              type="button"
+                              onClick={cancelEdit}
+                              className="text-caption-xs-regular text-secondary hover:text-primary px-2 py-0.5 rounded border border-strong hover:border-secondary"
+                            >
+                              取消
+                            </button>
+                            <button
+                              type="button"
+                              onClick={saveEdit}
+                              className="text-caption-xs-regular text-white bg-blue-500 hover:bg-blue-600 px-2 py-0.5 rounded"
+                            >
+                              保存
+                            </button>
+                          </div>
                         </div>
-                        <input
-                          type="text"
-                          value={editForm.url}
-                          onChange={(e) => setEditForm((f) => ({ ...f, url: e.target.value }))}
-                          placeholder="URL"
-                          className="w-full text-body-xs-regular bg-layer-1 border border-strong rounded px-2 py-1 focus:outline-none focus:border-primary"
-                        />
-                        <div className="flex justify-end gap-2 pt-0.5">
-                          <button
-                            type="button"
-                            onClick={cancelEdit}
-                            className="text-caption-xs-regular text-secondary hover:text-primary px-2 py-0.5 rounded border border-strong hover:border-secondary"
-                          >
-                            取消
-                          </button>
-                          <button
-                            type="button"
-                            onClick={saveEdit}
-                            className="text-caption-xs-regular text-white bg-blue-500 hover:bg-blue-600 px-2 py-0.5 rounded"
-                          >
-                            保存
-                          </button>
+                      ) : (
+                        /* Viewing row */
+                        <div className="flex items-center gap-2 px-3 py-2 group">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-body-xs-medium text-primary truncate">{link.display}</p>
+                            <p className="text-caption-xs-regular text-tertiary truncate">{link.url || "—"}</p>
+                          </div>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => startEdit(index)}
+                              className="p-1 rounded hover:bg-layer-1 text-secondary hover:text-primary"
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteLink(index)}
+                              className="p-1 rounded hover:bg-layer-1 text-secondary hover:text-red-500"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      /* Viewing row */
-                      <div className="flex items-center gap-2 px-3 py-2 group">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-body-xs-medium text-primary truncate">{link.display}</p>
-                          <p className="text-caption-xs-regular text-tertiary truncate">{link.url || "—"}</p>
-                        </div>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => startEdit(index)}
-                            className="p-1 rounded hover:bg-layer-1 text-secondary hover:text-primary"
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => deleteLink(index)}
-                            className="p-1 rounded hover:bg-layer-1 text-secondary hover:text-red-500"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {/* New link form */}
-                {isAddingNew && (
-                  <div className="px-3 py-2 space-y-1.5 border-t border-strong">
-                    <div>
-                      <input
-                        ref={addDisplayRef}
-                        type="text"
-                        value={addForm.display}
-                        onChange={(e) => setAddForm((f) => ({ ...f, display: e.target.value, displayError: "" }))}
-                        placeholder="显示名称"
-                        className={cn(
-                          "w-full text-body-xs-regular bg-layer-1 border rounded px-2 py-1 focus:outline-none",
-                          addForm.displayError ? "border-red-500" : "border-strong focus:border-primary"
-                        )}
-                      />
-                      {addForm.displayError && (
-                        <p className="text-caption-xs-regular text-red-500 mt-0.5">{addForm.displayError}</p>
                       )}
                     </div>
-                    <input
-                      type="text"
-                      value={addForm.url}
-                      onChange={(e) => setAddForm((f) => ({ ...f, url: e.target.value }))}
-                      placeholder="URL"
-                      className="w-full text-body-xs-regular bg-layer-1 border border-strong rounded px-2 py-1 focus:outline-none focus:border-primary"
-                    />
-                    <div className="flex justify-end gap-2 pt-0.5">
-                      <button
-                        type="button"
-                        onClick={cancelAdd}
-                        className="text-caption-xs-regular text-secondary hover:text-primary px-2 py-0.5 rounded border border-strong hover:border-secondary"
-                      >
-                        取消
-                      </button>
-                      <button
-                        type="button"
-                        onClick={saveAdd}
-                        className="text-caption-xs-regular text-white bg-blue-500 hover:bg-blue-600 px-2 py-0.5 rounded"
-                      >
-                        保存
-                      </button>
+                  ))}
+
+                  {/* New link form */}
+                  {isAddingNew && (
+                    <div className="px-3 py-2 space-y-1.5 border-t border-strong">
+                      <div>
+                        <input
+                          ref={addDisplayRef}
+                          type="text"
+                          value={addForm.display}
+                          onChange={(e) => setAddForm((f) => ({ ...f, display: e.target.value, displayError: "" }))}
+                          placeholder="显示名称"
+                          className={cn(
+                            "w-full text-body-xs-regular bg-layer-1 border rounded px-2 py-1 focus:outline-none",
+                            addForm.displayError ? "border-red-500" : "border-strong focus:border-primary"
+                          )}
+                        />
+                        {addForm.displayError && (
+                          <p className="text-caption-xs-regular text-red-500 mt-0.5">{addForm.displayError}</p>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        value={addForm.url}
+                        onChange={(e) => setAddForm((f) => ({ ...f, url: e.target.value }))}
+                        placeholder="URL"
+                        className="w-full text-body-xs-regular bg-layer-1 border border-strong rounded px-2 py-1 focus:outline-none focus:border-primary"
+                      />
+                      <div className="flex justify-end gap-2 pt-0.5">
+                        <button
+                          type="button"
+                          onClick={cancelAdd}
+                          className="text-caption-xs-regular text-secondary hover:text-primary px-2 py-0.5 rounded border border-strong hover:border-secondary"
+                        >
+                          取消
+                        </button>
+                        <button
+                          type="button"
+                          onClick={saveAdd}
+                          className="text-caption-xs-regular text-white bg-blue-500 hover:bg-blue-600 px-2 py-0.5 rounded"
+                        >
+                          保存
+                        </button>
+                      </div>
                     </div>
+                  )}
+                </div>
+
+                {/* Footer: Add link button */}
+                {!isAddingNew && (
+                  <div className="border-t border-strong px-3 py-2">
+                    <button
+                      type="button"
+                      onClick={startAdd}
+                      className="flex items-center gap-1.5 text-body-xs-regular text-secondary hover:text-primary w-full"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      添加链接
+                    </button>
                   </div>
                 )}
-              </div>
-
-              {/* Footer: Add link button */}
-              {!isAddingNew && (
-                <div className="border-t border-strong px-3 py-2">
-                  <button
-                    type="button"
-                    onClick={startAdd}
-                    className="flex items-center gap-1.5 text-body-xs-regular text-secondary hover:text-primary w-full"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    添加链接
-                  </button>
-                </div>
-              )}
-            </Popover.Panel>
-          </Transition>
+              </Popover.Panel>
+            </Transition>,
+            document.body
+          )}
         </>
       )}
     </Popover>
