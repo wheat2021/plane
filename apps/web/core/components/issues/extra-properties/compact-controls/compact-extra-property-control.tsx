@@ -4,6 +4,7 @@ import { CompactTextControl } from "./compact-text";
 import { CompactSelectControl } from "./compact-select";
 import { CompactCheckboxControl } from "./compact-checkbox";
 import { CompactMemberControl } from "./compact-member";
+import { CompactReferenceControl } from "./compact-reference";
 
 interface ICompactExtraPropertyControl {
   config: TExtraPropertyConfig;
@@ -42,6 +43,8 @@ export const CompactExtraPropertyControl: FC<ICompactExtraPropertyControl> = (pr
       return (
         <CompactMemberControl config={config} value={value} onChange={(val) => onChange(val)} disabled={disabled} />
       );
+    case "reference":
+      return <CompactReferenceControl config={config} value={value} disabled={disabled} />;
     default:
       return null;
   }

@@ -875,6 +875,35 @@ class IssueSerializer(DynamicBaseSerializer):
                                 {f"extra_properties.{key}": f"User {value} is not a member of this workspace."}
                             )
 
+                # Validate reference-type extra property values
+                reference_configs = ExtraPropertyConfig.objects.filter(
+                    workspace_id=workspace_id,
+                    type="reference",
+                    issue_type_bindings__project_id=project_id,
+                    issue_type_bindings__issue_type=issue_type,
+                ).values_list("key", flat=True)
+                for key in reference_configs:
+                    value = extra_properties.get(key)
+                    if value is None or value == []:
+                        continue
+                    if not isinstance(value, list):
+                        raise serializers.ValidationError(
+                            {f"extra_properties.{key}": "Reference value must be a list of {display, url} objects."}
+                        )
+                    for i, item in enumerate(value):
+                        if not isinstance(item, dict) or "display" not in item or "url" not in item:
+                            raise serializers.ValidationError(
+                                {
+                                    f"extra_properties.{key}": (
+                                        f"Item at index {i} must have 'display' and 'url' fields."
+                                    )
+                                }
+                            )
+                        if not item["display"]:
+                            raise serializers.ValidationError(
+                                {f"extra_properties.{key}": f"Item at index {i}: 'display' must not be empty."}
+                            )
+
         return data
 
 

@@ -60,6 +60,7 @@ const PROPERTY_TYPES: { value: TExtraPropertyType; label: string }[] = [
   { value: "multiselect", label: "Multi-Select" },
   { value: "checkbox", label: "Checkbox" },
   { value: "member", label: "Member" },
+  { value: "reference", label: "Reference" },
 ];
 
 /**
@@ -75,6 +76,7 @@ const isTypeCompatible = (from: TExtraPropertyType, to: TExtraPropertyType): boo
     multiselect: new Set(["multiselect"]),
     checkbox: new Set(["text", "textarea", "checkbox"]),
     member: new Set(["text", "textarea"]),
+    reference: new Set([]),
   };
   return compatible[from]?.has(to) ?? false;
 };

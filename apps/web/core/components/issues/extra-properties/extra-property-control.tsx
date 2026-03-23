@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { FC } from "react";
-import type { TExtraPropertyConfig, TExtraPropertyValue } from "@plane/types";
+import type { TExtraPropertyConfig, TExtraPropertyValue, TReferenceItem } from "@plane/types";
 // controls
 import { TextControl } from "./controls/text";
 import { TextareaControl } from "./controls/textarea";
@@ -8,6 +8,15 @@ import { SelectControl } from "./controls/select";
 import { MultiSelectControl } from "./controls/multi-select";
 import { CheckboxControl } from "./controls/checkbox";
 import { MemberControl } from "./controls/member";
+import { ReferenceControl } from "./controls/reference";
+
+/** Type guard: value is a string[] (not TReferenceItem[]) */
+const isStringArray = (v: TExtraPropertyValue): v is string[] =>
+  Array.isArray(v) && (v.length === 0 || typeof v[0] === "string");
+
+/** Type guard: value is a TReferenceItem[] */
+const isReferenceArray = (v: TExtraPropertyValue): v is TReferenceItem[] =>
+  Array.isArray(v) && (v.length === 0 || (typeof v[0] === "object" && v[0] !== null));
 
 /**
  * Checks if a value is valid for the given config type.
@@ -26,13 +35,15 @@ const isValueValid = (config: TExtraPropertyConfig, value: TExtraPropertyValue):
       return validValues.has(value);
     }
     case "multiselect": {
-      if (!Array.isArray(value)) return false;
+      if (!isStringArray(value)) return false;
       if (value.length === 0) return true;
       const validValues = new Set(config.options?.map((o) => o.value) ?? []);
       return value.every((v) => validValues.has(v));
     }
     case "member":
       return typeof value === "string";
+    case "reference":
+      return isReferenceArray(value);
     default:
       return true;
   }
@@ -42,7 +53,7 @@ const isValueValid = (config: TExtraPropertyConfig, value: TExtraPropertyValue):
  * For multiselect, filters out invalid elements. Returns null if all invalid.
  */
 const sanitizeValue = (config: TExtraPropertyConfig, value: TExtraPropertyValue): TExtraPropertyValue => {
-  if (config.type !== "multiselect" || !Array.isArray(value)) return null;
+  if (config.type !== "multiselect" || !isStringArray(value)) return null;
   const validValues = new Set(config.options?.map((o) => o.value) ?? []);
   const filtered = value.filter((v) => validValues.has(v));
   return filtered.length > 0 ? filtered : null;
@@ -99,6 +110,8 @@ export const ExtraPropertyControl: FC<IExtraPropertyControl> = (props) => {
           workspaceSlug={props.workspaceSlug}
         />
       );
+    case "reference":
+      return <ReferenceControl config={config} value={value} onChange={(val) => onChange(val)} disabled={disabled} />;
     default:
       return null;
   }

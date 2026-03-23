@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { observer } from "mobx-react";
 // icons
 import { BooleanPropertyIcon, DropdownPropertyIcon } from "@plane/propel/icons";
-import { Type, AlignLeft, User } from "lucide-react";
+import { Type, AlignLeft, User, Link2 } from "lucide-react";
 // types
 import type { TExtraPropertyConfig, TExtraPropertyValue, TIssueExtraProperties } from "@plane/types";
 // components
@@ -36,6 +36,8 @@ const getPropertyIcon = (type: TExtraPropertyConfig["type"]) => {
       return BooleanPropertyIcon;
     case "member":
       return User;
+    case "reference":
+      return Link2;
     default:
       return Type;
   }
