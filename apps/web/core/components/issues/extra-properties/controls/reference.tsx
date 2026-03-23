@@ -181,6 +181,10 @@ export const ReferenceControl: FC<IReferenceControl> = (props) => {
                 style={styles.popper}
                 {...attributes.popper}
                 className="z-30 w-80 rounded-md border border-strong bg-layer-2 shadow-lg"
+                // Prevent clicks inside the portal panel from bubbling to
+                // the sidebar's click-outside handler and closing the sidebar
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
               >
                 {/* Header */}
                 <div className="flex items-center justify-between px-3 py-2 border-b border-strong">
