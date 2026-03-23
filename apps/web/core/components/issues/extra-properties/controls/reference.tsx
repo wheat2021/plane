@@ -5,6 +5,7 @@ import { Link2, Pencil, Plus, X } from "lucide-react";
 import { Popover, Transition } from "@headlessui/react";
 import { usePopper } from "react-popper";
 import type { TExtraPropertyConfig, TExtraPropertyValue, TReferenceItem } from "@plane/types";
+import { Button } from "@plane/ui";
 import { cn } from "@plane/utils";
 
 interface IReferenceControl {
@@ -234,20 +235,12 @@ export const ReferenceControl: FC<IReferenceControl> = (props) => {
                             className="w-full text-body-xs-regular bg-layer-1 border border-strong rounded px-2 py-1 focus:outline-none focus:border-primary"
                           />
                           <div className="flex justify-end gap-2 pt-0.5">
-                            <button
-                              type="button"
-                              onClick={cancelEdit}
-                              className="text-caption-xs-regular text-secondary hover:text-primary px-2 py-0.5 rounded border border-strong hover:border-secondary"
-                            >
+                            <Button variant="neutral-primary" size="sm" onClick={cancelEdit}>
                               取消
-                            </button>
-                            <button
-                              type="button"
-                              onClick={saveEdit}
-                              className="text-caption-xs-regular text-white bg-blue-500 hover:bg-blue-600 px-2 py-0.5 rounded"
-                            >
+                            </Button>
+                            <Button variant="primary" size="sm" onClick={saveEdit}>
                               保存
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       ) : (
@@ -305,20 +298,12 @@ export const ReferenceControl: FC<IReferenceControl> = (props) => {
                         className="w-full text-body-xs-regular bg-layer-1 border border-strong rounded px-2 py-1 focus:outline-none focus:border-primary"
                       />
                       <div className="flex justify-end gap-2 pt-0.5">
-                        <button
-                          type="button"
-                          onClick={cancelAdd}
-                          className="text-caption-xs-regular text-secondary hover:text-primary px-2 py-0.5 rounded border border-strong hover:border-secondary"
-                        >
+                        <Button variant="neutral-primary" size="sm" onClick={cancelAdd}>
                           取消
-                        </button>
-                        <button
-                          type="button"
-                          onClick={saveAdd}
-                          className="text-caption-xs-regular text-white bg-blue-500 hover:bg-blue-600 px-2 py-0.5 rounded"
-                        >
+                        </Button>
+                        <Button variant="primary" size="sm" onClick={saveAdd}>
                           保存
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   )}
