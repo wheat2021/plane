@@ -83,7 +83,7 @@
   - 进入 Settings → Extra Properties，点击新建，选择类型"Member"
   - 确认 options 区域消失，颜色选择器出现
   - 选择颜色 #6366f1，保存，确认配置成功创建
-- [ ] 7.3 **控件渲染验证**：
+- [x] 7.3 **控件渲染验证**：
   - 将 member 类型 Extra Property 绑定到 Requirement work item type
   - 打开一个 Requirement 工作项详情，侧边栏中应显示该字段（User 图标）
   - 点击字段，下拉显示 workspace 成员列表，选择成员后显示头像+姓名
