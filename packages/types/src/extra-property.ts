@@ -8,7 +8,7 @@
 /**
  * Supported input control types for extra properties.
  */
-export type TExtraPropertyType = "text" | "textarea" | "select" | "multiselect" | "checkbox";
+export type TExtraPropertyType = "text" | "textarea" | "select" | "multiselect" | "checkbox" | "member";
 
 /**
  * Extra input configuration for an option or checkbox state.
@@ -72,6 +72,8 @@ export interface TExtraPropertyConfig {
   false_icon?: string;
   /** Hex color for checkbox false state icon */
   false_icon_color?: string;
+  /** Hex color for member type avatar border */
+  member_color?: string;
   /** Audit fields */
   created_at?: string;
   updated_at?: string;
