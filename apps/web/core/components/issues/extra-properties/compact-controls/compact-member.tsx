@@ -27,39 +27,44 @@ export const CompactMemberControl: FC<ICompactMemberControl> = observer((props) 
 
   const displayName = userDetails?.display_name ?? (userId ? "已移除用户" : "—");
 
-  const pillContent = userId ? (
+  // Avatar wrapped in a colored circle (h-5 w-5 container, sm avatar inside)
+  // memberColor becomes the full background when set, giving clear visual distinction
+  const avatarIcon = userId ? (
     userDetails ? (
-      <div className="flex h-5 flex-shrink-0 items-center gap-1 overflow-hidden rounded-sm border-[0.5px] border-strong px-1.5 py-0.5">
-        <div
-          className="rounded-full flex-shrink-0"
-          style={memberColor ? { padding: 1, background: memberColor } : undefined}
-        >
-          <Avatar name={userDetails.display_name} src={userDetails.avatar_url ?? undefined} size="xs" />
-        </div>
-        <span className="text-caption-sm-regular truncate max-w-16">{userDetails.display_name}</span>
+      <div
+        className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+        style={memberColor ? { backgroundColor: memberColor } : undefined}
+      >
+        <Avatar
+          name={userDetails.display_name}
+          src={userDetails.avatar_url ?? undefined}
+          size="sm"
+          showTooltip={false}
+          fallbackBackgroundColor={memberColor ?? undefined}
+        />
       </div>
     ) : (
-      <div className="flex h-5 flex-shrink-0 items-center gap-1 overflow-hidden rounded-sm border-[0.5px] border-strong px-1.5 py-0.5">
+      <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-layer-2">
         <UserX className="h-3 w-3 flex-shrink-0 text-secondary" />
-        <span className="text-caption-sm-regular truncate max-w-16 text-tertiary">已移除用户</span>
       </div>
     )
   ) : (
     <div
       className={cn(
-        "flex h-5 flex-shrink-0 items-center justify-center rounded-sm border-[0.5px] border-strong px-2 py-0.5",
-        "hover:bg-layer-1 transition-colors",
+        "flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full",
+        "border border-dashed border-custom-border-300",
+        "hover:border-custom-border-400 transition-colors",
         disabled && "cursor-not-allowed opacity-60"
       )}
     >
-      <User className="h-3 w-3 flex-shrink-0 text-secondary" />
+      <User className="h-3 w-3 flex-shrink-0 text-custom-text-300" />
     </div>
   );
 
   if (disabled) {
     return (
       <Tooltip tooltipHeading={config.label} tooltipContent={displayName} isMobile={isMobile}>
-        <div className="h-5">{pillContent}</div>
+        <div className="flex h-5 items-center">{avatarIcon}</div>
       </Tooltip>
     );
   }
@@ -68,7 +73,7 @@ export const CompactMemberControl: FC<ICompactMemberControl> = observer((props) 
     <Tooltip tooltipHeading={config.label} tooltipContent={displayName} isMobile={isMobile}>
       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
       <div
-        className="h-5"
+        className="flex h-5 items-center"
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
@@ -81,7 +86,7 @@ export const CompactMemberControl: FC<ICompactMemberControl> = observer((props) 
           buttonVariant="transparent-without-text"
           buttonContainerClassName="h-5"
           buttonClassName="h-5 p-0 border-0 bg-transparent hover:bg-transparent"
-          button={pillContent}
+          button={avatarIcon}
         />
       </div>
     </Tooltip>
