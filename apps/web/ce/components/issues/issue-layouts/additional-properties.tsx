@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { useTranslation } from "@plane/i18n";
 import { DropdownPropertyIcon, BooleanPropertyIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
-import { Type, AlignLeft } from "lucide-react";
+import { Type, AlignLeft, User } from "lucide-react";
 import type {
   IIssueDisplayProperties,
   TExtraDisplayProperties,
@@ -29,6 +29,8 @@ const getPropertyIcon = (type: string) => {
       return DropdownPropertyIcon;
     case "checkbox":
       return BooleanPropertyIcon;
+    case "member":
+      return User;
     default:
       return Type;
   }

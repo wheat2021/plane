@@ -50,6 +50,28 @@
   - `apps/web/core/components/issues/extra-properties/extra-property-renderer.tsx`
   - `apps/web/core/components/workspace/settings/extra-properties/form.tsx`
 
+## 8. 补充实现：Compact 视图控件（List / Board / Spreadsheet）
+
+> 原实现仅覆盖详情侧边栏渲染路径，列表/看板/电子表格视图使用独立的 CompactExtraPropertyControl 路径，缺少 member 类型支持，导致选中值无法展示。
+
+- [x] 8.1 新建 `apps/web/core/components/issues/extra-properties/compact-controls/compact-member.tsx`，实现 `CompactMemberControl` 组件：
+  - h-5 pill 样式（与其他 compact 控件一致）
+  - 有值时：Avatar（含 member_color 边框）+ 成员名截断
+  - 无值时：显示 "—" 占位
+  - 降级处理：userId 存在但 userDetails 不存在时显示 UserX 图标
+  - 使用 MemberDropdown 打开选择器，`button` prop 传入自定义 pill
+  - Tooltip 显示字段 label 和成员名
+  - `e.stopPropagation()` + `e.preventDefault()` 阻止行/卡片点击穿透
+  - `disabled` 时只读不可交互
+- [x] 8.2 在 `compact-controls/index.ts` 中导出 `CompactMemberControl`
+- [x] 8.3 在 `compact-extra-property-control.tsx` 的 switch 中新增 `case "member"` → 渲染 `CompactMemberControl`
+- [x] 8.4 在 `apps/web/ce/components/issues/issue-layouts/additional-properties.tsx` 的 `getPropertyIcon` 中新增 `case "member"` → 使用 `User`（lucide-react）图标
+- [ ] 8.5 提交 compact 控件改动：`#FICC-9999# feat: 补充 member 类型 compact 视图控件支持（list/board/spreadsheet）`
+  - `apps/web/core/components/issues/extra-properties/compact-controls/compact-member.tsx`（新文件）
+  - `apps/web/core/components/issues/extra-properties/compact-controls/index.ts`
+  - `apps/web/core/components/issues/extra-properties/compact-controls/compact-extra-property-control.tsx`
+  - `apps/web/ce/components/issues/issue-layouts/additional-properties.tsx`
+
 ## 7. 用户验证
 
 - [ ] 7.1 **后端 API 验证**：

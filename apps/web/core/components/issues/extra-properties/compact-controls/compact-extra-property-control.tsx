@@ -3,6 +3,7 @@ import type { TExtraPropertyConfig, TExtraPropertyValue } from "@plane/types";
 import { CompactTextControl } from "./compact-text";
 import { CompactSelectControl } from "./compact-select";
 import { CompactCheckboxControl } from "./compact-checkbox";
+import { CompactMemberControl } from "./compact-member";
 
 interface ICompactExtraPropertyControl {
   config: TExtraPropertyConfig;
@@ -36,6 +37,10 @@ export const CompactExtraPropertyControl: FC<ICompactExtraPropertyControl> = (pr
     case "checkbox":
       return (
         <CompactCheckboxControl config={config} value={value} onChange={(val) => onChange(val)} disabled={disabled} />
+      );
+    case "member":
+      return (
+        <CompactMemberControl config={config} value={value} onChange={(val) => onChange(val)} disabled={disabled} />
       );
     default:
       return null;
