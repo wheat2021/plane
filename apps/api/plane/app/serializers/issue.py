@@ -845,7 +845,15 @@ class IssueSerializer(DynamicBaseSerializer):
         if extra_properties and isinstance(extra_properties, dict):
             issue_type = data.get("type") or (self.instance.type if self.instance else None)
             project_id = self.context.get("project_id")
+            # workspace_id may not be in context; derive from instance or project
             workspace_id = self.context.get("workspace_id")
+            if not workspace_id and self.instance:
+                workspace_id = str(self.instance.workspace_id)
+            if not workspace_id and project_id:
+                from plane.db.models import Project as _Project
+                _proj = _Project.objects.filter(pk=project_id).values_list("workspace_id", flat=True).first()
+                if _proj:
+                    workspace_id = str(_proj)
             if issue_type and project_id and workspace_id:
                 member_configs = ExtraPropertyConfig.objects.filter(
                     workspace_id=workspace_id,
