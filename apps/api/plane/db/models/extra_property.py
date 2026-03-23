@@ -21,6 +21,7 @@ class ExtraPropertyConfig(BaseModel):
         ("checkbox", "Checkbox"),
         ("markdown", "Markdown"),
         ("member", "Member"),
+        ("reference", "Reference"),
     )
 
     workspace = models.ForeignKey(

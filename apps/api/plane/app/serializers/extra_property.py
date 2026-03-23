@@ -225,6 +225,24 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
                         option["extra_input"], f"options[{i}].extra_input", workspace_id
                     )
 
+        # Validate reference type values stored in default_value
+        if prop_type == "reference":
+            default_value = config.get("default_value")
+            if default_value is not None and default_value != []:
+                if not isinstance(default_value, list):
+                    raise serializers.ValidationError(
+                        {"default_value": "Reference type default_value must be a list of {display, url} objects."}
+                    )
+                for i, item in enumerate(default_value):
+                    if not isinstance(item, dict) or "display" not in item or "url" not in item:
+                        raise serializers.ValidationError(
+                            {"default_value": f"Reference item at index {i} must have 'display' and 'url' fields."}
+                        )
+                    if not item["display"]:
+                        raise serializers.ValidationError(
+                            {"default_value": f"Reference item at index {i}: 'display' must not be empty."}
+                        )
+
         # Validate checkbox extra_input references
         if prop_type == "checkbox" and workspace_id:
             for field in ("true_extra_input", "false_extra_input"):
