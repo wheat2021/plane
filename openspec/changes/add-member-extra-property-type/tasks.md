@@ -74,10 +74,10 @@
 
 ## 7. 用户验证
 
-- [ ] 7.1 **后端 API 验证**：
+- [x] 7.1 **后端 API 验证**：
   - 通过 Django shell 创建一个 `type=member` 的 ExtraPropertyConfig，确认创建成功
   - 通过 PATCH issue API 更新 `extra_properties`，写入合法 user_id，确认返回 200
-  - 写入非 workspace member 的 user_id，确认返回 400
+  - 写入非 workspace member 的 user_id，确认返回 400（发现 bug：workspace_id 未传入 context 导致校验不执行，已修复：从 instance.workspace_id 推导）
   - 写入 null，确认清除成功
 - [x] 7.2 **配置界面验证**：
   - 进入 Settings → Extra Properties，点击新建，选择类型"Member"
