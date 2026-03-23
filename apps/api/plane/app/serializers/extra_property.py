@@ -66,6 +66,12 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         allow_blank=True,
         help_text="Hex color for checkbox false state icon",
     )
+    member_color = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        help_text="Hex color for member type avatar border",
+    )
 
     class Meta:
         model = ExtraPropertyConfig
@@ -88,6 +94,7 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
             "true_icon_color",
             "false_icon",
             "false_icon_color",
+            "member_color",
             # Audit fields
             "created_at",
             "updated_at",
@@ -117,6 +124,7 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         data["true_icon_color"] = config.get("true_icon_color")
         data["false_icon"] = config.get("false_icon")
         data["false_icon_color"] = config.get("false_icon_color")
+        data["member_color"] = config.get("member_color")
         return data
 
     def to_internal_value(self, data):
@@ -144,6 +152,8 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
             config["false_icon"] = data["false_icon"]
         if "false_icon_color" in data:
             config["false_icon_color"] = data["false_icon_color"]
+        if "member_color" in data:
+            config["member_color"] = data["member_color"]
 
         if self.instance:
             existing_config = self.instance.config or {}
@@ -160,6 +170,7 @@ class ExtraPropertyConfigSerializer(BaseSerializer):
         internal_data.pop("true_icon_color", None)
         internal_data.pop("false_icon", None)
         internal_data.pop("false_icon_color", None)
+        internal_data.pop("member_color", None)
 
         return internal_data
 

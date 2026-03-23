@@ -20,6 +20,7 @@ class ExtraPropertyConfig(BaseModel):
         ("multiselect", "Multi-Select"),
         ("checkbox", "Checkbox"),
         ("markdown", "Markdown"),
+        ("member", "Member"),
     )
 
     workspace = models.ForeignKey(
@@ -95,6 +96,11 @@ class ExtraPropertyConfig(BaseModel):
     def false_icon_color(self):
         """Get icon color for false state (checkbox type)."""
         return self.config.get("false_icon_color")
+
+    @property
+    def member_color(self):
+        """Get color for member type avatar border."""
+        return self.config.get("member_color")
 
 
 class IssueTypeExtraProperty(BaseModel):

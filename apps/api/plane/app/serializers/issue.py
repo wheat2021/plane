@@ -40,6 +40,9 @@ from plane.db.models import (
     ProjectIssueType,
     EstimatePoint,
     IssueType,
+    WorkspaceMember,
+    ExtraPropertyConfig,
+    IssueTypeExtraProperty,
 )
 from plane.utils.content_validator import (
     validate_html_content,
@@ -836,6 +839,34 @@ class IssueSerializer(DynamicBaseSerializer):
             and not State.objects.filter(project_id=self.context.get("project_id"), pk=data.get("state_id")).exists()
         ):
             raise serializers.ValidationError("State is not valid please pass a valid state_id")
+
+        # Validate member-type extra property values
+        extra_properties = data.get("extra_properties")
+        if extra_properties and isinstance(extra_properties, dict):
+            issue_type = data.get("type") or (self.instance.type if self.instance else None)
+            project_id = self.context.get("project_id")
+            workspace_id = self.context.get("workspace_id")
+            if issue_type and project_id and workspace_id:
+                member_configs = ExtraPropertyConfig.objects.filter(
+                    workspace_id=workspace_id,
+                    type="member",
+                    issue_type_bindings__project_id=project_id,
+                    issue_type_bindings__issue_type=issue_type,
+                ).values_list("key", flat=True)
+                if member_configs:
+                    valid_member_ids = set(
+                        str(uid)
+                        for uid in WorkspaceMember.objects.filter(
+                            workspace_id=workspace_id, role__gt=0
+                        ).values_list("member_id", flat=True)
+                    )
+                    for key in member_configs:
+                        value = extra_properties.get(key)
+                        if value and value not in valid_member_ids:
+                            raise serializers.ValidationError(
+                                {f"extra_properties.{key}": f"User {value} is not a member of this workspace."}
+                            )
+
         return data
 
 
