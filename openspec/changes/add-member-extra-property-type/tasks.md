@@ -37,13 +37,13 @@
 
 ## 6. 提交实现代码
 
-- [ ] 6.1 提交后端改动：`#FICC-9999# feat: 新增 member 类型 extra property（后端模型、校验、migration）`
+- [x] 6.1 提交后端改动：`#FICC-9999# feat: 新增 member 类型 extra property（后端模型、校验、migration）`
   - `apps/api/plane/db/models/extra_property.py`
   - `apps/api/plane/app/serializers/extra_property.py`
   - `apps/api/plane/db/migrations/0131_add_member_type_to_extra_property.py`
-- [ ] 6.2 提交类型包改动：`#FICC-9999# feat: 扩展 TExtraPropertyType 支持 member 类型`
+- [x] 6.2 提交类型包改动：`#FICC-9999# feat: 扩展 TExtraPropertyType 支持 member 类型`
   - `packages/types/src/extra-property.ts`
-- [ ] 6.3 提交前端控件和配置界面改动：`#FICC-9999# feat: 新增 member 类型 extra property 前端控件和配置界面`
+- [x] 6.3 提交前端控件和配置界面改动：`#FICC-9999# feat: 新增 member 类型 extra property 前端控件和配置界面`
   - `apps/web/core/components/issues/extra-properties/controls/member.tsx`（新文件）
   - `apps/web/core/components/issues/extra-properties/controls/index.ts`
   - `apps/web/core/components/issues/extra-properties/extra-property-control.tsx`
