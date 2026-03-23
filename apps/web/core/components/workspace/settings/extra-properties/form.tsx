@@ -50,6 +50,7 @@ type FormValues = {
   true_icon_color?: string;
   false_icon?: string;
   false_icon_color?: string;
+  member_color?: string;
 };
 
 const PROPERTY_TYPES: { value: TExtraPropertyType; label: string }[] = [
@@ -58,6 +59,7 @@ const PROPERTY_TYPES: { value: TExtraPropertyType; label: string }[] = [
   { value: "select", label: "Select" },
   { value: "multiselect", label: "Multi-Select" },
   { value: "checkbox", label: "Checkbox" },
+  { value: "member", label: "Member" },
 ];
 
 /**
@@ -72,6 +74,7 @@ const isTypeCompatible = (from: TExtraPropertyType, to: TExtraPropertyType): boo
     select: new Set(["text", "textarea", "multiselect"]),
     multiselect: new Set(["multiselect"]),
     checkbox: new Set(["text", "textarea", "checkbox"]),
+    member: new Set(["text", "textarea"]),
   };
   return compatible[from]?.has(to) ?? false;
 };
@@ -129,6 +132,8 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
   const selectedType = watch("type");
   const showOptions = selectedType === "select" || selectedType === "multiselect";
   const showCheckboxValues = selectedType === "checkbox";
+  const showMemberColor = selectedType === "member";
+  const memberColorValue = watch("member_color");
   const trueIconValue = watch("true_icon");
   const trueIconColorValue = watch("true_icon_color");
   const falseIconValue = watch("false_icon");
@@ -191,6 +196,7 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
         true_icon_color: existingConfig.true_icon_color || undefined,
         false_icon: existingConfig.false_icon || undefined,
         false_icon_color: existingConfig.false_icon_color || undefined,
+        member_color: existingConfig.member_color || undefined,
       });
     }
   }, [existingConfig, reset]);
@@ -285,6 +291,10 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
           payload.false_icon = null as unknown as undefined;
           payload.false_icon_color = null as unknown as undefined;
         }
+      }
+
+      if (data.type === "member") {
+        payload.member_color = data.member_color || null;
       }
 
       if (isEditMode && configId) {
@@ -716,6 +726,45 @@ export const ExtraPropertyForm = observer(function ExtraPropertyForm({ configId,
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {showMemberColor && (
+          <div className="flex flex-col gap-2">
+            <span className="text-body-sm-medium text-secondary">头像颜色（可选）</span>
+            <div className="flex items-center gap-2">
+              <Popover className="relative">
+                <Popover.Button as="div" className="cursor-pointer">
+                  <div
+                    className="h-6 w-6 rounded-full border border-custom-border-200"
+                    style={{ background: memberColorValue || "#6b7280" }}
+                  />
+                </Popover.Button>
+                <Popover.Panel className="absolute z-10 left-0 mt-1">
+                  <Controller
+                    name="member_color"
+                    control={control}
+                    render={({ field: colorField }) => (
+                      <IconColorPicker
+                        value={{ name: "", color: colorField.value || "#6b7280" }}
+                        onChange={(val) => colorField.onChange(val.color || undefined)}
+                      />
+                    )}
+                  />
+                </Popover.Panel>
+              </Popover>
+              <span className="text-body-xs-regular text-tertiary">{memberColorValue || "未设置（使用默认样式）"}</span>
+              {memberColorValue && (
+                <button
+                  type="button"
+                  onClick={() => setValue("member_color", undefined)}
+                  className="text-custom-text-400 hover:text-custom-text-200"
+                  title="清除颜色"
+                >
+                  <X size={14} />
+                </button>
+              )}
             </div>
           </div>
         )}

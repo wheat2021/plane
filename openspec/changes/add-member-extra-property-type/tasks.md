@@ -1,39 +1,39 @@
 ## 1. 提交变更文档
 
-- [ ] 1.1 将 openspec/changes/add-member-extra-property-type/ 下所有文档（proposal.md、design.md、specs/、tasks.md）提交到 itemtype 分支，提交信息：`#FICC-9999# docs: 新增 member 类型 extra property 变更文档`
+- [x] 1.1 将 openspec/changes/add-member-extra-property-type/ 下所有文档（proposal.md、design.md、specs/、tasks.md）提交到 itemtype 分支，提交信息：`#FICC-9999# docs: 新增 member 类型 extra property 变更文档`
 
 ## 2. 后端实现
 
-- [ ] 2.1 检查最新 migration 编号（当前最新：0130），确认新 migration 编号为 0131
-- [ ] 2.2 在 `apps/api/plane/db/models/extra_property.py` 的 `ExtraPropertyConfig.TYPE_CHOICES` 中新增 `("member", "Member")`
-- [ ] 2.3 在 `ExtraPropertyConfig` 中新增 `member_color` property（从 `self.config.get("member_color")` 读取）
-- [ ] 2.4 创建 migration `0131_add_member_type_to_extra_property.py`，仅更新 `type` 字段的 choices（无 schema 变更，使用 `AlterField`）
-- [ ] 2.5 在 extra_property serializer（`apps/api/plane/app/serializers/extra_property.py`）中，为 `member` 类型新增值校验：值必须为合法的 workspace member user_id 或 null/""
+- [x] 2.1 检查最新 migration 编号（当前最新：0130），确认新 migration 编号为 0131
+- [x] 2.2 在 `apps/api/plane/db/models/extra_property.py` 的 `ExtraPropertyConfig.TYPE_CHOICES` 中新增 `("member", "Member")`
+- [x] 2.3 在 `ExtraPropertyConfig` 中新增 `member_color` property（从 `self.config.get("member_color")` 读取）
+- [x] 2.4 创建 migration `0131_add_member_type_to_extra_property.py`，仅更新 `type` 字段的 choices（无 schema 变更，使用 `AlterField`）
+- [x] 2.5 在 extra_property serializer（`apps/api/plane/app/serializers/extra_property.py`）中，为 `member` 类型新增值校验：值必须为合法的 workspace member user_id 或 null/""
 
 ## 3. 类型包扩展（@plane/types）
 
-- [ ] 3.1 在 `packages/types/src/extra-property.ts` 中，`TExtraPropertyType` 联合类型新增 `"member"`
-- [ ] 3.2 在 `TExtraPropertyConfig` 接口新增可选字段 `member_color?: string`
-- [ ] 3.3 执行 `pnpm --filter=@plane/types run build` 确认类型包编译通过
+- [x] 3.1 在 `packages/types/src/extra-property.ts` 中，`TExtraPropertyType` 联合类型新增 `"member"`
+- [x] 3.2 在 `TExtraPropertyConfig` 接口新增可选字段 `member_color?: string`
+- [x] 3.3 执行 `pnpm --filter=@plane/types run build` 确认类型包编译通过
 
 ## 4. 前端控件实现
 
-- [ ] 4.1 新建 `apps/web/core/components/issues/extra-properties/controls/member.tsx`，实现 `MemberControl` 组件：
+- [x] 4.1 新建 `apps/web/core/components/issues/extra-properties/controls/member.tsx`，实现 `MemberControl` 组件：
   - 使用 `MemberDropdown`（workspace 成员列表，不传 `projectId`）
   - 接收 `config.member_color` 并在已选成员头像上渲染颜色边框
   - 支持清除（设为 null）
   - `disabled` 时只读展示
-- [ ] 4.2 在 `apps/web/core/components/issues/extra-properties/controls/index.ts` 导出 `MemberControl`
-- [ ] 4.3 在 `extra-property-control.tsx` 的 `switch(config.type)` 中新增 `case "member"` → 渲染 `MemberControl`，同时在 `isValueValid` 校验中新增 `member` 类型规则（值为 string 或 null/null-like）
-- [ ] 4.4 在 `extra-property-renderer.tsx` 的 `getPropertyIcon()` 中新增 `member` 类型 → 使用 `User`（lucide-react）图标
+- [x] 4.2 在 `apps/web/core/components/issues/extra-properties/controls/index.ts` 导出 `MemberControl`
+- [x] 4.3 在 `extra-property-control.tsx` 的 `switch(config.type)` 中新增 `case "member"` → 渲染 `MemberControl`，同时在 `isValueValid` 校验中新增 `member` 类型规则（值为 string 或 null/null-like）
+- [x] 4.4 在 `extra-property-renderer.tsx` 的 `getPropertyIcon()` 中新增 `member` 类型 → 使用 `User`（lucide-react）图标
 
 ## 5. 前端配置界面
 
-- [ ] 5.1 在 `apps/web/core/components/workspace/settings/extra-properties/form.tsx` 的 `PROPERTY_TYPES` 数组中新增 `{ value: "member", label: "Member" }`
-- [ ] 5.2 在 form.tsx 中，当 `type === "member"` 时：
+- [x] 5.1 在 `apps/web/core/components/workspace/settings/extra-properties/form.tsx` 的 `PROPERTY_TYPES` 数组中新增 `{ value: "member", label: "Member" }`
+- [x] 5.2 在 form.tsx 中，当 `type === "member"` 时：
   - 隐藏 options 配置区域
   - 展示颜色选择器（复用现有 `IconColorPicker` 组件），绑定到 `config.member_color`
-- [ ] 5.3 在 form.tsx 的 `isTypeCompatible` 兼容矩阵中新增 `member` 规则：`member → text`、`member → textarea` 为兼容，其余不兼容
+- [x] 5.3 在 form.tsx 的 `isTypeCompatible` 兼容矩阵中新增 `member` 规则：`member → text`、`member → textarea` 为兼容，其余不兼容
 
 ## 6. 提交实现代码
 

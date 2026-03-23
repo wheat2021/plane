@@ -7,6 +7,7 @@ import { TextareaControl } from "./controls/textarea";
 import { SelectControl } from "./controls/select";
 import { MultiSelectControl } from "./controls/multi-select";
 import { CheckboxControl } from "./controls/checkbox";
+import { MemberControl } from "./controls/member";
 
 /**
  * Checks if a value is valid for the given config type.
@@ -30,6 +31,8 @@ const isValueValid = (config: TExtraPropertyConfig, value: TExtraPropertyValue):
       const validValues = new Set(config.options?.map((o) => o.value) ?? []);
       return value.every((v) => validValues.has(v));
     }
+    case "member":
+      return typeof value === "string";
     default:
       return true;
   }
@@ -86,6 +89,16 @@ export const ExtraPropertyControl: FC<IExtraPropertyControl> = (props) => {
       );
     case "checkbox":
       return <CheckboxControl config={config} value={value} onChange={onChange} disabled={disabled} />;
+    case "member":
+      return (
+        <MemberControl
+          config={config}
+          value={value}
+          onChange={(val) => onChange(val)}
+          disabled={disabled}
+          workspaceSlug={props.workspaceSlug}
+        />
+      );
     default:
       return null;
   }
