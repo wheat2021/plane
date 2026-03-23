@@ -140,7 +140,7 @@ export const ReferenceControl: FC<IReferenceControl> = (props) => {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
+              className="underline underline-offset-2 font-medium hover:no-underline"
               onClick={(e) => e.stopPropagation()}
             >
               {link.display}
