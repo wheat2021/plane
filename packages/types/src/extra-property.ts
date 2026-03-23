@@ -8,7 +8,17 @@
 /**
  * Supported input control types for extra properties.
  */
-export type TExtraPropertyType = "text" | "textarea" | "select" | "multiselect" | "checkbox" | "member";
+export type TExtraPropertyType = "text" | "textarea" | "select" | "multiselect" | "checkbox" | "member" | "reference";
+
+/**
+ * A single reference link item for the reference property type.
+ */
+export interface TReferenceItem {
+  /** Display text shown for the link (required, non-empty) */
+  display: string;
+  /** URL the link points to */
+  url: string;
+}
 
 /**
  * Extra input configuration for an option or checkbox state.
@@ -89,7 +99,7 @@ export type TExtraPropertyConfigLite = Pick<TExtraPropertyConfig, "id" | "key" |
 /**
  * Value types that can be stored for extra properties.
  */
-export type TExtraPropertyValue = string | string[] | boolean | null;
+export type TExtraPropertyValue = string | string[] | boolean | TReferenceItem[] | null;
 
 /**
  * Map of property keys to their values, stored on issues.
