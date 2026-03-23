@@ -38,9 +38,13 @@ export const ReferenceControl: FC<IReferenceControl> = (props) => {
   const [referenceEl, setReferenceEl] = useState<HTMLButtonElement | null>(null);
   const [popperEl, setPopperEl] = useState<HTMLDivElement | null>(null);
   const { styles, attributes } = usePopper(referenceEl, popperEl, {
-    placement: "bottom-start",
+    placement: "bottom-end",
     strategy: "fixed",
-    modifiers: [{ name: "offset", options: { offset: [0, 4] } }],
+    modifiers: [
+      { name: "offset", options: { offset: [0, 4] } },
+      { name: "preventOverflow", options: { padding: 8 } },
+      { name: "flip", options: { padding: 8 } },
+    ],
   });
 
   // Editing state: index of item being edited (-1 = none)
