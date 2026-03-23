@@ -66,7 +66,7 @@
 - [x] 8.2 在 `compact-controls/index.ts` 中导出 `CompactMemberControl`
 - [x] 8.3 在 `compact-extra-property-control.tsx` 的 switch 中新增 `case "member"` → 渲染 `CompactMemberControl`
 - [x] 8.4 在 `apps/web/ce/components/issues/issue-layouts/additional-properties.tsx` 的 `getPropertyIcon` 中新增 `case "member"` → 使用 `User`（lucide-react）图标
-- [ ] 8.5 提交 compact 控件改动：`#FICC-9999# feat: 补充 member 类型 compact 视图控件支持（list/board/spreadsheet）`
+- [x] 8.5 提交 compact 控件改动：`#FICC-9999# feat: 补充 member 类型 compact 视图控件支持（list/board/spreadsheet）`
   - `apps/web/core/components/issues/extra-properties/compact-controls/compact-member.tsx`（新文件）
   - `apps/web/core/components/issues/extra-properties/compact-controls/index.ts`
   - `apps/web/core/components/issues/extra-properties/compact-controls/compact-extra-property-control.tsx`
@@ -79,7 +79,7 @@
   - 通过 PATCH issue API 更新 `extra_properties`，写入合法 user_id，确认返回 200
   - 写入非 workspace member 的 user_id，确认返回 400
   - 写入 null，确认清除成功
-- [ ] 7.2 **配置界面验证**：
+- [x] 7.2 **配置界面验证**：
   - 进入 Settings → Extra Properties，点击新建，选择类型"Member"
   - 确认 options 区域消失，颜色选择器出现
   - 选择颜色 #6366f1，保存，确认配置成功创建
@@ -87,7 +87,8 @@
   - 将 member 类型 Extra Property 绑定到 Requirement work item type
   - 打开一个 Requirement 工作项详情，侧边栏中应显示该字段（User 图标）
   - 点击字段，下拉显示 workspace 成员列表，选择成员后显示头像+姓名
-  - 确认头像带有配置的紫色边框，与默认 assignee 视觉区分
+  - 确认头像整体背景色为配置的颜色（如紫色 #6366f1），与默认 assignee 绿色明显区分
+  - List/Board/Spreadsheet 视图中仅显示彩色背景头像图标（无姓名），Tooltip 显示字段名和成员名
   - 确认 disabled 状态下不可交互
-- [ ] 7.4 **降级验证**：
+- [x] 7.4 **降级验证**：
   - 将一个已离职/移除的 user_id 手动写入 extra_properties，刷新页面确认前端不崩溃，显示降级状态

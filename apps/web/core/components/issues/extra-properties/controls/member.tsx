@@ -26,6 +26,22 @@ export const MemberControl: FC<IMemberControl> = observer((props) => {
   const userDetails = userId ? getUserDetails(userId) : undefined;
   const memberColor = config.member_color;
 
+  // Avatar with optional colored background (full circle, not just a ring)
+  const avatarEl = userDetails ? (
+    <div
+      className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+      style={memberColor ? { backgroundColor: memberColor } : undefined}
+    >
+      <Avatar
+        name={userDetails.display_name}
+        src={userDetails.avatar_url ?? undefined}
+        size="sm"
+        showTooltip={false}
+        fallbackBackgroundColor={memberColor ?? undefined}
+      />
+    </div>
+  ) : null;
+
   // Disabled / read-only display
   if (disabled) {
     if (!userId) {
@@ -41,9 +57,7 @@ export const MemberControl: FC<IMemberControl> = observer((props) => {
     }
     return (
       <div className="flex items-center gap-1.5 h-7.5">
-        <div className="rounded-full" style={memberColor ? { padding: 1.5, background: memberColor } : undefined}>
-          <Avatar name={userDetails.display_name} src={userDetails.avatar_url ?? undefined} size="sm" />
-        </div>
+        {avatarEl}
         <span className="text-body-xs-regular truncate">{userDetails.display_name}</span>
       </div>
     );
@@ -57,14 +71,12 @@ export const MemberControl: FC<IMemberControl> = observer((props) => {
       buttonVariant="transparent-without-text"
       buttonContainerClassName="w-full text-left h-7.5"
       buttonClassName={cn("w-full", !userId && "text-placeholder")}
-      showUserDetails
+      showUserDetails={false}
       placeholder="选择成员..."
       button={
         userId && userDetails ? (
           <div className="flex items-center gap-1.5">
-            <div className="rounded-full" style={memberColor ? { padding: 1.5, background: memberColor } : undefined}>
-              <Avatar name={userDetails.display_name} src={userDetails.avatar_url ?? undefined} size="sm" />
-            </div>
+            {avatarEl}
             <span className="text-body-xs-regular truncate">{userDetails.display_name}</span>
           </div>
         ) : userId && !userDetails ? (
