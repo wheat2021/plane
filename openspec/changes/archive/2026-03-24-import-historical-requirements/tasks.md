@@ -52,8 +52,8 @@
 
 ## 9. 用户验证
 
-- [ ] 9.1 在 Plane UI 中打开 `大象-常规-26-0131` Cycle，确认约 32 条 Requirement Issue 存在且标题含 `[0131]`
-- [ ] 9.2 在 Plane UI 中打开 `大象-常规-26-0307` Cycle，确认约 45 条 Issue，抽查复合 IT_PM 行（FICCHEADS-1082 等）的 it_pm 为朱泓飞
-- [ ] 9.3 在 Plane UI 中打开 `大象-常规-26-0328` Cycle，确认约 43 条 Issue，有重点项目标签的 Issue 已关联 Module
-- [ ] 9.4 在 Plane UI 中验证同一 FICCHEADS 需求（如 FICCHEADS-1167 TARF平台建设）在不同 Cycle 下各有独立 Issue，描述（当前交付内容）不同
-- [ ] 9.5 确认 0425 已有数据未受影响（Issue 数量不变）
+- [x] 9.1 在 Plane UI 中打开 `大象-常规-26-0131` Cycle，确认约 32 条 Requirement Issue 存在且标题含 `[0131]`
+- [x] 9.2 在 Plane UI 中打开 `大象-常规-26-0307` Cycle，确认约 45 条 Issue，抽查复合 IT_PM 行（FICCHEADS-1082 等）的 it_pm 为朱泓飞
+- [x] 9.3 在 Plane UI 中打开 `大象-常规-26-0328` Cycle，确认约 43 条 Issue，有重点项目标签的 Issue 已关联 Module
+- [x] 9.4 在 Plane UI 中验证同一 FICCHEADS 需求（如 FICCHEADS-1167 TARF平台建设）在不同 Cycle 下各有独立 Issue，描述（当前交付内容）不同
+- [x] 9.5 确认 0425 已有数据未受影响（Issue 数量不变）
