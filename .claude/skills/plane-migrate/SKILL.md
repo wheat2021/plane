@@ -4,7 +4,7 @@ description: FICC 专用 Jira → Plane 迁移助手。分析 Jira CSV/XLSX、�
 license: MIT
 metadata:
   author: ficc-local
-  version: "1.1"
+  version: "1.3"
 ---
 
 # Plane 迁移助手（FICC 专用）
@@ -106,18 +106,17 @@ elif ext in ('.xlsx', '.xls'):
 
 ## 标准 Jira → Plane 字段映射表（内嵌，无需推断）
 
-| Jira CSV 列                | Plane API 字段     | 说明                                    |
-| -------------------------- | ------------------ | --------------------------------------- |
-| `summary` / `需求名`       | `name`             | 直接映射，最多255字符                   |
-| `description` / `需求描述` | `description_html` | 每行包进 `<p>` 标签                     |
-| `assignee`                 | `assignees`        | display_name 精确匹配 workspace members |
-| `status`                   | `state`            | 模糊匹配 project states（见下方规则）   |
-| `sprint` / `sprint.0`      | `cycle`            | 同名精确匹配；未提供则不关联            |
-| `key` / `需求编号`         | `external_id`      | 保留作溯源                              |
-| `issuetype`                | `type_id`          | 由 work_item_type 参数确定              |
-| _(固定)_                   | `external_source`  | 固定值 `"jira"`                         |
-| _(固定)_                   | `priority`         | 固定值 `"none"`                         |
-| _(固定)_                   | `state`            | 若 status 列不存在，用项目默认 state    |
+| Jira CSV 列                | Plane API 字段                | 说明                                         |
+| -------------------------- | ----------------------------- | -------------------------------------------- |
+| `summary` / `需求名`       | `name`                        | 直接映射，最多255字符                        |
+| `description` / `需求描述` | `description_html`            | pandoc 转换 wiki markup → HTML（见下方规则） |
+| `assignee`                 | `assignees`                   | display_name 精确匹配 workspace members      |
+| `status`                   | `state`                       | 模糊匹配 project states（见下方规则）        |
+| `sprint` / `sprint.0`      | `cycle`                       | 同名精确匹配；未提供则不关联                 |
+| `key` / `需求编号`         | `extra_properties.req_source` | 写入 req_source EP，仅作溯源标签，不唯一     |
+| `issuetype`                | `type_id`                     | 由 work_item_type 参数确定                   |
+| _(固定)_                   | `priority`                    | 固定值 `"none"`                              |
+| _(固定)_                   | `state`                       | 若 status 列不存在，用项目默认 state         |
 
 **以上列以外的所有其他列** = 候选 extra properties 或 Module 关联，进入 Phase 2 分析。
 
@@ -352,22 +351,61 @@ print(f'module_id: {module.id}')
 生成 `jira_data/<basename>_import_ready.csv`，列包含：
 
 ```
-external_id, name, description_html, type_id, state_id, priority,
-external_source, assignees(JSON), extra_properties(JSON), cycle_id, module_id
+name, description_html, type_id, state_id, priority,
+assignees(JSON), extra_properties(JSON), cycle_id, module_id
 ```
 
 转换规则：
 
 - `assignees` = `json.dumps([uid])` 或 `json.dumps([])`（未匹配时）
 - `extra_properties` = `json.dumps({...})`（仅包含非空字段）
+  - **req_source**：需求编号列的值直接写入（字符串），为空时不写入该键
   - **member 类型字段**：用 Phase 1d 建立的 `display_name_map` 完整查询，填入 UUID；未匹配时留空并在 GAP REPORT 中列出
   - **checkbox 类型字段**："是"/True → `true`，"否"/False → `false`
 - `cycle_id` = Cycle UUID（全部行填同一个，或从 sprint 列匹配）
 - `module_id` = Module UUID（从 Module 关联列精确匹配名称；"无"/空 → 空字符串）
 - `state_id`：用匹配到的 Plane state UUID
-- `description_html`：每行包进 `<p>`，空行用 `<p></p>`
+- `description_html`：**使用 pandoc 将 Jira wiki markup 转换为 HTML**（见下方转换规则）
 
 **展示前 3 行预览**，等待用户确认后继续。
+
+---
+
+### description_html 转换规则（Jira Wiki Markup → HTML）
+
+描述字段统一通过 `pandoc -f jira -t html` 转换，**不要**手动拼接 `<p>` 标签。
+
+```python
+import subprocess
+
+def wiki_to_html(text):
+    """Convert Jira wiki markup to HTML via pandoc. Falls back to <p> wrapping if pandoc fails."""
+    if not text or not text.strip():
+        return '<p></p>'
+    result = subprocess.run(
+        ['pandoc', '-f', 'jira', '-t', 'html'],
+        input=text, capture_output=True, text=True, timeout=10
+    )
+    if result.returncode == 0 and result.stdout.strip():
+        return result.stdout.strip()
+    # fallback: plain <p> per line
+    lines = [l.strip() for l in text.split('\n') if l.strip()]
+    return ''.join(f'<p>{l}</p>' for l in lines)
+```
+
+pandoc 支持的 Jira wiki markup 转换示例：
+
+| Jira 语法         | 转换结果                      |
+| ----------------- | ----------------------------- |
+| `h4. 标题`        | `<h4>标题</h4>`               |
+| `*加粗*`          | `<strong>加粗</strong>`       |
+| `_斜体_`          | `<em>斜体</em>`               |
+| ` * 列表项`       | `<ul><li>列表项</li></ul>`    |
+| `# 有序项`        | `<ol><li>有序项</li></ol>`    |
+| `{code}...{code}` | `<pre><code>...</code></pre>` |
+| 普通段落          | `<p>...</p>`                  |
+
+> **注意**：pandoc 不在宿主机 Docker 容器内，须在**宿主机**运行 Python 脚本调用 pandoc，再将结果写入 import_ready CSV，然后在 Phase 5 读取 CSV 导入。
 
 ---
 
@@ -382,12 +420,13 @@ payload = {
     "type_id": row['type_id'],
     "state": row['state_id'],      # 字段名为 state（传 UUID）
     "priority": "none",
-    "external_source": "jira",
-    "external_id": row['external_id'] or None,
     "assignees": json.loads(row['assignees']),
     "extra_properties": json.loads(row['extra_properties']),
+    # ★ 不传 external_id / external_source：需求编号已写入 extra_properties.req_source
 }
 ```
+
+> ⚠️ 每次导入**均新建** issue，不检查重复。相同 req_source 值在不同 cycle 中多次导入是合法的。
 
 成功后收集 issue UUID，最后**批量**关联 Cycle 和 Module：
 
@@ -402,16 +441,10 @@ for module_id, issue_ids in module_groups.items():
     {"issues": issue_ids}
 ```
 
-**重复保护**：若 HTTP 返回 400 且含 `external_id` 字段，说明已存在。询问用户：
-
-- `s` = 跳过（skip）
-- `o` = 覆盖（PATCH 已存在的 issue）
-- `a` = 全部跳过后续重复项
-
 **最终汇总**：
 
 ```
-成功: XX  跳过: XX  失败: XX
+成功: XX  失败: XX
 失败列表: [...]
 
 Cycle 关联: XX 条
