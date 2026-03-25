@@ -410,6 +410,18 @@ with transaction.atomic():
     created = Issue.objects.bulk_create(issue_objs)
     print(f'✅ 创建 Issue: {{len(created)}} 条')
 
+    # 修复 sequence_id：bulk_create 绕过 save()，需手动分配唯一序号并创建 IssueSequence
+    from plane.db.models import IssueSequence
+    from django.db.models import Max
+    last_seq = IssueSequence.objects.filter(project=proj).aggregate(m=Max('sequence'))['m'] or 0
+    seq_objs = []
+    for idx, issue in enumerate(created, 1):
+        issue.sequence_id = last_seq + idx
+        seq_objs.append(IssueSequence(issue=issue, sequence=issue.sequence_id, project=proj, workspace=ws))
+    Issue.objects.bulk_update(created, ['sequence_id'])
+    IssueSequence.objects.bulk_create(seq_objs, ignore_conflicts=True)
+    print(f'✅ 分配 sequence_id: {{last_seq+1}} ~ {{last_seq+len(created)}}')
+
     pairs = list(zip(created, remapped_data))
 
     # bulk_create IssueAssignee
