@@ -1,6 +1,6 @@
 ## 1. 提交变更文档
 
-- [ ] 1.1 提交 openspec 变更文档（proposal、design、specs、tasks）
+- [x] 1.1 提交 openspec 变更文档（proposal、design、specs、tasks）
 
 ## 2. 实现 build_import_csv.py
 
@@ -33,19 +33,19 @@
 
 ## 5. 提交实现代码
 
-- [ ] 5.1 提交所有新增脚本：`#FICC-9999# feat: 新增需求数据重新导入脚本（build_import_csv/import_users/reimport_all）`
+- [x] 5.1 提交所有新增脚本：`#FICC-9999# feat: 新增需求数据重新导入脚本（build_import_csv/import_users/reimport_all）`
 
 ## 6. 用户验证（Dev 环境）
 
-- [ ] 6.1 运行 `python build_import_csv.py`，确认 `requirements_import_ready.csv` 生成，检查行数（预期 ~200 行）
-- [ ] 6.2 人工抽查 CSV：选取 0425 和 0523 各一行，验证 extra_properties JSON 结构正确、req_source 有值
-- [ ] 6.3 运行 `python reimport_all.py --env dev`，确认 5 个 Cycles 和 10 个 Modules 已创建
-- [ ] 6.4 检查 Dev Plane 界面：Requirement issues 总数 = CSV 行数，每条 issue 有正确的 cycle 关联
-- [ ] 6.5 抽查 3 条 issue：req_source、it_pm、techLead、Module 关联均正确
-- [ ] 6.6 用户确认 Dev 验证通过
+- [x] 6.1 运行 `python build_import_csv.py`，确认 `requirements_import_ready.csv` 生成，检查行数（预期 ~200 行）
+- [x] 6.2 人工抽查 CSV：选取 0425 和 0523 各一行，验证 extra_properties JSON 结构正确、req_source 有值
+- [x] 6.3 运行 `python reimport_all.py --env dev`，确认 5 个 Cycles 和 10 个 Modules 已创建
+- [x] 6.4 检查 Dev Plane 界面：Requirement issues 总数 = CSV 行数，每条 issue 有正确的 cycle 关联
+- [x] 6.5 抽查 3 条 issue：req_source、it_pm、techLead、Module 关联均正确
+- [x] 6.6 用户确认 Dev 验证通过
 
 ## 7. 生产环境导入（用户确认后执行）
 
-- [ ] 7.1 运行 `python import_users.py --env prod`，确认 93 个用户全部导入
-- [ ] 7.2 运行 `python reimport_all.py --env prod`
-- [ ] 7.3 验证生产环境数据与 Dev 一致（issue 总数、抽查 extra_properties）
+- [x] 7.1 运行 `python import_users.py --env prod`，确认 93 个用户全部导入
+- [x] 7.2 运行 `python reimport_all.py --env prod`
+- [x] 7.3 验证生产环境数据与 Dev 一致（issue 总数、抽查 extra_properties）
