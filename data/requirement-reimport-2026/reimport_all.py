@@ -32,11 +32,11 @@ ENV_CONFIG = {
         "container":  "plane-api-1",
     },
     "prod": {
-        "base_url":   os.environ.get("PROD_BASE_URL", "http://localhost:8000"),
-        "api_token":  os.environ.get("PROD_API_TOKEN", ""),
+        "base_url":   "http://10.102.21.231:8080",
+        "api_token":  "",   # 生产不再使用 REST API，保留字段兼容性
         "workspace":  "ficc",
-        "project_id": os.environ.get("PROD_PROJECT_ID", "18b7ccc8-4b96-4af0-8c6f-76550cba28a7"),
-        "container":  "plane-api-1",
+        "project_id": "f5a45eb3-66a3-48cb-8c96-d09f80791645",
+        "container":  "api",
     },
 }
 
@@ -51,7 +51,7 @@ CYCLES = [
 
 # 工号 → 姓名（用于 Module Assignee，Jira modules.csv 存储工号）
 # 工号 → email（环境无关，用于 Module Assignee 查找）
-EMP_ID_EMAIL: dict[str, str] = {
+EMP_ID_EMAIL = {
     "025246": "zhuhongfei@htsc.com",
     "025241": "wangshengpeng@htsc.com",
     "024868": "qiangaoxiang@htsc.com",
@@ -118,8 +118,8 @@ ws = Workspace.objects.get(slug='{cfg["workspace"]}')
 proj = Project.objects.get(id='{cfg["project_id"]}')
 req_type = IssueType.objects.filter(workspace=ws, name='Requirement').first()
 if not req_type:
-    print('❌ 未找到 Requirement IssueType，请先创建')
-    exit(1)
+    req_type = IssueType.objects.create(workspace=ws, name='Requirement', description='需求', is_default=False)
+    print(f'✅ 创建 IssueType: Requirement ({{req_type.id}})')
 
 ep_defs = json.loads(base64.b64decode('{ep_b64}').decode())
 created = skipped = 0
@@ -169,7 +169,7 @@ else:
 
 # ── Step 2: lookup-or-create Cycles ──────────────────────────────────────────
 
-def ensure_cycles(cfg: dict) -> dict[str, str]:
+def ensure_cycles(cfg: dict) -> dict:
     """返回 {cycle_name: cycle_id}"""
     print("\n[Step 2] 创建/查找 Cycles ...")
 
@@ -215,7 +215,7 @@ print('CYCLE_MAP:' + json.dumps(result, ensure_ascii=False))
 
 # ── Step 3: lookup-or-create Modules from Jira modules.csv ───────────────────
 
-def ensure_modules(cfg: dict) -> dict[str, str]:
+def ensure_modules(cfg: dict) -> dict:
     """返回 {module_name: module_id}"""
     print("\n[Step 3] 创建/查找 Modules ...")
 
