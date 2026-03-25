@@ -284,10 +284,10 @@ ws = Workspace.objects.get(slug='{ws}')
 proj = Project.objects.get(id='{project_id}')
 user = ProjectMember.objects.filter(project=proj).order_by('created_at').first().member
 
-closed_state = State.objects.filter(project=proj, group='cancelled').first()
+closed_state = State.objects.filter(project=proj, group='completed').first()
 if not closed_state:
-    raise RuntimeError('未找到 cancelled group 的 state')
-print(f'Cancelled state: {{closed_state.name}} ({{closed_state.id}})')
+    raise RuntimeError('未找到 completed group 的 state')
+print(f'Done state: {{closed_state.name}} ({{closed_state.id}})')
 
 closed_cycles = set(json.loads('''{closed_cycles_json}'''))
 issues_data = json.loads(base64.b64decode('{issues_b64}').decode())
