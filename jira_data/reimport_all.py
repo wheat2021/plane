@@ -82,6 +82,68 @@ def run_django_shell(container: str, script: str) -> str:
     return result.stdout
 
 
+# ── Extra Property 定义（从 Dev 环境导出，生产环境幂等创建）────────────────────
+EXTRA_PROPERTIES = [
+  {"key":"techLead","label":"IT技术负责人","type":"member","config":{"member_color":"#3b82f6"},"is_required":False},
+  {"key":"refs","label":"参考链接","type":"reference","config":{},"is_required":False},
+  {"key":"department","label":"所属部门","type":"select","config":{"options":[{"label":"中央交易室","value":"中央交易室"},{"label":"信息技术部","value":"信息技术部"},{"label":"固定收益部","value":"固定收益部"},{"label":"资金运营部","value":"资金运营部"},{"label":"风险管理部","value":"风险管理部"},{"label":"香港金控FICC","value":"香港金控FICC"}]},"is_required":False},
+  {"key":"domestic_overseas","label":"境内/外类别","type":"select","config":{"options":[{"label":"境内","value":"境内"},{"label":"境外","value":"境外"}]},"is_required":False},
+  {"key":"category_l1","label":"一级分类","type":"select","config":{"options":[{"label":"互换","value":"互换"},{"label":"借贷","value":"借贷"},{"label":"债券","value":"债券"},{"label":"回购","value":"回购"},{"label":"场外衍生品","value":"场外衍生品"},{"label":"基金","value":"基金"},{"label":"外汇","value":"外汇"},{"label":"拆借","value":"拆借"},{"label":"期权","value":"期权"},{"label":"期货","value":"期货"},{"label":"票据","value":"票据"},{"label":"综合","value":"综合"}]},"is_required":False},
+  {"key":"category_l2","label":"二级分类","type":"select","config":{"options":[{"label":"TARF","value":"TARF"},{"label":"债券ETF","value":"债券ETF"},{"label":"南向通债券","value":"南向通债券"},{"label":"商品期权","value":"商品期权"},{"label":"场外收益互换","value":"场外收益互换"},{"label":"外币回购","value":"外币回购"},{"label":"外币拆借","value":"外币拆借"},{"label":"外汇期货","value":"外汇期货"},{"label":"多资产","value":"多资产"},{"label":"平台优化","value":"平台优化"},{"label":"票据","value":"票据"},{"label":"美国国债","value":"美国国债"},{"label":"股指期货","value":"股指期货"},{"label":"转贴现和正回购","value":"转贴现和正回购"},{"label":"银行间借贷","value":"银行间借贷"},{"label":"销售业务","value":"销售业务"},{"label":"风险管理","value":"风险管理"},{"label":"债券","value":"债券"},{"label":"债券借贷","value":"债券借贷"},{"label":"国债期货","value":"国债期货"}]},"is_required":False},
+  {"key":"category_l3","label":"三级分类","type":"select","config":{"options":[{"label":"业务报表","value":"业务报表"},{"label":"交易后","value":"交易后"},{"label":"交易管理","value":"交易管理"},{"label":"交易簿记","value":"交易簿记"},{"label":"交易链路","value":"交易链路"},{"label":"交易风控","value":"交易风控"},{"label":"信用风险","value":"信用风险"},{"label":"场外","value":"场外"},{"label":"策略研发","value":"策略研发"},{"label":"账户管理","value":"账户管理"},{"label":"销售管理","value":"销售管理"},{"label":"风险管理","value":"风险管理"},{"label":"做市义务监控","value":"做市义务监控"},{"label":"客户准入","value":"客户准入"}]},"is_required":False},
+  {"key":"center","label":"所属中心","type":"select","config":{"options":[{"label":"FICC交易平台中心","value":"FICC交易平台中心"},{"label":"代客业务中心","value":"代客业务中心"},{"label":"做市业务中心","value":"做市业务中心"},{"label":"流动性管理中心","value":"流动性管理中心"},{"label":"科技研发中心","value":"科技研发中心"},{"label":"自营业务中心","value":"自营业务中心"},{"label":"销售业务中心","value":"销售业务中心"},{"label":"风险合规中心","value":"风险合规中心"}]},"is_required":False},
+  {"key":"team","label":"所属团队","type":"select","config":{"options":[{"label":"—","value":"—"},{"label":"代客销售团队","value":"代客销售团队"},{"label":"信用交易台","value":"信用交易台"},{"label":"利率衍生品交易台","value":"利率衍生品交易台"},{"label":"外币债券做市台","value":"外币债券做市台"},{"label":"外汇产品团队","value":"外汇产品团队"},{"label":"外汇做市台","value":"外汇做市台"},{"label":"大象平台产品团队","value":"大象平台产品团队"},{"label":"宏观产品团队","value":"宏观产品团队"},{"label":"平台架构","value":"平台架构"},{"label":"策略管理","value":"策略管理"},{"label":"自营交易七台","value":"自营交易七台"},{"label":"自营交易五台","value":"自营交易五台"},{"label":"量化研发团队","value":"量化研发团队"},{"label":"风险管理团队","value":"风险管理团队"},{"label":"多资产创新产品团队","value":"多资产创新产品团队"},{"label":"本币做市台","value":"本币做市台"},{"label":"融资台","value":"融资台"}]},"is_required":False},
+  {"key":"biz_pm","label":"固收产品经理","type":"text","config":{},"is_required":False},
+  {"key":"biz_priority","label":"业务优先级","type":"text","config":{},"is_required":False},
+  {"key":"it_pm","label":"IT产品经理","type":"member","config":{"member_color":"#10b981"},"is_required":False},
+  {"key":"in_delivery","label":"是否纳入交付","type":"checkbox","config":{},"is_required":False},
+  {"key":"estimated_iteration","label":"预估迭代","type":"select","config":{"options":[{"label":"本迭代无法启动后续重新排期","value":"本迭代无法启动后续重新排期"},{"label":"预计0425迭代完成交付","value":"预计0425迭代完成交付"},{"label":"预计0523迭代之后完成交付","value":"预计0523迭代之后完成交付"},{"label":"预计0523迭代完成交付","value":"预计0523迭代完成交付"},{"label":"预计0613迭代之后完成交付","value":"预计0613迭代之后完成交付"},{"label":"预计0613迭代完成交付","value":"预计0613迭代完成交付"},{"label":"预计0704迭代完成交付","value":"预计0704迭代完成交付"},{"label":"预计0704迭代之后完成交付","value":"预计0704迭代之后完成交付"}]},"is_required":False},
+  {"key":"delivery_content","label":"交付内容","type":"text","config":{},"is_required":False},
+  {"key":"remarks","label":"备注","type":"text","config":{},"is_required":False},
+  {"key":"admission","label":"需求是否准入","type":"checkbox","config":{},"is_required":False},
+  {"key":"req_source","label":"需求编号","type":"text","config":{},"is_required":False},
+]
+
+
+# ── Step 0: 确保 Extra Property 定义存在（幂等）────────────────────────────────
+
+def ensure_extra_properties(cfg: dict):
+    print("\n[Step 0] 确保 Extra Property 定义存在 ...")
+    import base64
+    ep_b64 = base64.b64encode(json.dumps(EXTRA_PROPERTIES, ensure_ascii=False).encode()).decode()
+    script = textwrap.dedent(f"""
+import json, base64
+from plane.db.models import ExtraPropertyConfig, IssueTypeExtraProperty, IssueType, Project, Workspace
+
+ws = Workspace.objects.get(slug='{cfg["workspace"]}')
+proj = Project.objects.get(id='{cfg["project_id"]}')
+req_type = IssueType.objects.filter(workspace=ws, name='Requirement').first()
+if not req_type:
+    print('❌ 未找到 Requirement IssueType，请先创建')
+    exit(1)
+
+ep_defs = json.loads(base64.b64decode('{ep_b64}').decode())
+created = skipped = 0
+for d in ep_defs:
+    config, _ = ExtraPropertyConfig.objects.get_or_create(
+        workspace=ws, key=d['key'],
+        defaults={{'label': d['label'], 'type': d['type'], 'config': d['config']}}
+    )
+    _, new = IssueTypeExtraProperty.objects.get_or_create(
+        project=proj, issue_type=req_type, extra_property_config=config,
+        defaults={{'is_required': d['is_required']}}
+    )
+    if new:
+        created += 1
+    else:
+        skipped += 1
+
+print(f'✅ Extra Properties: 新建 {{created}} 个，已存在跳过 {{skipped}} 个')
+""")
+    out = run_django_shell(cfg["container"], script)
+    print(out.strip())
+
+
 
 
 
@@ -404,6 +466,7 @@ def main():
     if args.clean:
         clean_requirements(cfg)
 
+    ensure_extra_properties(cfg)
     cycle_map = ensure_cycles(cfg)
     module_map = ensure_modules(cfg)
     import_issues(cfg, cycle_map, module_map)
