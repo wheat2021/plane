@@ -3,12 +3,12 @@
 创建 Cycles/Modules 并从 requirements_import_ready.csv 批量导入 Requirement issues
 
 用法：
-  python reimport_all.py --env dev           # 本机验证
-  python reimport_all.py --env dev --clean   # 先清空再导入
-  python reimport_all.py --env prod          # 生产（在生产服务器上运行）
+  python3 reimport_all.py --env dev           # 本机验证
+  python3 reimport_all.py --env dev --clean   # 先清空再导入
+  python3 reimport_all.py --env prod          # 生产（在生产服务器上运行）
 
-生产环境需设置环境变量：
-  PROD_API_TOKEN=<token>   # 生产 API Token
+全流程通过 Django Shell ORM 操作，无限流风险，支持已完成 Cycle。
+0131/0307/0328/0425 迭代的 issue 使用 Cancelled 终态；0523 保持 Backlog。
 """
 
 import argparse
@@ -18,10 +18,7 @@ import os
 import subprocess
 import sys
 import textwrap
-import time
 from collections import defaultdict
-
-import requests
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -85,25 +82,7 @@ def run_django_shell(container: str, script: str) -> str:
     return result.stdout
 
 
-def api_headers(token: str) -> dict:
-    return {"X-Api-Key": token, "Content-Type": "application/json"}
 
-
-def api_post(base_url: str, token: str, path: str, payload: dict,
-             retries: int = 5, base_delay: float = 2.0) -> dict:
-    """POST with exponential backoff on 429 rate limit"""
-    url = f"{base_url}/api/v1{path}"
-    delay = base_delay
-    for attempt in range(retries):
-        resp = requests.post(url, headers=api_headers(token), json=payload, timeout=30)
-        if resp.status_code == 429:
-            wait = delay * (2 ** attempt)
-            print(f"  ⏳ 限流(429)，等待 {wait:.0f}s 后重试 ...")
-            time.sleep(wait)
-            continue
-        resp.raise_for_status()
-        return resp.json()
-    raise RuntimeError(f"超过最大重试次数（{retries}），URL: {url}")
 
 
 # ── Step 1: 清空 Requirement issues ──────────────────────────────────────────
@@ -253,136 +232,159 @@ print('MODULE_MAP:' + json.dumps(result, ensure_ascii=False))
     raise RuntimeError("未能解析 MODULE_MAP")
 
 
-# ── Step 4: 从 CSV 导入 Issues ───────────────────────────────────────────────
+# 已结束迭代（使用 Cancelled 终态）
+CLOSED_CYCLES = {"大象-常规-26-0131", "大象-常规-26-0307", "大象-常规-26-0328", "大象-常规-26-0425"}
+
+
+# ── Step 4: 从 CSV 导入 Issues（Django Shell bulk_create）────────────────────
 
 def import_issues(cfg: dict, cycle_map: dict, module_map: dict):
-    print("\n[Step 4] 从 CSV 导入 Requirement issues ...")
+    print("\n[Step 4] 从 CSV 导入 Requirement issues (Django Shell) ...")
 
     csv_path = os.path.join(DIR, "requirements_import_ready.csv")
     with open(csv_path, encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
 
-    base_url = cfg["base_url"]
-    token = cfg["api_token"]
     ws = cfg["workspace"]
     project_id = cfg["project_id"]
-    issue_url = f"/workspaces/{ws}/projects/{project_id}/issues/"
 
-    # {cycle_name: [issue_id, ...]}
-    cycle_issues: dict[str, list[str]] = defaultdict(list)
-    # {module_id: [issue_id, ...]}
-    module_issues: dict[str, list[str]] = defaultdict(list)
-
-    ok = fail = 0
-    cycle_stats: dict[str, int] = defaultdict(int)
-    errors: list[str] = []
-
+    # 构建传入 Django Shell 的数据
+    issues_data = []
     for i, row in enumerate(rows, 1):
         cycle_name = row["cycle_name"]
-        module_name = row.get("module_name", "")
-
         cycle_id = cycle_map.get(cycle_name)
         if not cycle_id:
-            msg = f"行 {i}: cycle '{cycle_name}' 未找到，跳过"
-            print(f"  ⚠ {msg}")
-            errors.append(msg)
-            fail += 1
+            print(f"  ⚠ 行 {i}: cycle '{cycle_name}' 未找到，跳过")
             continue
-
-        payload = {
+        module_name = row.get("module_name", "")
+        issues_data.append({
             "name": row["name"],
             "description_html": row.get("description_html", "") or "",
             "type_id": row["type_id"],
-            "state": row["state_id"],
-            "priority": row.get("priority", "none"),
+            "state_id": row["state_id"],
             "assignees": json.loads(row["assignees"]),
             "extra_properties": json.loads(row["extra_properties"]),
-        }
+            "cycle_id": cycle_id,
+            "cycle_name": cycle_name,
+            "module_id": module_map.get(module_name, "") if module_name else "",
+        })
 
-        try:
-            resp = api_post(base_url, token, issue_url, payload)
-            issue_id = resp.get("id") or resp.get("issue_id")
-            if not issue_id:
-                raise ValueError(f"响应中无 issue id: {resp}")
+    import base64
+    issues_b64 = base64.b64encode(json.dumps(issues_data, ensure_ascii=False).encode()).decode()
+    closed_cycles_json = json.dumps(list(CLOSED_CYCLES), ensure_ascii=False)
 
-            cycle_issues[cycle_name].append(issue_id)
-
-            if module_name and module_name in module_map:
-                module_issues[module_map[module_name]].append(issue_id)
-
-            ok += 1
-            cycle_stats[cycle_name] += 1
-
-            if i % 20 == 0:
-                print(f"  ... {i}/{len(rows)} 已处理")
-
-            time.sleep(0.8)  # 避免触发限流
-
-        except Exception as e:
-            msg = f"行 {i} [{row['name'][:30]}]: {e}"
-            print(f"  ✗ {msg}")
-            errors.append(msg)
-            fail += 1
-
-    print(f"\n  Issue 创建完成: ✅{ok}  ✗{fail}")
-
-    # ── Step 5: 批量关联 Cycle（Django Shell，绕过已完成 Cycle 的 API 限制）────
-    print("\n[Step 5] 批量关联 Cycles (via Django Shell) ...")
-    cycle_issues_json = json.dumps(
-        {cycle_map[cname]: ids for cname, ids in cycle_issues.items()},
-        ensure_ascii=False
-    )
-    cycle_name_map_json = json.dumps(
-        {cycle_map[cname]: cname for cname in cycle_issues},
-        ensure_ascii=False
-    )
     script = textwrap.dedent(f"""
-import json
-from plane.db.models import CycleIssue, Cycle, Project, ProjectMember, Workspace
+import json, base64
+from plane.db.models import (
+    Issue, IssueAssignee, CycleIssue, ModuleIssue,
+    Project, ProjectMember, State, Workspace
+)
 
 ws = Workspace.objects.get(slug='{ws}')
 proj = Project.objects.get(id='{project_id}')
 user = ProjectMember.objects.filter(project=proj).order_by('created_at').first().member
 
-cycle_issues = json.loads('''{cycle_issues_json}''')
-cycle_name_map = json.loads('''{cycle_name_map_json}''')
+closed_state = State.objects.filter(project=proj, group='cancelled').first()
+if not closed_state:
+    raise RuntimeError('未找到 cancelled group 的 state')
+print(f'Cancelled state: {{closed_state.name}} ({{closed_state.id}})')
 
-for cycle_id, issue_ids in cycle_issues.items():
+closed_cycles = set(json.loads('''{closed_cycles_json}'''))
+issues_data = json.loads(base64.b64decode('{issues_b64}').decode())
+
+# bulk_create Issues
+issue_objs = []
+for d in issues_data:
+    state_id = str(closed_state.id) if d['cycle_name'] in closed_cycles else d['state_id']
+    issue_objs.append(Issue(
+        workspace=ws,
+        project=proj,
+        name=d['name'],
+        description_html=d['description_html'],
+        type_id=d['type_id'],
+        state_id=state_id,
+        priority='none',
+        extra_properties=d['extra_properties'],
+        created_by=user,
+        updated_by=user,
+    ))
+
+created = Issue.objects.bulk_create(issue_objs)
+print(f'✅ 创建 Issue: {{len(created)}} 条')
+
+# 直接用 zip 保持顺序（PostgreSQL bulk_create 保证返回顺序与输入一致）
+pairs = list(zip(created, issues_data))
+
+# bulk_create IssueAssignee
+assignee_objs = []
+for issue, d in pairs:
+    for uid in d['assignees']:
+        assignee_objs.append(IssueAssignee(
+            workspace=ws, project=proj, issue_id=str(issue.id), assignee_id=uid,
+            created_by=user, updated_by=user,
+        ))
+if assignee_objs:
+    IssueAssignee.objects.bulk_create(assignee_objs, ignore_conflicts=True)
+    print(f'✅ 关联 Assignee: {{len(assignee_objs)}} 条')
+
+# bulk_create CycleIssue
+from collections import defaultdict
+cycle_groups = defaultdict(list)
+module_groups = defaultdict(list)
+for issue, d in pairs:
+    cycle_groups[d['cycle_id']].append(str(issue.id))
+    if d['module_id']:
+        module_groups[d['module_id']].append(str(issue.id))
+
+from plane.db.models import Cycle
+cycle_objs = []
+for cycle_id, issue_ids in cycle_groups.items():
     cycle = Cycle.objects.get(id=cycle_id)
-    existing = set(CycleIssue.objects.filter(cycle=cycle).values_list('issue_id', flat=True))
-    to_create = [iid for iid in issue_ids if iid not in existing]
-    CycleIssue.objects.bulk_create([
-        CycleIssue(workspace=ws, project=proj, cycle=cycle, issue_id=iid,
-                   created_by=user, updated_by=user)
-        for iid in to_create
-    ], ignore_conflicts=True)
-    cname = cycle_name_map.get(cycle_id, cycle_id)
-    print(f'  ✅ Cycle {{cname}}: 关联 {{len(to_create)}} 条')
+    existing = set(str(x) for x in CycleIssue.objects.filter(cycle=cycle).values_list('issue_id', flat=True))
+    for iid in issue_ids:
+        if iid not in existing:
+            cycle_objs.append(CycleIssue(
+                workspace=ws, project=proj, cycle=cycle, issue_id=iid,
+                created_by=user, updated_by=user,
+            ))
+CycleIssue.objects.bulk_create(cycle_objs, ignore_conflicts=True)
+print(f'✅ 关联 CycleIssue: {{len(cycle_objs)}} 条')
+
+# 打印各 Cycle 分布
+from plane.db.models import Cycle as CycleModel
+for cycle_id, issue_ids in cycle_groups.items():
+    cname = CycleModel.objects.get(id=cycle_id).name
+    print(f'  {{cname}}: {{len(issue_ids)}} 条')
+
+# bulk_create ModuleIssue
+from plane.db.models import Module
+module_objs = []
+for module_id, issue_ids in module_groups.items():
+    module = Module.objects.get(id=module_id)
+    for iid in issue_ids:
+        module_objs.append(ModuleIssue(
+            workspace=ws, project=proj, module=module, issue_id=iid,
+            created_by=user, updated_by=user,
+        ))
+ModuleIssue.objects.bulk_create(module_objs, ignore_conflicts=True)
+print(f'✅ 关联 ModuleIssue: {{len(module_objs)}} 条')
+
+print(f'RESULT:{{len(created)}}:0')
 """)
     out = run_django_shell(cfg["container"], script)
     print(out.strip())
 
-    # ── Step 6: 批量关联 Module ───────────────────────────────────────────────
-    print("\n[Step 6] 批量关联 Modules ...")
-    for mid, issue_ids in module_issues.items():
-        url = f"/workspaces/{ws}/projects/{project_id}/modules/{mid}/module-issues/"
-        try:
-            api_post(base_url, token, url, {"issues": issue_ids})
-            print(f"  ✅ Module {mid}: 关联 {len(issue_ids)} 条")
-        except Exception as e:
-            print(f"  ✗ Module {mid}: {e}")
+    # 解析结果
+    for line in out.splitlines():
+        if line.startswith("RESULT:"):
+            ok, fail = line[7:].split(":")
+            break
+    else:
+        ok, fail = "?", "?"
 
-    # ── 验证报告 ──────────────────────────────────────────────────────────────
     print("\n" + "─" * 50)
     print("📊 导入报告")
-    print(f"  总处理: {len(rows)} 行  ✅成功: {ok}  ✗失败: {fail}")
-    print("  各迭代分布:")
-    for cname in [c["name"] for c in CYCLES]:
-        print(f"    {cname}: {cycle_stats.get(cname, 0)} 条")
-    if errors:
-        print(f"\n  失败详情（前 10 条）:")
-        for e in errors[:10]:
-            print(f"    - {e}")
+    print(f"  总处理: {len(issues_data)} 行  ✅成功: {ok}  ✗失败: {fail}")
     print("─" * 50)
 
 
@@ -397,12 +399,7 @@ def main():
     args = parser.parse_args()
 
     cfg = ENV_CONFIG[args.env]
-
-    if args.env == "prod" and not cfg["api_token"]:
-        print("错误：生产环境需设置 PROD_API_TOKEN 环境变量", file=sys.stderr)
-        sys.exit(1)
-
-    print(f"环境: {args.env}  API: {cfg['base_url']}  项目: {cfg['project_id']}")
+    print(f"环境: {args.env}  容器: {cfg['container']}  项目: {cfg['project_id']}")
 
     if args.clean:
         clean_requirements(cfg)
