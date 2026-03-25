@@ -50,23 +50,22 @@ CYCLES = [
 ]
 
 # 工号 → 姓名（用于 Module Assignee，Jira modules.csv 存储工号）
-EMP_ID_UUID: dict[str, str] = {
-    "025246": "b0c16d7f-e6db-46ed-b34e-ff2059b1c211",
-    "025241": "e7b11737-6f57-458f-9892-5a168e411edf",
-    "024868": "535b3838-1804-4a1f-8353-5320babd97b8",
-    "023824": "daa28f62-9d59-4c8a-9c93-28d931e72b99",
-    "019040": "9a969130-2666-4604-9326-c2b17ca09ef1",
-    "017573": "74c21a3b-1b9b-47f2-b7ab-b8195738260d",
-    "019521": "86316c00-0847-43a8-8176-834f264e0307",
-    "015260": "8baed4ad-64c0-4922-b4bb-e9d77a865fd7",
-    "010713": "ee12bda6-18fc-4ad5-a35e-74c256781157",
-    "017436": "0d5d1a69-68ee-4885-9bb7-bf93e92eb4aa",
-    "017433": "98cb9446-ac30-4857-9c77-644999e62d52",
-    "017485": "ee31178b-09ee-4d85-a3dd-7302c10c3af5",
-    "015964": "14b265fe-200d-46aa-8e25-66f57a1e130d",
-    "019521": "86316c00-0847-43a8-8176-834f264e0307",
-    "015260": "8baed4ad-64c0-4922-b4bb-e9d77a865fd7",
-    "018045": "77342d2f-a6cf-4a2d-8142-2f5f84d0636a",
+# 工号 → email（环境无关，用于 Module Assignee 查找）
+EMP_ID_EMAIL: dict[str, str] = {
+    "025246": "zhuhongfei@htsc.com",
+    "025241": "wangshengpeng@htsc.com",
+    "024868": "qiangaoxiang@htsc.com",
+    "023824": "liupeijin@htsc.com",
+    "019040": "xiaqing@htsc.com",
+    "017573": "yaozhongbing@htsc.com",
+    "019521": "zenghuicong@htsc.com",
+    "015260": "sunyuhan@htsc.com",
+    "010713": "zhang.jun@htsc.com",
+    "017436": "qiting@htsc.com",
+    "017433": "wanglunzhang@htsc.com",
+    "017485": "wangxifeng@htsc.com",
+    "015964": "xuke015964@htsc.com",
+    "018045": "chenzhiping@htsc.com",
 }
 
 
@@ -232,7 +231,7 @@ def ensure_modules(cfg: dict) -> dict[str, str]:
                 modules_data.append({
                     "name": name,
                     "external_id": ext_id,
-                    "lead_uuid": EMP_ID_UUID.get(assignee_emp, ""),
+                    "lead_email": EMP_ID_EMAIL.get(assignee_emp, ""),
                 })
 
     modules_json = json.dumps(modules_data, ensure_ascii=False)
@@ -256,10 +255,10 @@ for m in modules_data:
         continue
 
     lead = None
-    if m['lead_uuid']:
-        lead = User.objects.filter(id=m['lead_uuid']).first()
+    if m['lead_email']:
+        lead = User.objects.filter(email=m['lead_email']).first()
         if not lead:
-            print(f'  ⚠ lead UUID 未找到: {{m["lead_uuid"]}}')
+            print(f'  ⚠ lead email 未找到: {{m["lead_email"]}}')
 
     kwargs = dict(
         workspace=ws, project=proj, name=name,
@@ -334,50 +333,84 @@ def import_issues(cfg: dict, cycle_map: dict, module_map: dict):
     import base64
     issues_b64 = base64.b64encode(json.dumps(issues_data, ensure_ascii=False).encode()).decode()
     closed_cycles_json = json.dumps(list(CLOSED_CYCLES), ensure_ascii=False)
+    # Dev uuid→email 映射（用于生产环境替换）
+    dev_uuid_email = {
+        "b0c16d7f-e6db-46ed-b34e-ff2059b1c211": "zhuhongfei@htsc.com", "e7b11737-6f57-458f-9892-5a168e411edf": "wangshengpeng@htsc.com", "535b3838-1804-4a1f-8353-5320babd97b8": "qiangaoxiang@htsc.com", "daa28f62-9d59-4c8a-9c93-28d931e72b99": "liupeijin@htsc.com", "9a969130-2666-4604-9326-c2b17ca09ef1": "xiaqing@htsc.com", "74c21a3b-1b9b-47f2-b7ab-b8195738260d": "yaozhongbing@htsc.com", "86316c00-0847-43a8-8176-834f264e0307": "zenghuicong@htsc.com", "15e4d327-6119-4941-85ac-624f7b021630": "jiangyuzhu@htsc.com", "6fe8459b-3b6b-4197-a29a-f95f2a7e20cc": "chengnan@htsc.com", "b5cf400d-4a1a-4daf-8ad7-dc33d720391c": "bichenggong@htsc.com", "98cb9446-ac30-4857-9c77-644999e62d52": "wanglunzhang@htsc.com", "ee31178b-09ee-4d85-a3dd-7302c10c3af5": "wangxifeng@htsc.com", "0d5d1a69-68ee-4885-9bb7-bf93e92eb4aa": "qiting@htsc.com", "943c1313-5035-46a0-b1e2-91e3a19546a6": "wukeyiqiong@htsc.com", "f81bb5d7-a37c-4d34-b1fc-f92d46f5b2a8": "zhangtianyi@htsc.com", "144bf735-9e10-4029-84d0-85e3749bf5d3": "zhangxian012191@htsc.com", "ee12bda6-18fc-4ad5-a35e-74c256781157": "zhang.jun@htsc.com", "77342d2f-a6cf-4a2d-8142-2f5f84d0636a": "chenzhiping@htsc.com", "14b265fe-200d-46aa-8e25-66f57a1e130d": "xuke015964@htsc.com", "8baed4ad-64c0-4922-b4bb-e9d77a865fd7": "sunyuhan@htsc.com", "1f032804-4e24-4b85-a5d3-e57bb39f84b4": "huyufan@htsc.com", "6c2cb768-b63a-45b0-859e-859ab2345c4e": "xiaqingfei@htsc.com",
+    }
+    dev_uuid_email_b64 = base64.b64encode(json.dumps(dev_uuid_email, ensure_ascii=False).encode()).decode()
+
+    # member 类型的 extra_property key（需要替换 UUID）
+    MEMBER_EP_KEYS = ["techLead", "it_pm"]
 
     script = textwrap.dedent(f"""
 import json, base64
 from django.db import transaction
 from plane.db.models import (
     Issue, IssueAssignee, CycleIssue, ModuleIssue,
-    Project, ProjectMember, State, Workspace
+    IssueType, Project, ProjectMember, State, User, Workspace
 )
 
 ws = Workspace.objects.get(slug='{ws}')
 proj = Project.objects.get(id='{project_id}')
 user = ProjectMember.objects.filter(project=proj).order_by('created_at').first().member
 
+# 运行时查询 type_id 和 state（不依赖 CSV 中的 Dev UUID）
+req_type = IssueType.objects.filter(workspace=ws, name='Requirement').first()
+if not req_type:
+    raise RuntimeError('未找到 Requirement IssueType')
 closed_state = State.objects.filter(project=proj, group='completed').first()
-if not closed_state:
-    raise RuntimeError('未找到 completed group 的 state')
-print(f'Done state: {{closed_state.name}} ({{closed_state.id}})')
+backlog_state = State.objects.filter(project=proj, group='backlog').first()
+if not closed_state or not backlog_state:
+    raise RuntimeError('未找到 completed/backlog state')
+print(f'type_id: {{req_type.id}}')
+print(f'Done state: {{closed_state.id}}, Backlog state: {{backlog_state.id}}')
+
+# 建立 email→uuid 映射（用于替换 CSV 中的 Dev UUID）
+dev_uuid_email = json.loads(base64.b64decode('{dev_uuid_email_b64}').decode())
+email_to_uuid = {{m.member.email: str(m.member.id)
+                  for m in ProjectMember.objects.filter(project=proj).select_related('member')
+                  if m.member.email}}
+# dev_uuid → prod_uuid
+uuid_remap = {{}}
+for dev_uuid, email in dev_uuid_email.items():
+    prod_uuid = email_to_uuid.get(email)
+    if prod_uuid:
+        uuid_remap[dev_uuid] = prod_uuid
+print(f'UUID 映射: {{len(uuid_remap)}} 个用户')
+
+member_ep_keys = {json.dumps(MEMBER_EP_KEYS)}
+
+def remap_uuid(uid):
+    return uuid_remap.get(uid, uid)
 
 closed_cycles = set(json.loads('''{closed_cycles_json}'''))
 issues_data = json.loads(base64.b64decode('{issues_b64}').decode())
 
 with transaction.atomic():
-    # bulk_create Issues
     issue_objs = []
+    remapped_data = []
     for d in issues_data:
-        state_id = str(closed_state.id) if d['cycle_name'] in closed_cycles else d['state_id']
+        state_id = str(closed_state.id) if d['cycle_name'] in closed_cycles else str(backlog_state.id)
+        # 替换 assignees UUID
+        new_assignees = [remap_uuid(uid) for uid in d['assignees']]
+        # 替换 extra_properties 中 member 类型字段的 UUID
+        ep = dict(d['extra_properties'])
+        for key in member_ep_keys:
+            if key in ep and ep[key]:
+                ep[key] = remap_uuid(ep[key])
         issue_objs.append(Issue(
-            workspace=ws,
-            project=proj,
-            name=d['name'],
-            description_html=d['description_html'],
-            type_id=d['type_id'],
-            state_id=state_id,
-            priority='none',
-            extra_properties=d['extra_properties'],
-            created_by=user,
-            updated_by=user,
+            workspace=ws, project=proj,
+            name=d['name'], description_html=d['description_html'],
+            type_id=str(req_type.id), state_id=state_id,
+            priority='none', extra_properties=ep,
+            created_by=user, updated_by=user,
         ))
+        remapped_data.append({{**d, 'assignees': new_assignees}})
 
     created = Issue.objects.bulk_create(issue_objs)
     print(f'✅ 创建 Issue: {{len(created)}} 条')
 
-    # 直接用 zip 保持顺序（PostgreSQL bulk_create 保证返回顺序与输入一致）
-    pairs = list(zip(created, issues_data))
+    pairs = list(zip(created, remapped_data))
 
     # bulk_create IssueAssignee
     assignee_objs = []
