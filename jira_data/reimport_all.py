@@ -337,6 +337,7 @@ def import_issues(cfg: dict, cycle_map: dict, module_map: dict):
 
     script = textwrap.dedent(f"""
 import json, base64
+from django.db import transaction
 from plane.db.models import (
     Issue, IssueAssignee, CycleIssue, ModuleIssue,
     Project, ProjectMember, State, Workspace
@@ -354,84 +355,85 @@ print(f'Done state: {{closed_state.name}} ({{closed_state.id}})')
 closed_cycles = set(json.loads('''{closed_cycles_json}'''))
 issues_data = json.loads(base64.b64decode('{issues_b64}').decode())
 
-# bulk_create Issues
-issue_objs = []
-for d in issues_data:
-    state_id = str(closed_state.id) if d['cycle_name'] in closed_cycles else d['state_id']
-    issue_objs.append(Issue(
-        workspace=ws,
-        project=proj,
-        name=d['name'],
-        description_html=d['description_html'],
-        type_id=d['type_id'],
-        state_id=state_id,
-        priority='none',
-        extra_properties=d['extra_properties'],
-        created_by=user,
-        updated_by=user,
-    ))
-
-created = Issue.objects.bulk_create(issue_objs)
-print(f'✅ 创建 Issue: {{len(created)}} 条')
-
-# 直接用 zip 保持顺序（PostgreSQL bulk_create 保证返回顺序与输入一致）
-pairs = list(zip(created, issues_data))
-
-# bulk_create IssueAssignee
-assignee_objs = []
-for issue, d in pairs:
-    for uid in d['assignees']:
-        assignee_objs.append(IssueAssignee(
-            workspace=ws, project=proj, issue_id=str(issue.id), assignee_id=uid,
-            created_by=user, updated_by=user,
+with transaction.atomic():
+    # bulk_create Issues
+    issue_objs = []
+    for d in issues_data:
+        state_id = str(closed_state.id) if d['cycle_name'] in closed_cycles else d['state_id']
+        issue_objs.append(Issue(
+            workspace=ws,
+            project=proj,
+            name=d['name'],
+            description_html=d['description_html'],
+            type_id=d['type_id'],
+            state_id=state_id,
+            priority='none',
+            extra_properties=d['extra_properties'],
+            created_by=user,
+            updated_by=user,
         ))
-if assignee_objs:
-    IssueAssignee.objects.bulk_create(assignee_objs, ignore_conflicts=True)
-    print(f'✅ 关联 Assignee: {{len(assignee_objs)}} 条')
 
-# bulk_create CycleIssue
-from collections import defaultdict
-cycle_groups = defaultdict(list)
-module_groups = defaultdict(list)
-for issue, d in pairs:
-    cycle_groups[d['cycle_id']].append(str(issue.id))
-    if d['module_id']:
-        module_groups[d['module_id']].append(str(issue.id))
+    created = Issue.objects.bulk_create(issue_objs)
+    print(f'✅ 创建 Issue: {{len(created)}} 条')
 
-from plane.db.models import Cycle
-cycle_objs = []
-for cycle_id, issue_ids in cycle_groups.items():
-    cycle = Cycle.objects.get(id=cycle_id)
-    existing = set(str(x) for x in CycleIssue.objects.filter(cycle=cycle).values_list('issue_id', flat=True))
-    for iid in issue_ids:
-        if iid not in existing:
-            cycle_objs.append(CycleIssue(
-                workspace=ws, project=proj, cycle=cycle, issue_id=iid,
+    # 直接用 zip 保持顺序（PostgreSQL bulk_create 保证返回顺序与输入一致）
+    pairs = list(zip(created, issues_data))
+
+    # bulk_create IssueAssignee
+    assignee_objs = []
+    for issue, d in pairs:
+        for uid in d['assignees']:
+            assignee_objs.append(IssueAssignee(
+                workspace=ws, project=proj, issue_id=str(issue.id), assignee_id=uid,
                 created_by=user, updated_by=user,
             ))
-CycleIssue.objects.bulk_create(cycle_objs, ignore_conflicts=True)
-print(f'✅ 关联 CycleIssue: {{len(cycle_objs)}} 条')
+    if assignee_objs:
+        IssueAssignee.objects.bulk_create(assignee_objs, ignore_conflicts=True)
+        print(f'✅ 关联 Assignee: {{len(assignee_objs)}} 条')
 
-# 打印各 Cycle 分布
-from plane.db.models import Cycle as CycleModel
-for cycle_id, issue_ids in cycle_groups.items():
-    cname = CycleModel.objects.get(id=cycle_id).name
-    print(f'  {{cname}}: {{len(issue_ids)}} 条')
+    # bulk_create CycleIssue
+    from collections import defaultdict
+    cycle_groups = defaultdict(list)
+    module_groups = defaultdict(list)
+    for issue, d in pairs:
+        cycle_groups[d['cycle_id']].append(str(issue.id))
+        if d['module_id']:
+            module_groups[d['module_id']].append(str(issue.id))
 
-# bulk_create ModuleIssue
-from plane.db.models import Module
-module_objs = []
-for module_id, issue_ids in module_groups.items():
-    module = Module.objects.get(id=module_id)
-    for iid in issue_ids:
-        module_objs.append(ModuleIssue(
-            workspace=ws, project=proj, module=module, issue_id=iid,
-            created_by=user, updated_by=user,
-        ))
-ModuleIssue.objects.bulk_create(module_objs, ignore_conflicts=True)
-print(f'✅ 关联 ModuleIssue: {{len(module_objs)}} 条')
+    from plane.db.models import Cycle
+    cycle_objs = []
+    for cycle_id, issue_ids in cycle_groups.items():
+        cycle = Cycle.objects.get(id=cycle_id)
+        existing = set(str(x) for x in CycleIssue.objects.filter(cycle=cycle).values_list('issue_id', flat=True))
+        for iid in issue_ids:
+            if iid not in existing:
+                cycle_objs.append(CycleIssue(
+                    workspace=ws, project=proj, cycle=cycle, issue_id=iid,
+                    created_by=user, updated_by=user,
+                ))
+    CycleIssue.objects.bulk_create(cycle_objs, ignore_conflicts=True)
+    print(f'✅ 关联 CycleIssue: {{len(cycle_objs)}} 条')
 
-print(f'RESULT:{{len(created)}}:0')
+    # 打印各 Cycle 分布
+    from plane.db.models import Cycle as CycleModel
+    for cycle_id, issue_ids in cycle_groups.items():
+        cname = CycleModel.objects.get(id=cycle_id).name
+        print(f'  {{cname}}: {{len(issue_ids)}} 条')
+
+    # bulk_create ModuleIssue
+    from plane.db.models import Module
+    module_objs = []
+    for module_id, issue_ids in module_groups.items():
+        module = Module.objects.get(id=module_id)
+        for iid in issue_ids:
+            module_objs.append(ModuleIssue(
+                workspace=ws, project=proj, module=module, issue_id=iid,
+                created_by=user, updated_by=user,
+            ))
+    ModuleIssue.objects.bulk_create(module_objs, ignore_conflicts=True)
+    print(f'✅ 关联 ModuleIssue: {{len(module_objs)}} 条')
+
+    print(f'RESULT:{{len(created)}}:0')
 """)
     out = run_django_shell(cfg["container"], script)
     print(out.strip())
