@@ -187,6 +187,8 @@ body {
   &:-webkit-autofill:focus,
   &:-webkit-autofill:active {
     -webkit-background-clip: text;
+    -webkit-text-fill-color: var(--text-color-primary);
+    box-shadow: 0 0 0 1000px var(--background-color-surface-1) inset;
   }
 }
 
