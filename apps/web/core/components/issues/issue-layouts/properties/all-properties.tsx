@@ -36,6 +36,8 @@ import { useProjectState } from "@/hooks/store/use-project-state";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useIssueStoreType } from "@/hooks/use-issue-layout-store";
 import { usePlatformOS } from "@/hooks/use-platform-os";
+import { useDefaultPropertyConfig } from "@/hooks/store/use-default-property-config";
+import { DefaultPropertyTooltip } from "@/components/issues/extra-properties/default-property-tooltip";
 // plane web components
 import { WorkItemLayoutAdditionalProperties } from "@/plane-web/components/issues/issue-layouts/additional-properties";
 // local components
@@ -54,7 +56,15 @@ export interface IIssueProperties {
 }
 
 export const IssueProperties = observer(function IssueProperties(props: IIssueProperties) {
-  const { issue, updateIssue, displayProperties, extraDisplayProperties, isReadOnly, className, isEpic = false } = props;
+  const {
+    issue,
+    updateIssue,
+    displayProperties,
+    extraDisplayProperties,
+    isReadOnly,
+    className,
+    isEpic = false,
+  } = props;
   // i18n
   const { t } = useTranslation();
   // store hooks
@@ -70,6 +80,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
   const { areEstimateEnabledByProjectId } = useProjectEstimates();
   const { getStateById } = useProjectState();
   const { isMobile } = usePlatformOS();
+  const { getDescription } = useDefaultPropertyConfig();
   const projectDetails = getProjectById(issue.project_id);
 
   // router
@@ -186,6 +197,14 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
     e.preventDefault();
   };
 
+  // helper: return DefaultPropertyTooltip for a default property if issue has a type and description is set
+  const defaultPropTooltip = (propertyKey: string) => {
+    if (!issue.type_id || !workspaceSlug) return null;
+    const desc = getDescription(workspaceSlug.toString(), issue.type_id, propertyKey);
+    if (!desc) return null;
+    return <DefaultPropertyTooltip description={desc} />;
+  };
+
   return (
     <div className={className}>
       {/* basic properties */}
@@ -207,7 +226,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
 
       {/* priority */}
       <WithDisplayPropertiesHOC displayProperties={displayProperties} displayPropertyKey="priority">
-        <div className="h-5" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
+        <div className="h-5 flex items-center gap-1" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
           <PriorityDropdown
             value={issue?.priority}
             onChange={handlePriority}
@@ -216,6 +235,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             renderByDefault={isMobile}
             showTooltip
           />
+          {defaultPropTooltip("priority")}
         </div>
       </WithDisplayPropertiesHOC>
 
@@ -260,7 +280,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
         displayPropertyKey="start_date"
         shouldRenderProperty={() => !isDateRangeEnabled}
       >
-        <div className="h-5" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
+        <div className="h-5 flex items-center gap-1" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
           <DateDropdown
             value={issue.start_date ?? null}
             onChange={handleStartDate}
@@ -274,6 +294,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             showTooltip
             labelClassName="text-caption-sm-regular"
           />
+          {defaultPropTooltip("start_date")}
         </div>
       </WithDisplayPropertiesHOC>
 
@@ -283,7 +304,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
         displayPropertyKey="due_date"
         shouldRenderProperty={() => !isDateRangeEnabled}
       >
-        <div className="h-5" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
+        <div className="h-5 flex items-center gap-1" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
           <DateDropdown
             value={issue?.target_date ?? null}
             onChange={handleTargetDate}
@@ -301,12 +322,13 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             showTooltip
             labelClassName="text-caption-sm-regular"
           />
+          {defaultPropTooltip("target_date")}
         </div>
       </WithDisplayPropertiesHOC>
 
       {/* assignee */}
       <WithDisplayPropertiesHOC displayProperties={displayProperties} displayPropertyKey="assignee">
-        <div className="h-5" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
+        <div className="h-5 flex items-center gap-1" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
           <MemberDropdown
             projectId={issue?.project_id}
             value={issue?.assignee_ids}
@@ -321,6 +343,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             tooltipContent=""
             renderByDefault={isMobile}
           />
+          {defaultPropTooltip("assignee_ids")}
         </div>
       </WithDisplayPropertiesHOC>
 
@@ -330,7 +353,11 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             {/* modules */}
             {projectDetails?.module_view && (
               <WithDisplayPropertiesHOC displayProperties={displayProperties} displayPropertyKey="modules">
-                <div className="h-5" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
+                <div
+                  className="h-5 flex items-center gap-1"
+                  onFocus={handleEventPropagation}
+                  onClick={handleEventPropagation}
+                >
                   <ModuleDropdown
                     buttonContainerClassName="truncate max-w-40"
                     projectId={issue?.project_id}
@@ -343,6 +370,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
                     showCount
                     showTooltip
                   />
+                  {defaultPropTooltip("module_ids")}
                 </div>
               </WithDisplayPropertiesHOC>
             )}
@@ -350,7 +378,11 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             {/* cycles */}
             {projectDetails?.cycle_view && (
               <WithDisplayPropertiesHOC displayProperties={displayProperties} displayPropertyKey="cycle">
-                <div className="h-5" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
+                <div
+                  className="h-5 flex items-center gap-1"
+                  onFocus={handleEventPropagation}
+                  onClick={handleEventPropagation}
+                >
                   <CycleDropdown
                     buttonContainerClassName="truncate max-w-40"
                     projectId={issue?.project_id}
@@ -361,6 +393,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
                     renderByDefault={isMobile}
                     showTooltip
                   />
+                  {defaultPropTooltip("cycle_id")}
                 </div>
               </WithDisplayPropertiesHOC>
             )}
@@ -371,7 +404,11 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
       {/* estimates */}
       {projectId && areEstimateEnabledByProjectId(projectId?.toString()) && (
         <WithDisplayPropertiesHOC displayProperties={displayProperties} displayPropertyKey="estimate">
-          <div className="h-5" onFocus={handleEventPropagation} onClick={handleEventPropagation}>
+          <div
+            className="h-5 flex items-center gap-1"
+            onFocus={handleEventPropagation}
+            onClick={handleEventPropagation}
+          >
             <EstimateDropdown
               value={issue.estimate_point ?? undefined}
               onChange={handleEstimate}
@@ -381,6 +418,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
               renderByDefault={isMobile}
               showTooltip
             />
+            {defaultPropTooltip("estimate_point")}
           </div>
         </WithDisplayPropertiesHOC>
       )}

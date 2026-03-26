@@ -16,7 +16,7 @@ import { useProject } from "@/hooks/store/use-project";
 import { useUser } from "@/hooks/store/user";
 import { useDefaultPropertyConfig } from "@/hooks/store/use-default-property-config";
 // components
-import { ExtraPropertyDescriptionPopover } from "@/components/issues/extra-properties/description-popover";
+import { DefaultPropertyTooltip } from "@/components/issues/extra-properties/default-property-tooltip";
 import useReloadConfirmations from "@/hooks/use-reload-confirmation";
 // plane web components
 import { DeDupeIssuePopoverRoot } from "@/plane-web/components/de-dupe/duplicate-popover";
@@ -93,7 +93,7 @@ export const PeekOverviewIssueDetails = observer(function PeekOverviewIssueDetai
     if (!issue.type_id) return null;
     const desc = getDescription(workspaceSlug, issue.type_id, propertyKey);
     if (!desc) return null;
-    return <ExtraPropertyDescriptionPopover description={desc} align={align} />;
+    return <DefaultPropertyTooltip description={desc} align={align} />;
   };
 
   const issueDescription =

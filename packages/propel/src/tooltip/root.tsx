@@ -62,15 +62,24 @@ export function Tooltip(props: ITooltipProps) {
             render={
               <BaseTooltip.Popup>
                 {tooltipHeading && <p className="text-caption-md-medium text-primary">{tooltipHeading}</p>}
-                {tooltipContent && (
-                  <p
-                    className={cn("text-caption-sm-regular text-secondary", {
-                      "mt-1": tooltipHeading && tooltipHeading !== "",
-                    })}
-                  >
-                    {tooltipContent}
-                  </p>
-                )}
+                {tooltipContent &&
+                  (typeof tooltipContent === "string" ? (
+                    <p
+                      className={cn("text-caption-sm-regular text-secondary", {
+                        "mt-1": tooltipHeading && tooltipHeading !== "",
+                      })}
+                    >
+                      {tooltipContent}
+                    </p>
+                  ) : (
+                    <div
+                      className={cn({
+                        "mt-1": tooltipHeading && tooltipHeading !== "",
+                      })}
+                    >
+                      {tooltipContent}
+                    </div>
+                  ))}
               </BaseTooltip.Popup>
             }
           />

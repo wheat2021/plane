@@ -32,7 +32,7 @@ import { useMember } from "@/hooks/store/use-member";
 import { useProject } from "@/hooks/store/use-project";
 import { useProjectState } from "@/hooks/store/use-project-state";
 import { useDefaultPropertyConfig } from "@/hooks/store/use-default-property-config";
-import { ExtraPropertyDescriptionPopover } from "@/components/issues/extra-properties/description-popover";
+import { DefaultPropertyTooltip } from "@/components/issues/extra-properties/default-property-tooltip";
 // plane web components
 import { WorkItemAdditionalSidebarProperties } from "@/plane-web/components/issues/issue-details/additional-properties";
 import { IssueParentSelectRoot } from "@/plane-web/components/issues/issue-details/parent-select-root";
@@ -71,7 +71,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
     if (!issue.type_id) return undefined;
     const desc = getDescription(workspaceSlug, issue.type_id, propertyKey);
     if (!desc) return undefined;
-    return <ExtraPropertyDescriptionPopover description={desc} />;
+    return <DefaultPropertyTooltip description={desc} />;
   };
 
   const createdByDetails = getUserDetails(issue?.created_by);
