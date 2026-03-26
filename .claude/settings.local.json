@@ -1,5 +1,0 @@
-{
-  "permissions": {
-    "allow": ["Bash(openspec status:*)", "Bash(python3:*)", "Bash(curl:*)", "Bash(grep:*)"]
-  }
-}
