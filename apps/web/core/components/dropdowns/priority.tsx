@@ -30,6 +30,7 @@ type Props = TDropdownProps & {
   onClose?: () => void;
   value: TIssuePriorities | undefined | null;
   renderByDefault?: boolean;
+  customTooltipContent?: React.ReactNode;
 };
 
 type ButtonProps = {
@@ -44,6 +45,7 @@ type ButtonProps = {
   priority: TIssuePriorities | undefined;
   showTooltip: boolean;
   renderToolTipByDefault?: boolean;
+  customTooltipContent?: React.ReactNode;
 };
 
 function BorderButton(props: ButtonProps) {
@@ -58,6 +60,7 @@ function BorderButton(props: ButtonProps) {
     priority,
     showTooltip,
     renderToolTipByDefault = true,
+    customTooltipContent,
   } = props;
 
   const priorityDetails = ISSUE_PRIORITIES.find((p) => p.key === priority);
@@ -75,8 +78,8 @@ function BorderButton(props: ButtonProps) {
 
   return (
     <Tooltip
-      tooltipHeading={t("priority")}
-      tooltipContent={priorityDetails?.title ?? t("common.none")}
+      tooltipHeading={customTooltipContent ? "" : t("priority")}
+      tooltipContent={customTooltipContent ?? priorityDetails?.title ?? t("common.none")}
       disabled={!showTooltip}
       isMobile={isMobile}
       renderByDefault={renderToolTipByDefault}
@@ -149,6 +152,7 @@ function BackgroundButton(props: ButtonProps) {
     priority,
     showTooltip,
     renderToolTipByDefault = true,
+    customTooltipContent,
   } = props;
 
   const priorityDetails = ISSUE_PRIORITIES.find((p) => p.key === priority);
@@ -166,8 +170,8 @@ function BackgroundButton(props: ButtonProps) {
 
   return (
     <Tooltip
-      tooltipHeading={t("priority")}
-      tooltipContent={t(priorityDetails?.key ?? "none")}
+      tooltipHeading={customTooltipContent ? "" : t("priority")}
+      tooltipContent={customTooltipContent ?? priorityDetails?.title ?? t("common.none")}
       disabled={!showTooltip}
       isMobile={isMobile}
       renderByDefault={renderToolTipByDefault}
@@ -241,6 +245,7 @@ function TransparentButton(props: ButtonProps) {
     priority,
     showTooltip,
     renderToolTipByDefault = true,
+    customTooltipContent,
   } = props;
 
   const priorityDetails = ISSUE_PRIORITIES.find((p) => p.key === priority);
@@ -250,8 +255,8 @@ function TransparentButton(props: ButtonProps) {
 
   return (
     <Tooltip
-      tooltipHeading={t("priority")}
-      tooltipContent={priorityDetails?.title ?? t("common.none")}
+      tooltipHeading={customTooltipContent ? "" : t("priority")}
+      tooltipContent={customTooltipContent ?? priorityDetails?.title ?? t("common.none")}
       disabled={!showTooltip}
       isMobile={isMobile}
       renderByDefault={renderToolTipByDefault}
@@ -334,6 +339,7 @@ export function PriorityDropdown(props: Props) {
     tabIndex,
     value = "none",
     renderByDefault = true,
+    customTooltipContent,
   } = props;
   // states
   const [query, setQuery] = useState("");
@@ -432,6 +438,7 @@ export function PriorityDropdown(props: Props) {
             showTooltip={showTooltip}
             hideText={BUTTON_VARIANTS_WITHOUT_TEXT.includes(buttonVariant)}
             renderToolTipByDefault={renderByDefault}
+            customTooltipContent={customTooltipContent}
           />
         </button>
       )}
