@@ -187,15 +187,19 @@ export class UserStore implements IUserStore {
       if (currentUserData && currentUserData.is_password_autoset && this.data) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const user = await this.authService.setPassword(csrfToken, { password: data.password });
-        set(this.data, ["is_password_autoset"], false);
-        set(this.data, ["is_password_reset_required"], false);
+        runInAction(() => {
+          if (this.data) {
+            set(this.data, ["is_password_autoset"], false);
+            set(this.data, ["is_password_reset_required"], false);
+          }
+        });
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return user;
       }
       return undefined;
     } catch (error) {
-      if (this.data) set(this.data, ["is_password_autoset"], true);
       runInAction(() => {
+        if (this.data) set(this.data, ["is_password_autoset"], true);
         this.error = {
           status: "user-update-error",
           message: "Failed to update current user",

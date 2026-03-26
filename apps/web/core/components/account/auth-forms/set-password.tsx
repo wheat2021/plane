@@ -1,6 +1,5 @@
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { observer } from "mobx-react";
 import { useSearchParams } from "next/navigation";
 // icons
 import { Eye, EyeOff } from "lucide-react";
@@ -35,7 +34,7 @@ const defaultValues: TResetPasswordFormValues = {
 // services
 const authService = new AuthService();
 
-export const SetPasswordForm = observer(function SetPasswordForm() {
+export const SetPasswordForm = function SetPasswordForm() {
   // router
   const router = useAppRouter();
   // search params
@@ -121,7 +120,7 @@ export const SetPasswordForm = observer(function SetPasswordForm() {
               id="email"
               name="email"
               type="email"
-              value={user?.email}
+              value={user?.email ?? ""}
               //hasError={Boolean(errors.email)}
               placeholder={t("auth.common.email.placeholder")}
               className="h-10 w-full border border-strong !bg-surface-1 pr-12 text-placeholder cursor-not-allowed"
@@ -201,4 +200,4 @@ export const SetPasswordForm = observer(function SetPasswordForm() {
       </form>
     </FormContainer>
   );
-});
+};

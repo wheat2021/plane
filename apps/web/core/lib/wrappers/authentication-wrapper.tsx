@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useEffect } from "react";
 import { observer } from "mobx-react";
 import { useSearchParams, usePathname } from "next/navigation";
 import useSWR from "swr";
@@ -72,89 +73,69 @@ export const AuthenticationWrapper = observer(function AuthenticationWrapper(pro
     return redirectionRoute;
   };
 
-  if ((isUserSWRLoading || isUserLoading || workspacesLoader) && !currentUser?.id)
+  // Compute redirect target outside render (null = no redirect, render children)
+  const getRedirectTarget = (): string | null => {
+    const isLoading = (isUserSWRLoading || isUserLoading || workspacesLoader) && !currentUser?.id;
+    if (isLoading) return null;
+
+    if (pageType === EPageTypes.PUBLIC) return null;
+
+    if (pageType === EPageTypes.NON_AUTHENTICATED) {
+      if (!currentUser?.id) return null;
+      if (currentUser?.is_password_autoset || currentUser?.is_password_reset_required) return "/accounts/set-password";
+      if (currentUserProfile?.id && isUserOnboard) return getWorkspaceRedirectionUrl();
+      return "/onboarding";
+    }
+
+    if (pageType === EPageTypes.ONBOARDING) {
+      if (!currentUser?.id) return `/${pathname ? `?next_path=${pathname}` : ``}`;
+      if (currentUser?.is_password_autoset || currentUser?.is_password_reset_required) return "/accounts/set-password";
+      if (currentUser && currentUserProfile?.id && isUserOnboard) return getWorkspaceRedirectionUrl();
+      return null;
+    }
+
+    if (pageType === EPageTypes.SET_PASSWORD) {
+      if (!currentUser?.id) return `/${pathname ? `?next_path=${pathname}` : ``}`;
+      // If user doesn't need to set password, redirect away regardless of onboarding status
+      if (currentUser && !currentUser?.is_password_autoset && !currentUser?.is_password_reset_required) {
+        if (currentUserProfile?.id && isUserOnboard) return getWorkspaceRedirectionUrl();
+        if (currentUserProfile?.id) return "/onboarding";
+        return null; // Profile still loading
+      }
+      return null;
+    }
+
+    if (pageType === EPageTypes.AUTHENTICATED) {
+      if (!currentUser?.id) return `/${pathname ? `?next_path=${pathname}` : ``}`;
+      if (currentUser?.is_password_autoset || currentUser?.is_password_reset_required) return "/accounts/set-password";
+      if (currentUserProfile?.id && isUserOnboard) return null;
+      return "/onboarding";
+    }
+
+    return null;
+  };
+
+  const redirectTarget = getRedirectTarget();
+
+  // All navigation happens in useEffect to avoid setState-during-render warnings
+  useEffect(() => {
+    if (!redirectTarget) return;
+    if (pageType === EPageTypes.ONBOARDING && currentUser?.id && currentUserProfile?.id && isUserOnboard) {
+      router.replace(redirectTarget);
+    } else {
+      router.push(redirectTarget);
+    }
+  }, [redirectTarget]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const isLoading = (isUserSWRLoading || isUserLoading || workspacesLoader) && !currentUser?.id;
+  if (isLoading)
     return (
       <div className="relative flex h-screen w-full items-center justify-center">
         <LogoSpinner />
       </div>
     );
 
-  if (pageType === EPageTypes.PUBLIC) return <>{children}</>;
-
-  if (pageType === EPageTypes.NON_AUTHENTICATED) {
-    if (!currentUser?.id) return <>{children}</>;
-    else {
-      // 强制改密优先于所有其他跳转
-      if (currentUser?.is_password_autoset || currentUser?.is_password_reset_required) {
-        router.push("/accounts/set-password");
-        return <></>;
-      }
-      if (currentUserProfile?.id && isUserOnboard) {
-        const currentRedirectRoute = getWorkspaceRedirectionUrl();
-        router.push(currentRedirectRoute);
-        return <></>;
-      } else {
-        router.push("/onboarding");
-        return <></>;
-      }
-    }
-  }
-
-  if (pageType === EPageTypes.ONBOARDING) {
-    if (!currentUser?.id) {
-      router.push(`/${pathname ? `?next_path=${pathname}` : ``}`);
-      return <></>;
-    } else {
-      // 强制改密优先于 onboarding
-      if (currentUser?.is_password_autoset || currentUser?.is_password_reset_required) {
-        router.push("/accounts/set-password");
-        return <></>;
-      }
-      if (currentUser && currentUserProfile?.id && isUserOnboard) {
-        const currentRedirectRoute = getWorkspaceRedirectionUrl();
-        router.replace(currentRedirectRoute);
-        return <></>;
-      } else return <>{children}</>;
-    }
-  }
-
-  if (pageType === EPageTypes.SET_PASSWORD) {
-    if (!currentUser?.id) {
-      router.push(`/${pathname ? `?next_path=${pathname}` : ``}`);
-      return <></>;
-    } else {
-      // Redirect away only when password is already set AND no forced reset is pending
-      if (
-        currentUser &&
-        !currentUser?.is_password_autoset &&
-        !currentUser?.is_password_reset_required &&
-        currentUserProfile?.id &&
-        isUserOnboard
-      ) {
-        const currentRedirectRoute = getWorkspaceRedirectionUrl();
-        router.push(currentRedirectRoute);
-        return <></>;
-      } else return <>{children}</>;
-    }
-  }
-
-  if (pageType === EPageTypes.AUTHENTICATED) {
-    if (currentUser?.id) {
-      // 强制改密优先于访问任何认证页面
-      if (currentUser?.is_password_autoset || currentUser?.is_password_reset_required) {
-        router.push("/accounts/set-password");
-        return <></>;
-      }
-      if (currentUserProfile && currentUserProfile?.id && isUserOnboard) return <>{children}</>;
-      else {
-        router.push(`/onboarding`);
-        return <></>;
-      }
-    } else {
-      router.push(`/${pathname ? `?next_path=${pathname}` : ``}`);
-      return <></>;
-    }
-  }
+  if (redirectTarget) return <></>;
 
   return <>{children}</>;
 });
