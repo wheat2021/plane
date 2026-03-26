@@ -113,3 +113,5 @@ build/
 temp/
 scripts/
 jira_data/
+.kiro/
+.factory/
