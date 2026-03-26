@@ -113,5 +113,9 @@ build/
 temp/
 scripts/
 jira_data/
+
+# coding tools
 .kiro/
 .factory/
+.agent/
+.claude/

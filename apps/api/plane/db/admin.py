@@ -137,7 +137,7 @@ class EmployeeUserAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
-        extra_context["reset_password_url"] = f"reset-password/"
+        extra_context["reset_password_url"] = "../reset-password/"
         return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
     # ------------------------------------------------------------------
