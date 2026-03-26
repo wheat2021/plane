@@ -4,7 +4,7 @@ description: FICC 专用 Jira → Plane 迁移助手。分析 Jira CSV/XLSX、�
 license: MIT
 metadata:
   author: ficc-local
-  version: "1.3"
+  version: "1.4"
 ---
 
 # Plane 迁移助手（FICC 专用）
@@ -24,7 +24,40 @@ metadata:
 
 ---
 
-## FICC 固定配置
+## 生产环境配置（FICC 专用）
+
+```
+生产服务器:  appadmin@10.102.21.231
+容器名:      api（不是 plane-api-1）
+workspace:   ficc
+project_id:  f5a45eb3-66a3-48cb-8c96-d09f80791645
+服务地址:    http://10.102.21.231:8080
+```
+
+**生产导入标准流程**（参考 `data/requirement-reimport-2026/`）：
+
+```bash
+# 1. 传输脚本和数据到生产服务器
+rsync -av data/<任务目录>/ appadmin@10.102.21.231:/home/appadmin/plane-data/<任务目录>/
+
+# 2. 导入用户（首次）
+rsync -av jira_data/import_users.py jira_data/prod_user_import.json \
+  appadmin@10.102.21.231:/home/appadmin/plane-data/
+ssh appadmin@10.102.21.231 "cd /home/appadmin/plane-data && python3 import_users.py --env prod"
+
+# 3. 执行数据导入
+ssh appadmin@10.102.21.231 "cd /home/appadmin/plane-data/<任务目录> && python3 reimport_all.py --env prod --clean"
+```
+
+**已知生产环境约束**：
+
+- Python 版本为 3.7，不支持 `list[dict]`、`dict[str, str]` 等 3.9+ 类型注解，需用 `list`、`dict` 替代
+- `import_users.py` 创建用户时必须设置 `username=email`，否则触发唯一约束冲突
+- `import_users.py` 用 `id=u['id']` 保留 Dev UUID，生产用户 UUID 与 Dev 完全一致，无需 UUID 替换
+
+---
+
+## FICC 固定配置（Dev 环境）
 
 在整个 skill 执行过程中使用以下常量，不要询问用户：
 
@@ -467,12 +500,64 @@ Module 关联: X 个 module，共 XX 条 issue
 
 ## 已知 API 限制（勿踩坑）
 
-| 操作         | 正确方式                               | 错误方式                                            |
-| ------------ | -------------------------------------- | --------------------------------------------------- |
-| 创建 Cycle   | Django Shell（需 `owned_by` 字段）     | REST POST /cycles/（返回 "Project ID is required"） |
-| 创建 Module  | Django Shell                           | REST POST /modules/（同样有问题）                   |
-| 查询 members | REST GET /members/                     | —                                                   |
-| 创建 issue   | REST POST /issues/                     | —                                                   |
-| 关联 Cycle   | REST POST /cycles/{id}/cycle-issues/   | —                                                   |
-| 关联 Module  | REST POST /modules/{id}/module-issues/ | —                                                   |
-| issue 字段名 | `"state": <UUID>`                      | `"state_id": <UUID>`（无效）                        |
+| 操作         | 正确方式                                                                  | 错误方式                                                   |
+| ------------ | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| 创建 Cycle   | Django Shell（需 `owned_by` 字段）                                        | REST POST /cycles/（返回 "Project ID is required"）        |
+| 创建 Module  | Django Shell                                                              | REST POST /modules/（同样有问题）                          |
+| 查询 members | REST GET /members/                                                        | —                                                          |
+| 创建 issue   | Django Shell bulk_create（推荐）或 REST POST /issues/                     | —                                                          |
+| 关联 Cycle   | Django Shell bulk_create（推荐，支持已完成Cycle）                         | REST POST /cycles/{id}/cycle-issues/（已完成Cycle返回400） |
+| 关联 Module  | Django Shell bulk_create（推荐）或 REST POST /modules/{id}/module-issues/ | —                                                          |
+| issue 字段名 | `"state": <UUID>`（REST API）                                             | `"state_id": <UUID>`（无效）                               |
+
+---
+
+## Phase 5 替代方案：Django Shell 全量导入
+
+**适用场景**：批量迁移导入（>50 条）、存在已完成 Cycle、无 webhook 需求。
+
+**不适用场景**：需要触发通知/活动日志、无 Docker/SSH 访问权限。
+
+**对比**：
+
+| 维度         | REST API             | Django Shell        |
+| ------------ | -------------------- | ------------------- |
+| 速度         | ~1s/条（含限流等待） | 秒级（bulk_create） |
+| 限流         | 有（429）            | 无                  |
+| 已完成 Cycle | 拒绝关联（400）      | 无限制              |
+| 活动日志     | 自动记录             | 不记录              |
+| 业务校验     | 完整                 | 绕过                |
+
+**核心代码模式**：
+
+```python
+# 单次 docker exec 完成所有操作
+script = f"""
+import json
+from plane.db.models import Issue, IssueAssignee, CycleIssue, ModuleIssue, State, ...
+
+# 查询 closed state（已结束迭代使用）
+closed_state = State.objects.filter(project=proj, group='cancelled').first()
+
+# bulk_create Issues
+issues = Issue.objects.bulk_create([
+    Issue(workspace=ws, project=proj, name=d['name'],
+          state_id=closed_state.id if d['cycle_name'] in CLOSED_CYCLES else d['state_id'],
+          extra_properties=d['extra_properties'], ...)
+    for d in issues_data
+])
+
+# bulk_create CycleIssue（支持已完成 Cycle）
+CycleIssue.objects.bulk_create([
+    CycleIssue(workspace=ws, project=proj, cycle_id=..., issue_id=str(i.id), ...)
+    for i in issues
+], ignore_conflicts=True)
+
+# bulk_create ModuleIssue
+ModuleIssue.objects.bulk_create([...], ignore_conflicts=True)
+"""
+subprocess.run(["docker", "exec", "-i", container, "python", "manage.py", "shell"],
+               input=script, ...)
+```
+
+> ⚠️ `bulk_create` 返回的对象在 PostgreSQL 上会填充 `id`，可直接用于后续关联。
