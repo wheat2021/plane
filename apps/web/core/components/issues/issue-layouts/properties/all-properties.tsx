@@ -303,6 +303,12 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             renderByDefault={isMobile}
             showTooltip
             labelClassName="text-caption-sm-regular"
+            customTooltipContent={getCustomTooltipContent(
+              "start_date",
+              issue.start_date
+                ? (renderFormattedPayloadDate(new Date(issue.start_date)) ?? t("common.none"))
+                : t("common.none")
+            )}
           />
         </div>
       </WithDisplayPropertiesHOC>
@@ -330,6 +336,12 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             renderByDefault={isMobile}
             showTooltip
             labelClassName="text-caption-sm-regular"
+            customTooltipContent={getCustomTooltipContent(
+              "target_date",
+              issue.target_date
+                ? (renderFormattedPayloadDate(new Date(issue.target_date)) ?? t("common.none"))
+                : t("common.none")
+            )}
           />
         </div>
       </WithDisplayPropertiesHOC>
@@ -350,6 +362,10 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             optionsClassName="z-10"
             tooltipContent=""
             renderByDefault={isMobile}
+            customTooltipContent={getCustomTooltipContent(
+              "assignee_ids",
+              `${issue.assignee_ids?.length ?? 0} ${issue.assignee_ids?.length !== 1 ? t("assignees") : t("assignee")}`
+            )}
           />
         </div>
       </WithDisplayPropertiesHOC>
@@ -372,6 +388,10 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
                     buttonVariant="border-with-text"
                     showCount
                     showTooltip
+                    customTooltipContent={getCustomTooltipContent(
+                      "module_ids",
+                      `${issue.module_ids?.length ?? 0} ${t("common.module")}${issue.module_ids?.length !== 1 ? "s" : ""}`
+                    )}
                   />
                 </div>
               </WithDisplayPropertiesHOC>
@@ -390,6 +410,10 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
                     buttonVariant="border-with-text"
                     renderByDefault={isMobile}
                     showTooltip
+                    customTooltipContent={getCustomTooltipContent(
+                      "cycle_id",
+                      issue.cycle_id ? issue.cycle_id : t("common.none")
+                    )}
                   />
                 </div>
               </WithDisplayPropertiesHOC>
@@ -410,6 +434,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
               buttonVariant="border-with-text"
               renderByDefault={isMobile}
               showTooltip
+              customTooltipContent={getCustomTooltipContent("estimate_point", issue.estimate_point ?? t("common.none"))}
             />
           </div>
         </WithDisplayPropertiesHOC>

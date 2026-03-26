@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
@@ -14,6 +15,7 @@ type TMemberDropdownProps = {
   optionsClassName?: string;
   projectId?: string;
   renderByDefault?: boolean;
+  customTooltipContent?: React.ReactNode;
 } & MemberDropdownProps;
 
 export const MemberDropdown = observer(function MemberDropdown(props: TMemberDropdownProps) {

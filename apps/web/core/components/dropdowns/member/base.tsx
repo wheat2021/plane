@@ -25,6 +25,7 @@ type TMemberDropdownBaseProps = {
   onDropdownOpen?: () => void;
   optionsClassName?: string;
   renderByDefault?: boolean;
+  customTooltipContent?: React.ReactNode;
 } & MemberDropdownProps;
 
 export const MemberDropdownBase = observer(function MemberDropdownBase(props: TMemberDropdownBaseProps) {
@@ -55,6 +56,7 @@ export const MemberDropdownBase = observer(function MemberDropdownBase(props: TM
     tabIndex,
     tooltipContent,
     value,
+    customTooltipContent,
   } = props;
   // refs
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -134,9 +136,11 @@ export const MemberDropdownBase = observer(function MemberDropdownBase(props: TM
           <DropdownButton
             className={cn("text-11", buttonClassName)}
             isActive={isOpen}
-            tooltipHeading={placeholder}
+            tooltipHeading={customTooltipContent ? "" : placeholder}
             tooltipContent={
-              tooltipContent ?? `${value?.length ?? 0} ${value?.length !== 1 ? t("assignees") : t("assignee")}`
+              customTooltipContent ??
+              tooltipContent ??
+              `${value?.length ?? 0} ${value?.length !== 1 ? t("assignees") : t("assignee")}`
             }
             showTooltip={showTooltip}
             variant={buttonVariant}

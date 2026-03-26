@@ -36,6 +36,7 @@ type Props = TDropdownProps & {
   formatToken?: string;
   renderByDefault?: boolean;
   labelClassName?: string;
+  customTooltipContent?: React.ReactNode;
 };
 
 export const DateDropdown = observer(function DateDropdown(props: Props) {
@@ -64,6 +65,7 @@ export const DateDropdown = observer(function DateDropdown(props: Props) {
     formatToken,
     renderByDefault = true,
     labelClassName = "",
+    customTooltipContent,
   } = props;
   // states
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -132,8 +134,8 @@ export const DateDropdown = observer(function DateDropdown(props: Props) {
       <DropdownButton
         className={buttonClassName}
         isActive={isOpen}
-        tooltipHeading={placeholder}
-        tooltipContent={value ? renderFormattedDate(value, formatToken) : "None"}
+        tooltipHeading={customTooltipContent ? "" : placeholder}
+        tooltipContent={customTooltipContent ?? (value ? renderFormattedDate(value, formatToken) : "None")}
         showTooltip={showTooltip}
         variant={buttonVariant}
         renderToolTipByDefault={renderByDefault}

@@ -17,6 +17,7 @@ type TModuleDropdownProps = TDropdownProps & {
   onClose?: () => void;
   renderByDefault?: boolean;
   itemClassName?: string;
+  customTooltipContent?: React.ReactNode;
 } & (
     | {
         multiple: false;

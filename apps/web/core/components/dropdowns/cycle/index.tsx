@@ -27,6 +27,7 @@ type Props = TDropdownProps & {
   canRemoveCycle?: boolean;
   renderByDefault?: boolean;
   currentCycleId?: string;
+  customTooltipContent?: React.ReactNode;
 };
 
 export const CycleDropdown = observer(function CycleDropdown(props: Props) {
@@ -51,6 +52,7 @@ export const CycleDropdown = observer(function CycleDropdown(props: Props) {
     canRemoveCycle = true,
     renderByDefault = true,
     currentCycleId,
+    customTooltipContent,
   } = props;
   // i18n
   const { t } = useTranslation();
@@ -109,8 +111,8 @@ export const CycleDropdown = observer(function CycleDropdown(props: Props) {
           <DropdownButton
             className={buttonClassName}
             isActive={isOpen}
-            tooltipHeading={t("common.cycle")}
-            tooltipContent={selectedName ?? placeholder}
+            tooltipHeading={customTooltipContent ? "" : t("common.cycle")}
+            tooltipContent={customTooltipContent ?? selectedName ?? placeholder}
             showTooltip={showTooltip}
             variant={buttonVariant}
             renderToolTipByDefault={renderByDefault}

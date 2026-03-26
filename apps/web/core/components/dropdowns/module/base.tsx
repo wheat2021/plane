@@ -28,6 +28,7 @@ type TModuleDropdownBaseProps = TDropdownProps & {
   projectId: string | undefined;
   renderByDefault?: boolean;
   showCount?: boolean;
+  customTooltipContent?: React.ReactNode;
 } & (
     | {
         multiple: false;
@@ -66,6 +67,7 @@ export const ModuleDropdownBase = observer(function ModuleDropdownBase(props: TM
     showTooltip = false,
     tabIndex,
     value,
+    customTooltipContent,
   } = props;
   // i18n
   const { t } = useTranslation();
@@ -137,14 +139,15 @@ export const ModuleDropdownBase = observer(function ModuleDropdownBase(props: TM
           <DropdownButton
             className={buttonClassName}
             isActive={isOpen}
-            tooltipHeading={t("common.module")}
+            tooltipHeading={customTooltipContent ? "" : t("common.module")}
             tooltipContent={
-              Array.isArray(value)
+              customTooltipContent ??
+              (Array.isArray(value)
                 ? `${value
                     .map((moduleId) => getModuleById(moduleId)?.name)
                     .toString()
                     .replaceAll(",", ", ")}`
-                : ""
+                : "")
             }
             showTooltip={showTooltip}
             variant={buttonVariant}

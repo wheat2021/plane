@@ -29,6 +29,7 @@ type Props = TDropdownProps & {
   projectId: string | undefined;
   value: string | undefined | null;
   renderByDefault?: boolean;
+  customTooltipContent?: React.ReactNode;
 };
 
 type DropdownOptions =
@@ -59,6 +60,7 @@ export const EstimateDropdown = observer(function EstimateDropdown(props: Props)
     tabIndex,
     value,
     renderByDefault = true,
+    customTooltipContent,
   } = props;
   // i18n
   const { t } = useTranslation();
@@ -183,8 +185,8 @@ export const EstimateDropdown = observer(function EstimateDropdown(props: Props)
           <DropdownButton
             className={buttonClassName}
             isActive={isOpen}
-            tooltipHeading={t("project_settings.estimates.label")}
-            tooltipContent={selectedEstimate ? selectedEstimate?.value : placeholder}
+            tooltipHeading={customTooltipContent ? "" : t("project_settings.estimates.label")}
+            tooltipContent={customTooltipContent ?? (selectedEstimate ? selectedEstimate?.value : placeholder)}
             showTooltip={showTooltip}
             variant={buttonVariant}
             renderToolTipByDefault={renderByDefault}
