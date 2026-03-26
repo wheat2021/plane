@@ -68,7 +68,7 @@ function BorderButton(props: ButtonProps) {
     <Tooltip
       tooltipHeading={tooltipHeading}
       tooltipContent={<>{tooltipContent}</>}
-      disabled={!showTooltip}
+      disabled={!showTooltip && !tooltipContent}
       isMobile={isMobile}
       renderByDefault={renderToolTipByDefault}
     >
@@ -96,7 +96,7 @@ function BackgroundButton(props: ButtonProps) {
     <Tooltip
       tooltipHeading={tooltipHeading}
       tooltipContent={<>{tooltipContent}</>}
-      disabled={!showTooltip}
+      disabled={!showTooltip && !tooltipContent}
       isMobile={isMobile}
       renderByDefault={renderToolTipByDefault}
     >
@@ -121,7 +121,7 @@ function TransparentButton(props: ButtonProps) {
     <Tooltip
       tooltipHeading={tooltipHeading}
       tooltipContent={<>{tooltipContent}</>}
-      disabled={!showTooltip}
+      disabled={!showTooltip && !tooltipContent}
       isMobile={isMobile}
       renderByDefault={renderToolTipByDefault}
     >
