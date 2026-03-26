@@ -31,6 +31,7 @@ import { StateDropdown } from "@/components/dropdowns/state/dropdown";
 import { useProjectEstimates } from "@/hooks/store/estimates";
 import { useIssues } from "@/hooks/store/use-issues";
 import { useLabel } from "@/hooks/store/use-label";
+import { useMember } from "@/hooks/store/use-member";
 import { useProject } from "@/hooks/store/use-project";
 import { useProjectState } from "@/hooks/store/use-project-state";
 import { useAppRouter } from "@/hooks/use-app-router";
@@ -70,6 +71,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
   // store hooks
   const { getProjectById } = useProject();
   const { labelMap } = useLabel();
+  const { getUserDetails } = useMember();
   const storeType = useIssueStoreType();
   const {
     issues: { changeModulesInIssue },
@@ -364,7 +366,10 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
             renderByDefault={isMobile}
             customTooltipContent={getCustomTooltipContent(
               "assignee_ids",
-              `${issue.assignee_ids?.length ?? 0} ${issue.assignee_ids?.length !== 1 ? t("assignees") : t("assignee")}`
+              issue.assignee_ids
+                ?.map((id) => getUserDetails(id)?.display_name)
+                .filter(Boolean)
+                .join(", ") || t("common.none")
             )}
           />
         </div>
