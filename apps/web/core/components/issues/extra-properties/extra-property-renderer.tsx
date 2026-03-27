@@ -7,7 +7,7 @@ import { Type, AlignLeft, User, Link2 } from "lucide-react";
 import type { TExtraPropertyConfig, TExtraPropertyValue, TIssueExtraProperties } from "@plane/types";
 // components
 import { SidebarPropertyListItem } from "@/components/common/layout/sidebar/property-list-item";
-import { ExtraPropertyDescriptionPopover } from "./description-popover";
+import { DefaultPropertyTooltip } from "./default-property-tooltip";
 import { ExtraPropertyControl } from "./extra-property-control";
 
 interface IExtraPropertyRenderer {
@@ -62,9 +62,7 @@ export const ExtraPropertyRenderer: FC<IExtraPropertyRenderer> = observer((props
             key={config.id}
             icon={Icon}
             label={`${config.label}${isRequired ? " *" : ""}`}
-            appendElement={
-              config.description ? <ExtraPropertyDescriptionPopover description={config.description} /> : undefined
-            }
+            appendElement={config.description ? <DefaultPropertyTooltip description={config.description} /> : undefined}
           >
             <ExtraPropertyControl
               config={config}

@@ -34,7 +34,7 @@ import { useIssueModal } from "@/hooks/context/use-issue-modal";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useProject } from "@/hooks/store/use-project";
 import { useDefaultPropertyConfig } from "@/hooks/store/use-default-property-config";
-import { ExtraPropertyDescriptionPopover } from "@/components/issues/extra-properties/description-popover";
+import { DefaultPropertyTooltip } from "@/components/issues/extra-properties/default-property-tooltip";
 import { useProjectState } from "@/hooks/store/use-project-state";
 import { useWorkspaceDraftIssues } from "@/hooks/store/workspace-draft";
 import { usePlatformOS } from "@/hooks/use-platform-os";
@@ -134,7 +134,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
   } = useIssueDetail();
   const { fetchCycles } = useProjectIssueProperties();
   const { getStateById } = useProjectState();
-  const { getDescription } = useDefaultPropertyConfig();
+  const { getAlias, getDescription } = useDefaultPropertyConfig();
 
   // form info
   const methods = useForm<TIssue>({
@@ -164,7 +164,13 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
     if (!typeId || !workspaceSlug) return null;
     const desc = getDescription(workspaceSlug.toString(), typeId, propertyKey);
     if (!desc) return null;
-    return <ExtraPropertyDescriptionPopover description={desc} align={align} />;
+    return <DefaultPropertyTooltip description={desc} align={align} />;
+  };
+
+  const formPropAlias = (propertyKey: string, fallback: string) => {
+    const typeId = watch("type_id");
+    if (!typeId || !workspaceSlug) return fallback;
+    return getAlias(workspaceSlug.toString(), typeId, propertyKey) || fallback;
   };
 
   // derived values
@@ -457,7 +463,7 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
               )}
               <div className="space-y-1">
                 <div className="flex items-center gap-1">
-                  <span className="text-body-xs-medium text-secondary">{t("title")}</span>
+                  <span className="text-body-xs-medium text-secondary">{formPropAlias("title", t("title"))}</span>
                   <span className="text-red-500">*</span>
                   {formPropAppend("title")}
                 </div>
@@ -478,7 +484,9 @@ export const IssueFormRoot = observer(function IssueFormRoot(props: IssueFormPro
             >
               <div className="px-5">
                 <div className="flex items-center gap-1 mb-1">
-                  <span className="text-body-xs-medium text-secondary">{t("description")}</span>
+                  <span className="text-body-xs-medium text-secondary">
+                    {formPropAlias("description", t("description"))}
+                  </span>
                   {formPropAppend("description")}
                 </div>
                 <IssueDescriptionEditor
