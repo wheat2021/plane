@@ -26,11 +26,13 @@ from typing import Optional, Dict, Tuple, Any, Union, List
 # Sentinel value for issues whose type does not support the extra property
 EP_NONE_UNSUPPORTED = "__none_unsupported__"
 EP_PREFIX = "extra_property:"
-EP_ANNOTATION_PREFIX = "ep__"
+# Single underscore prefix to avoid Django ORM interpreting "ep__field" as a
+# cross-relation lookup (Django uses __ as the relation separator in field lookups).
+EP_ANNOTATION_PREFIX = "ep_"
 
 
 def ep_annotation_name(group_by: str) -> str:
-    """Convert 'extra_property:severity' → 'ep__severity' (valid Django annotation name)."""
+    """Convert 'extra_property:severity' → 'ep_severity' (valid Django annotation name)."""
     return EP_ANNOTATION_PREFIX + group_by[len(EP_PREFIX) :]
 
 
