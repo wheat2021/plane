@@ -57,7 +57,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
   const { t } = useTranslation();
   // store hooks
   const { getProjectById } = useProject();
-  const { getDescription } = useDefaultPropertyConfig();
+  const { getAlias, getDescription } = useDefaultPropertyConfig();
   const {
     issue: { getIssueById },
   } = useIssueDetail();
@@ -72,6 +72,11 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
     const desc = getDescription(workspaceSlug, issue.type_id, propertyKey);
     if (!desc) return undefined;
     return <DefaultPropertyTooltip description={desc} />;
+  };
+
+  const defaultPropLabel = (propertyKey: string, fallback: string) => {
+    if (!issue.type_id) return fallback;
+    return getAlias(workspaceSlug, issue.type_id, propertyKey) || fallback;
   };
 
   const createdByDetails = getUserDetails(issue?.created_by);
@@ -126,7 +131,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
 
         <SidebarPropertyListItem
           icon={MembersPropertyIcon}
-          label={t("common.assignees")}
+          label={defaultPropLabel("assignee_ids", t("common.assignees"))}
           appendElement={defaultPropAppend("assignee_ids")}
         >
           <MemberDropdown
@@ -150,7 +155,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
 
         <SidebarPropertyListItem
           icon={PriorityPropertyIcon}
-          label={t("common.priority")}
+          label={defaultPropLabel("priority", t("common.priority"))}
           appendElement={defaultPropAppend("priority")}
         >
           <PriorityDropdown
@@ -169,7 +174,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
         {createdByDetails && (
           <SidebarPropertyListItem
             icon={UserCirclePropertyIcon}
-            label={t("common.created_by")}
+            label={defaultPropLabel("created_by", t("common.created_by"))}
             childrenClassName="px-2"
             appendElement={defaultPropAppend("created_by")}
           >
@@ -185,7 +190,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
 
         <SidebarPropertyListItem
           icon={StartDatePropertyIcon}
-          label={t("common.order_by.start_date")}
+          label={defaultPropLabel("start_date", t("common.order_by.start_date"))}
           appendElement={defaultPropAppend("start_date")}
         >
           <DateDropdown
@@ -209,7 +214,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
 
         <SidebarPropertyListItem
           icon={DueDatePropertyIcon}
-          label={t("common.order_by.due_date")}
+          label={defaultPropLabel("target_date", t("common.order_by.due_date"))}
           appendElement={defaultPropAppend("target_date")}
         >
           <div className="flex items-center gap-2 w-full">
@@ -240,7 +245,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
         {isEstimateEnabled && (
           <SidebarPropertyListItem
             icon={EstimatePropertyIcon}
-            label={t("common.estimate")}
+            label={defaultPropLabel("estimate_point", t("common.estimate"))}
             appendElement={defaultPropAppend("estimate_point")}
           >
             <EstimateDropdown
@@ -265,7 +270,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
         {projectDetails?.module_view && (
           <SidebarPropertyListItem
             icon={ModuleIcon}
-            label={t("common.modules")}
+            label={defaultPropLabel("module_ids", t("common.modules"))}
             appendElement={defaultPropAppend("module_ids")}
           >
             <IssueModuleSelect
@@ -282,7 +287,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
         {projectDetails?.cycle_view && (
           <SidebarPropertyListItem
             icon={CycleIcon}
-            label={t("common.cycle")}
+            label={defaultPropLabel("cycle_id", t("common.cycle"))}
             appendElement={
               <>
                 {defaultPropAppend("cycle_id")}
@@ -303,7 +308,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
 
         <SidebarPropertyListItem
           icon={ParentPropertyIcon}
-          label={t("common.parent")}
+          label={defaultPropLabel("parent_id", t("common.parent"))}
           appendElement={defaultPropAppend("parent_id")}
         >
           <IssueParentSelectRoot
@@ -318,7 +323,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
 
         <SidebarPropertyListItem
           icon={LabelPropertyIcon}
-          label={t("common.labels")}
+          label={defaultPropLabel("label_ids", t("common.labels"))}
           appendElement={defaultPropAppend("label_ids")}
         >
           <IssueLabel workspaceSlug={workspaceSlug} projectId={projectId} issueId={issueId} disabled={disabled} />

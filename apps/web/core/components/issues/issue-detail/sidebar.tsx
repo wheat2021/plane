@@ -84,6 +84,12 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
     return <DefaultPropertyTooltip description={desc} />;
   };
 
+  // helper: return alias if configured, else fallback label
+  const defaultPropLabel = (propertyKey: string, fallback: string) => {
+    if (!issue.type_id) return fallback;
+    return defaultPropertyConfigStore.getAlias(workspaceSlug, issue.type_id, propertyKey) || fallback;
+  };
+
   const minDate = issue.start_date ? getDate(issue.start_date) : null;
   minDate?.setDate(minDate.getDate());
 
@@ -133,7 +139,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
 
             <SidebarPropertyListItem
               icon={MembersPropertyIcon}
-              label={t("common.assignees")}
+              label={defaultPropLabel("assignee_ids", t("common.assignees"))}
               appendElement={defaultPropAppend("assignee_ids")}
             >
               <MemberDropdown
@@ -157,7 +163,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
 
             <SidebarPropertyListItem
               icon={PriorityPropertyIcon}
-              label={t("common.priority")}
+              label={defaultPropLabel("priority", t("common.priority"))}
               appendElement={defaultPropAppend("priority")}
             >
               <PriorityDropdown
@@ -176,7 +182,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
             {createdByDetails && (
               <SidebarPropertyListItem
                 icon={UserCirclePropertyIcon}
-                label={t("common.created_by")}
+                label={defaultPropLabel("created_by", t("common.created_by"))}
                 appendElement={defaultPropAppend("created_by")}
               >
                 <div className="px-2 flex gap-2">
@@ -188,7 +194,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
 
             <SidebarPropertyListItem
               icon={StartDatePropertyIcon}
-              label={t("common.order_by.start_date")}
+              label={defaultPropLabel("start_date", t("common.order_by.start_date"))}
               appendElement={defaultPropAppend("start_date")}
             >
               <DateDropdown
@@ -212,7 +218,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
 
             <SidebarPropertyListItem
               icon={DueDatePropertyIcon}
-              label={t("common.order_by.due_date")}
+              label={defaultPropLabel("target_date", t("common.order_by.due_date"))}
               appendElement={defaultPropAppend("target_date")}
             >
               <div className="flex items-center gap-2 w-full">
@@ -243,7 +249,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
             {projectId && areEstimateEnabledByProjectId(projectId) && (
               <SidebarPropertyListItem
                 icon={EstimatePropertyIcon}
-                label={t("common.estimate")}
+                label={defaultPropLabel("estimate_point", t("common.estimate"))}
                 appendElement={defaultPropAppend("estimate_point")}
               >
                 <EstimateDropdown
@@ -268,7 +274,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
             {projectDetails?.module_view && (
               <SidebarPropertyListItem
                 icon={ModuleIcon}
-                label={t("common.modules")}
+                label={defaultPropLabel("module_ids", t("common.modules"))}
                 appendElement={defaultPropAppend("module_ids")}
               >
                 <IssueModuleSelect
@@ -285,7 +291,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
             {projectDetails?.cycle_view && (
               <SidebarPropertyListItem
                 icon={CycleIcon}
-                label={t("common.cycle")}
+                label={defaultPropLabel("cycle_id", t("common.cycle"))}
                 appendElement={
                   <>
                     <TransferHopInfo workItem={issue} />
@@ -306,7 +312,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
 
             <SidebarPropertyListItem
               icon={ParentPropertyIcon}
-              label={t("common.parent")}
+              label={defaultPropLabel("parent_id", t("common.parent"))}
               appendElement={defaultPropAppend("parent_id")}
             >
               <IssueParentSelectRoot
@@ -321,7 +327,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
 
             <SidebarPropertyListItem
               icon={LabelPropertyIcon}
-              label={t("common.labels")}
+              label={defaultPropLabel("label_ids", t("common.labels"))}
               appendElement={defaultPropAppend("label_ids")}
             >
               <IssueLabel
