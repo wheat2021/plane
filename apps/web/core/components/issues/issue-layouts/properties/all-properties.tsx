@@ -38,7 +38,6 @@ import { useAppRouter } from "@/hooks/use-app-router";
 import { useIssueStoreType } from "@/hooks/use-issue-layout-store";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 import { useDefaultPropertyConfig } from "@/hooks/store/use-default-property-config";
-import { SimpleMarkdown } from "@/components/issues/extra-properties/simple-markdown";
 // plane web components
 import { WorkItemLayoutAdditionalProperties } from "@/plane-web/components/issues/issue-layouts/additional-properties";
 // local components
@@ -82,7 +81,7 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
   const { areEstimateEnabledByProjectId } = useProjectEstimates();
   const { getStateById } = useProjectState();
   const { isMobile } = usePlatformOS();
-  const { getDescription } = useDefaultPropertyConfig();
+  const { getAlias } = useDefaultPropertyConfig();
   const projectDetails = getProjectById(issue.project_id);
 
   // router
@@ -199,16 +198,14 @@ export const IssueProperties = observer(function IssueProperties(props: IIssuePr
     e.preventDefault();
   };
 
-  // helper: return custom tooltip content (description + value) for a default property if description is set
+  // helper: return custom tooltip content (alias + value) for a default property if alias is set
   const getCustomTooltipContent = (propertyKey: string, value: string) => {
     if (!issue.type_id || !workspaceSlug) return null;
-    const desc = getDescription(workspaceSlug.toString(), issue.type_id, propertyKey);
-    if (!desc) return null;
+    const alias = getAlias(workspaceSlug.toString(), issue.type_id, propertyKey);
+    if (!alias) return null;
     return (
       <div className="space-y-1">
-        <div className="text-caption-sm-regular text-primary">
-          <SimpleMarkdown text={desc} />
-        </div>
+        <div className="text-caption-md-medium text-primary">{alias}</div>
         <div className="text-caption-sm-regular text-secondary">{value}</div>
       </div>
     );

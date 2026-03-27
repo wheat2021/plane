@@ -13,7 +13,11 @@ type Props = {
 export const DefaultPropertyTooltip: FC<Props> = ({ description, align = "left" }: Props) => {
   return (
     <Tooltip
-      tooltipContent={<SimpleMarkdown text={description} />}
+      tooltipContent={
+        <div className="text-caption-sm-regular text-secondary">
+          <SimpleMarkdown text={description} />
+        </div>
+      }
       position={align === "right" ? "right" : "left"}
       sideOffset={8}
     >
