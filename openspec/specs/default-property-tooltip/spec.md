@@ -23,9 +23,9 @@ type Props = {
 - **THEN** 组件 SHALL 显示一个 Info 图标（`size-3.5`，颜色 `text-custom-text-400`）
 - **AND** 图标 SHALL 在 hover 时变为 `text-custom-text-300`
 
-#### Scenario: 点击显示 tooltip
+#### Scenario: hover 显示 tooltip
 
-- **WHEN** 用户点击 Info 图标
+- **WHEN** 用户 hover Info 图标
 - **THEN** 系统 SHALL 显示 tooltip，tooltipContent 为 `<SimpleMarkdown text={description} />` 渲染结果
 
 #### Scenario: align 为 right 时 tooltip 向左展开
@@ -83,3 +83,15 @@ SimpleMarkdown SHALL 支持以下 Markdown 语法：
 
 - **WHEN** 文本包含空行
 - **THEN** 空行 SHALL 渲染为 `<div className="h-1.5"></div>`
+
+---
+
+### ~~Requirement: ExtraPropertyDescriptionPopover 组件~~ (REMOVED)
+
+> **已移除**：被 `DefaultPropertyTooltip` 完全替代。旧组件使用 click-to-toggle 手动状态管理，新组件使用 Radix Tooltip（hover 触发）；新组件与设计系统一致，代码量更少，交互更自然。
+>
+> **Migration**:
+>
+> - `apps/web/core/components/issues/issue-modal/form.tsx`：`formPropAppend` 中的 `ExtraPropertyDescriptionPopover` → `DefaultPropertyTooltip`
+> - `apps/web/core/components/issues/extra-properties/extra-property-renderer.tsx`：`ExtraPropertyDescriptionPopover` → `DefaultPropertyTooltip`
+> - `apps/web/core/components/issues/extra-properties/description-popover.tsx`：文件删除

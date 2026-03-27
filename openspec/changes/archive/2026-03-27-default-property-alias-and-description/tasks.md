@@ -25,7 +25,7 @@
   - 引入 `getAlias` 和 `setAlias`
   - 每行新增 `<input type="text" placeholder="Alias…">` 并排在 description textarea 左侧（固定宽度 `w-28`）
   - 实现 `handleAliasChange` 调用 `setAlias`
-- [ ] 4.2 验证：设置页中每个属性行显示并排的 alias input 和 description textarea
+- [x] 4.2 验证：设置页中每个属性行显示并排的 alias input 和 description textarea
 
 ## 5. 侧边栏与 Peek Overview 属性面板 alias 替换 [UPSTREAM-RISK]
 
@@ -34,7 +34,7 @@
   - 新增 `defaultPropLabel(key, fallback)` helper：返回 `getAlias(ws, typeId, key) || fallback`（type_id 为 null 时直接返回 fallback）
   - 将所有 `SidebarPropertyListItem` 的 `label={t("...")}` 替换为 `label={defaultPropLabel("key", t("..."))}`（8 个属性）
 - [x] 5.2 修改 `apps/web/core/components/issues/peek-overview/properties.tsx`：同上
-- [ ] 5.3 验证：为 priority 配置 alias，侧边栏和 peek-overview 的 "Priority" label 替换为 alias
+- [x] 5.3 验证：为 priority 配置 alias，侧边栏和 peek-overview 的 "Priority" label 替换为 alias
 
 ## 6. 创建表单 alias 标签替换 [UPSTREAM-RISK]
 
@@ -43,7 +43,7 @@
   - 新增 `formPropAlias(key, fallback)` helper：返回 `getAlias(ws, typeId, key) || fallback`（typeId/ws 为空时返回 fallback）
   - 将 title 标签 `{t("title")}` 替换为 `{formPropAlias("title", t("title"))}`
   - 将 description 标签 `{t("description")}` 替换为 `{formPropAlias("description", t("description"))}`
-- [ ] 6.2 验证：为 title 配置 alias，创建表单的 title 标签显示为 alias
+- [x] 6.2 验证：为 title 配置 alias，创建表单的 title 标签显示为 alias
 
 ## 7. 全屏详情与 Peek Overview 新增条件性 label 行 [UPSTREAM-RISK]
 
@@ -53,8 +53,8 @@
   - title 区域：在 `<div className="flex items-start gap-1">` 前插入 `{mainPropLabelRow("title", t("common.title"), "right")}`，并**移除**旧的 `<div className="mt-1 flex-shrink-0">{mainPropAppend(...)}</div>`
   - description 区域：在 `<DescriptionInput>` 前插入 `{mainPropLabelRow("description", t("description"))}`，并**移除**旧的 `<div className="mt-4">{mainPropAppend("description")}</div>`
 - [x] 7.2 修改 `apps/web/core/components/issues/peek-overview/issue-detail.tsx`：同上
-- [ ] 7.3 验证：为 title 配置 alias，全屏详情和 peek-overview 的 title 字段上方显示 alias label 行
-- [ ] 7.4 验证：均未配置时，全屏详情界面与变更前完全一致（无 label 行）
+- [x] 7.3 验证：为 title 配置 alias，全屏详情和 peek-overview 的 title 字段上方显示 alias label 行
+- [x] 7.4 验证：均未配置时，全屏详情界面与变更前完全一致（无 label 行）
 
 ## 8. 提交实现代码
 
@@ -67,11 +67,24 @@
 
 ## 9. 用户验证
 
-- [ ] 9.1 验证 alias 不覆盖 description：为 priority 设置 alias，再设置 description，刷新页面后两者均保留
-- [ ] 9.2 验证侧边栏 alias 替换：为 priority 配置 alias "紧急程度"，侧边栏 label 显示为"紧急程度"
-- [ ] 9.3 验证 ℹ️ 共存：为同一属性同时设置 alias 和 description，侧边栏显示 alias 文字且 ℹ️ 图标正常
-- [ ] 9.4 验证创建表单 alias：为 title 配置 alias "任务名称"，创建表单 title 标签显示"任务名称"
-- [ ] 9.5 验证全屏详情 label 行：为 title 配置 alias，全屏详情 title 字段上方出现 alias label 行
-- [ ] 9.6 验证无配置时无变化：清空所有 alias/description，全屏详情和侧边栏与原来完全一致
-- [ ] 9.7 验证 extra 属性 tooltip：自定义 extra 属性的 ℹ️ 图标仍可正常 hover 显示（迁移到 DefaultPropertyTooltip 后）
-- [ ] 9.8 验证 description-popover.tsx 已删除：全局搜索 `ExtraPropertyDescriptionPopover` 无任何引用
+- [x] 9.1 验证 alias 不覆盖 description：为 priority 设置 alias，再设置 description，刷新页面后两者均保留
+- [x] 9.2 验证侧边栏 alias 替换：为 priority 配置 alias "紧急程度"，侧边栏 label 显示为"紧急程度"
+- [x] 9.3 验证 ℹ️ 共存：为同一属性同时设置 alias 和 description，侧边栏显示 alias 文字且 ℹ️ 图标正常
+- [x] 9.4 验证创建表单 alias：为 title 配置 alias "任务名称"，创建表单 title 标签显示"任务名称"
+- [x] 9.5 验证全屏详情 label 行：为 title 配置 alias，全屏详情 title 字段上方出现 alias label 行
+- [x] 9.6 验证无配置时无变化：清空所有 alias/description，全屏详情和侧边栏与原来完全一致
+- [x] 9.7 验证 extra 属性 tooltip：自定义 extra 属性的 ℹ️ 图标仍可正常 hover 显示（迁移到 DefaultPropertyTooltip 后）
+- [x] 9.8 验证 description-popover.tsx 已删除：全局搜索 `ExtraPropertyDescriptionPopover` 无任何引用
+
+## 10. List/Kanban tooltip 改为显示 alias，统一 tooltip 字体样式
+
+- [x] 10.1 修改 `apps/web/core/components/issues/issue-layouts/properties/all-properties.tsx`：
+  - 新增 `getAlias` 到 `useDefaultPropertyConfig()` 解构
+  - 重构 `getCustomTooltipContent`：改为基于 `alias` 触发（无 alias 返回 null），
+    内容从 `desc + value` 改为 `alias（text-caption-md-medium text-primary）+ value（text-caption-sm-regular text-secondary）`
+- [x] 10.2 修改 `apps/web/core/components/issues/extra-properties/default-property-tooltip.tsx`：
+  - 给 `<SimpleMarkdown>` 包装 `<div className="text-caption-sm-regular text-secondary">`，
+    使 ℹ️ 浮窗字体样式与 list/kanban 标准 tooltip 保持一致
+- [x] 10.3 提交：`#FICC-9999# feat: list/kanban tooltip 改为显示 alias，统一 info 图标浮窗字体样式`
+- [x] 10.4 验证：为 priority 配置 alias，list view 悬停 priority 图标显示 alias + 属性值
+- [x] 10.5 验证：为某属性配置 description，详情侧边栏 ℹ️ 图标浮窗字体样式与 list view tooltip 一致

@@ -8,13 +8,14 @@
 
 ### Requirement: 默认属性 description 配置存储
 
-系统 SHALL 在 localStorage 中，以 workspace + issue type 为维度，存储每个默认属性的自定义 description。
+系统 SHALL 在 localStorage 中，以 workspace + issue type 为维度，存储每个默认属性的自定义 description 和 alias。
 
 #### Scenario: 保存 description
 
 - **WHEN** 用户在设置页为某个默认属性输入 description
-- **THEN** 系统 SHALL 将 description 保存到 localStorage，key 为 `plane-default-prop-config`
-- **AND** 数据结构 SHALL 为 `{ [workspaceSlug]: { [issueTypeId]: { [propertyKey]: { description: string } } } }`
+- **THEN** 系统 SHALL 将 description **合并**保存到 localStorage，key 为 `plane-default-prop-config`
+- **AND** 数据结构 SHALL 为 `{ [workspaceSlug]: { [issueTypeId]: { [propertyKey]: { alias?: string; description?: string } } } }`
+- **AND** 已有的 alias 字段 SHALL NOT 被覆盖
 
 #### Scenario: 读取 description
 
@@ -32,7 +33,7 @@
 
 ### Requirement: 设置页默认属性 description 编辑 UI
 
-在 project work item type 设置页的展开面板中，SHALL 新增 "Default Properties" 区块，允许为每个默认属性配置 description。
+在 project work item type 设置页的展开面板中，SHALL 展示 "Default Properties" 区块，允许为每个默认属性配置 alias 和 description。
 
 #### Scenario: 展示默认属性列表
 
@@ -49,14 +50,14 @@
 
 #### Scenario: 自动保存
 
-- **WHEN** 用户修改 description 时（onChange 事件）
+- **WHEN** 用户修改 description 或 alias 时（onChange 事件）
 - **THEN** 系统 SHALL 立即将新值保存到 localStorage
 - **AND** 不需要额外的"保存"按钮
 
 #### Scenario: 只读模式
 
 - **WHEN** 当前用户无编辑权限
-- **THEN** description 输入区域 SHALL 不可编辑
+- **THEN** description 和 alias 输入区域 SHALL 不可编辑
 
 ---
 
