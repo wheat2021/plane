@@ -3,6 +3,7 @@ import { CalendarDays, LayersIcon, Paperclip } from "lucide-react";
 // types
 import { ISSUE_GROUP_BY_OPTIONS } from "@plane/constants";
 import type { ISvgIcons } from "@plane/propel/icons";
+import type { TExtraPropertyConfig } from "@plane/types";
 import {
   LinkIcon,
   CycleIcon,
@@ -105,12 +106,44 @@ export const SPREADSHEET_COLUMNS: { [key in keyof IIssueDisplayProperties]: TSpr
   attachment_count: SpreadsheetAttachmentColumn,
 };
 
+/**
+ * Returns extra property configs of type "select" that are bound to at least one
+ * issue type in the given project. Used to populate dynamic group-by options.
+ */
+export const useProjectSelectExtraProperties = (projectId?: string): TExtraPropertyConfig[] => {
+  const workspaceSlug = store.workspaceRoot.currentWorkspace?.slug;
+  if (!workspaceSlug || !projectId) return [];
+
+  const allConfigs = store.extraPropertyConfig.getConfigsByWorkspace(workspaceSlug);
+  const selectConfigs = allConfigs.filter((c: TExtraPropertyConfig) => c.type === "select");
+  if (selectConfigs.length === 0) return [];
+
+  // Collect all config IDs bound to any issue type in this project
+  const projectIssueTypes = store.issueType.getProjectIssueTypes(projectId) ?? [];
+  const boundConfigIds = new Set<string>();
+  for (const issueType of projectIssueTypes) {
+    const configIds = store.issueTypeExtraProperty.getConfigIdsByIssueType(projectId, issueType.id);
+    for (const id of configIds) boundConfigIds.add(id);
+  }
+
+  return selectConfigs.filter((c: TExtraPropertyConfig) => boundConfigIds.has(c.id));
+};
+
 export const useGroupByOptions = (
-  options: TIssueGroupByOptions[]
+  options: TIssueGroupByOptions[],
+  projectId?: string
 ): {
   key: TIssueGroupByOptions;
   titleTranslationKey: string;
 }[] => {
-  const groupByOptions = ISSUE_GROUP_BY_OPTIONS.filter((option) => options.includes(option.key));
-  return groupByOptions;
+  const staticOptions = ISSUE_GROUP_BY_OPTIONS.filter((option) => options.includes(option.key));
+
+  // Append dynamic select extra property options
+  const selectExtraProps = useProjectSelectExtraProperties(projectId);
+  const extraOptions = selectExtraProps.map((config: TExtraPropertyConfig) => ({
+    key: `extra_property:${config.key}` as TIssueGroupByOptions,
+    titleTranslationKey: config.label, // label is already a display string, not a translation key
+  }));
+
+  return [...staticOptions, ...extraOptions];
 };

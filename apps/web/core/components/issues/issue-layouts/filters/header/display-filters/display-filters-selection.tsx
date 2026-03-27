@@ -30,6 +30,7 @@ type Props = {
   cycleViewDisabled?: boolean;
   moduleViewDisabled?: boolean;
   isEpic?: boolean;
+  projectId?: string;
 };
 
 export const DisplayFiltersSelection = observer(function DisplayFiltersSelection(props: Props) {
@@ -45,6 +46,7 @@ export const DisplayFiltersSelection = observer(function DisplayFiltersSelection
     cycleViewDisabled = false,
     moduleViewDisabled = false,
     isEpic = false,
+    projectId,
   } = props;
 
   const isDisplayFilterEnabled = (displayFilter: keyof IIssueDisplayFilterOptions) =>
@@ -86,6 +88,7 @@ export const DisplayFiltersSelection = observer(function DisplayFiltersSelection
               })
             }
             ignoreGroupedFilters={[...ignoreGroupedFilters, ...computedIgnoreGroupedFilters]}
+            projectId={projectId}
           />
         </div>
       )}

@@ -11,10 +11,11 @@ type Props = {
   groupByOptions: TIssueGroupByOptions[];
   handleUpdate: (val: TIssueGroupByOptions) => void;
   ignoreGroupedFilters: Partial<TIssueGroupByOptions>[];
+  projectId?: string;
 };
 
 export const FilterGroupBy = observer(function FilterGroupBy(props: Props) {
-  const { displayFilters, groupByOptions, handleUpdate, ignoreGroupedFilters } = props;
+  const { displayFilters, groupByOptions, handleUpdate, ignoreGroupedFilters, projectId } = props;
   // hooks
   const { t } = useTranslation();
   const [previewEnabled, setPreviewEnabled] = useState(true);
@@ -22,7 +23,7 @@ export const FilterGroupBy = observer(function FilterGroupBy(props: Props) {
   const selectedGroupBy = displayFilters?.group_by ?? null;
   const selectedSubGroupBy = displayFilters?.sub_group_by ?? null;
 
-  const options = useGroupByOptions(groupByOptions);
+  const options = useGroupByOptions(groupByOptions, projectId);
 
   return (
     <>

@@ -23,6 +23,7 @@ import { IssueFilterHelperStore } from "../helpers/issue-filter-helper.store";
 // types
 import type { IIssueRootStore } from "../root.store";
 import { ProjectService } from "@/services/project";
+import { store } from "@/lib/store-context";
 // constants
 // services
 
@@ -133,9 +134,20 @@ export class ProjectIssuesFilter extends IssueFilterHelperStore implements IProj
     const _filters = await this.projectService.getProjectUserProperties(workspaceSlug, projectId);
 
     const richFilters = _filters?.rich_filters;
-    const displayFilters = this.computedDisplayFilters(_filters?.display_filters);
+    let displayFilters = this.computedDisplayFilters(_filters?.display_filters);
     const displayProperties = this.computedDisplayProperties(_filters?.display_properties);
     const extraDisplayProperties = this.computedExtraDisplayProperties(_filters?.extra_display_properties);
+
+    // Validate extra_property group_by: reset if the property key no longer exists in this project
+    if (displayFilters?.group_by?.startsWith("extra_property:")) {
+      const propKey = displayFilters.group_by.slice("extra_property:".length);
+      const wsSlug = workspaceSlug;
+      const configs = store.extraPropertyConfig.getConfigsByWorkspace(wsSlug);
+      const configExists = configs.some((c) => c.key === propKey && c.type === "select");
+      if (!configExists) {
+        displayFilters = { ...displayFilters, group_by: null };
+      }
+    }
 
     // fetching the kanban toggle helpers in the local storage
     const kanbanFilters = {

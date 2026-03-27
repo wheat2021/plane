@@ -13,6 +13,7 @@ import type {
   TCycleGroups,
   IIssueDisplayProperties,
   IPragmaticDropPayload,
+  TExtraPropertyConfig,
   TIssue,
   TIssueGroupByOptions,
   IIssueFilterOptions,
@@ -101,9 +102,16 @@ export const getGroupByColumns = ({
   // Return undefined if no valid groupBy
   if (!groupBy) return undefined;
 
+  // Handle dynamic extra_property:* groupBy keys
+  if (groupBy.startsWith("extra_property:")) {
+    const propKey = groupBy.slice("extra_property:".length);
+    return getExtraPropertySelectColumns(propKey, projectId);
+  }
+
   // Map of group by options to their corresponding column getter functions
+  type StaticGroupByColumnTypes = Exclude<GroupByColumnTypes, `extra_property:${string}`>;
   const groupByColumnMap: Record<
-    GroupByColumnTypes,
+    StaticGroupByColumnTypes,
     ({ isWorkspaceLevel, projectId }: TGetColumns) => IGroupByColumn[] | undefined
   > = {
     project: getProjectColumns,
@@ -119,7 +127,48 @@ export const getGroupByColumns = ({
   };
 
   // Get and return the columns for the specified group by option
-  return groupByColumnMap[groupBy]?.({ isWorkspaceLevel, projectId });
+  return groupByColumnMap[groupBy as StaticGroupByColumnTypes]?.({ isWorkspaceLevel, projectId });
+};
+
+const EXTRA_PROPERTY_NONE_UNSUPPORTED = "__none_unsupported__";
+
+/**
+ * Generates group-by columns for a select-type extra property.
+ * Returns option columns, a "None" (no value) column, and a "N/A" (unsupported type) column.
+ */
+const getExtraPropertySelectColumns = (propKey: string, projectId?: string): IGroupByColumn[] | undefined => {
+  const workspaceSlug = store.workspaceRoot.currentWorkspace?.slug;
+  if (!workspaceSlug) return undefined;
+
+  const configs = store.extraPropertyConfig.getConfigsByWorkspace(workspaceSlug);
+  const config = configs.find((c: TExtraPropertyConfig) => c.key === propKey && c.type === "select");
+  if (!config) return undefined;
+
+  const options: Array<{ value: string; label?: string }> = (config.config as { options?: Array<{ value: string; label?: string }> })?.options ?? [];
+
+  const columns: IGroupByColumn[] = options.map((opt) => ({
+    id: opt.value,
+    name: opt.label ?? opt.value,
+    payload: { extra_properties: { [propKey]: opt.value } } as Partial<TIssue>,
+  }));
+
+  // "None" column: supported type but no value set
+  columns.push({
+    id: "None",
+    name: "None",
+    payload: { extra_properties: { [propKey]: null } } as Partial<TIssue>,
+  });
+
+  // "N/A" column: issue type does not support this property — drop disabled
+  columns.push({
+    id: EXTRA_PROPERTY_NONE_UNSUPPORTED,
+    name: "N/A",
+    payload: {},
+    isDropDisabled: true,
+    dropErrorMessage: "此工作项类型不支持该属性",
+  });
+
+  return columns;
 };
 
 const getProjectColumns = (): IGroupByColumn[] | undefined => {
@@ -538,41 +587,65 @@ export const handleGroupDragDrop = async (
 
   // update updatedIssue values based on the source and destination groupIds
   if (source.groupId && destination.groupId && source.groupId !== destination.groupId && groupBy) {
-    const groupKey = ISSUE_FILTER_DEFAULT_DATA[groupBy];
-    let groupValue: any = clone(sourceIssue[groupKey]);
+    if (groupBy.startsWith("extra_property:")) {
+      // Extra property grouping: update extra_properties[propKey] directly
+      const propKey = groupBy.slice("extra_property:".length);
+      // Defensive guard: __none_unsupported__ column is drop-disabled; skip if reached anyway
+      if (destination.groupId !== EXTRA_PROPERTY_NONE_UNSUPPORTED) {
+        const newValue = destination.groupId === "None" ? null : destination.groupId;
+        updatedIssue = {
+          ...updatedIssue,
+          extra_properties: { ...sourceIssue.extra_properties, [propKey]: newValue },
+        };
+      }
+    } else {
+      const groupKey = ISSUE_FILTER_DEFAULT_DATA[groupBy as keyof typeof ISSUE_FILTER_DEFAULT_DATA];
+      let groupValue: any = clone(sourceIssue[groupKey]);
 
-    // If groupValues is an array, remove source groupId and add destination groupId
-    if (Array.isArray(groupValue)) {
-      pull(groupValue, source.groupId);
-      if (destination.groupId !== "None") groupValue = uniq(concat(groupValue, [destination.groupId]));
-    } // else just update the groupValue based on destination groupId
-    else {
-      groupValue = destination.groupId === "None" ? null : destination.groupId;
+      // If groupValues is an array, remove source groupId and add destination groupId
+      if (Array.isArray(groupValue)) {
+        pull(groupValue, source.groupId);
+        if (destination.groupId !== "None") groupValue = uniq(concat(groupValue, [destination.groupId]));
+      } // else just update the groupValue based on destination groupId
+      else {
+        groupValue = destination.groupId === "None" ? null : destination.groupId;
+      }
+
+      // keep track of updates on what was added and what was removed
+      issueUpdates[groupKey] = { ADD: getGroupId(destination.groupId), REMOVE: getGroupId(source.groupId) };
+      updatedIssue = { ...updatedIssue, [groupKey]: groupValue };
     }
-
-    // keep track of updates on what was added and what was removed
-    issueUpdates[groupKey] = { ADD: getGroupId(destination.groupId), REMOVE: getGroupId(source.groupId) };
-    updatedIssue = { ...updatedIssue, [groupKey]: groupValue };
   }
 
   // do the same for subgroup
   // update updatedIssue values based on the source and destination subGroupIds
   if (subGroupBy && source.subGroupId && destination.subGroupId && source.subGroupId !== destination.subGroupId) {
-    const subGroupKey = ISSUE_FILTER_DEFAULT_DATA[subGroupBy];
-    let subGroupValue: any = clone(sourceIssue[subGroupKey]);
+    if (subGroupBy.startsWith("extra_property:")) {
+      const propKey = subGroupBy.slice("extra_property:".length);
+      if (destination.subGroupId !== EXTRA_PROPERTY_NONE_UNSUPPORTED) {
+        const newValue = destination.subGroupId === "None" ? null : destination.subGroupId;
+        updatedIssue = {
+          ...updatedIssue,
+          extra_properties: { ...(updatedIssue.extra_properties ?? sourceIssue.extra_properties), [propKey]: newValue },
+        };
+      }
+    } else {
+      const subGroupKey = ISSUE_FILTER_DEFAULT_DATA[subGroupBy as keyof typeof ISSUE_FILTER_DEFAULT_DATA];
+      let subGroupValue: any = clone(sourceIssue[subGroupKey]);
 
-    // If subGroupValue is an array, remove source subGroupId and add destination subGroupId
-    if (Array.isArray(subGroupValue)) {
-      pull(subGroupValue, source.subGroupId);
-      if (destination.subGroupId !== "None") subGroupValue = uniq(concat(subGroupValue, [destination.subGroupId]));
-    } // else just update the subGroupValue based on destination subGroupId
-    else {
-      subGroupValue = destination.subGroupId === "None" ? null : destination.subGroupId;
+      // If subGroupValue is an array, remove source subGroupId and add destination subGroupId
+      if (Array.isArray(subGroupValue)) {
+        pull(subGroupValue, source.subGroupId);
+        if (destination.subGroupId !== "None") subGroupValue = uniq(concat(subGroupValue, [destination.subGroupId]));
+      } // else just update the subGroupValue based on destination subGroupId
+      else {
+        subGroupValue = destination.subGroupId === "None" ? null : destination.subGroupId;
+      }
+
+      // keep track of updates on what was added and what was removed
+      issueUpdates[subGroupKey] = { ADD: getGroupId(destination.subGroupId), REMOVE: getGroupId(source.subGroupId) };
+      updatedIssue = { ...updatedIssue, [subGroupKey]: subGroupValue };
     }
-
-    // keep track of updates on what was added and what was removed
-    issueUpdates[subGroupKey] = { ADD: getGroupId(destination.subGroupId), REMOVE: getGroupId(source.subGroupId) };
-    updatedIssue = { ...updatedIssue, [subGroupKey]: subGroupValue };
   }
 
   if (updatedIssue && sourceIssue?.project_id) {

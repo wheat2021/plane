@@ -127,6 +127,7 @@ export const HeaderFilters = observer(function HeaderFilters(props: Props) {
           cycleViewDisabled={!currentProjectDetails?.cycle_view}
           moduleViewDisabled={!currentProjectDetails?.module_view}
           isEpic={storeType === EIssuesStoreType.EPIC}
+          projectId={projectId}
         />
       </FiltersDropdown>
       {canUserCreateIssue ? (
