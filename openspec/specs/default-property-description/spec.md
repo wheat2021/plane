@@ -72,8 +72,8 @@
 
 #### Scenario: 点击 ℹ️ 显示弹窗
 
-- **WHEN** 用户点击 ℹ️ 图标
-- **THEN** 系统 SHALL 显示一个浮层，以 Markdown 格式渲染 description 内容
+- **WHEN** 用户点击 ℓ 图标
+- **THEN** 系统 SHALL 通过 `DefaultPropertyTooltip` 组件显示 tooltip，以 Markdown 格式渲染 description 内容
 
 #### Scenario: type_id 为 null 时不显示
 
@@ -132,3 +132,33 @@
 
 - **WHEN** 界面语言切换时
 - **THEN** "Title" 和 "Description" 标签 SHALL 通过 `t("title")` / `t("description")` i18n key 渲染
+
+---
+
+### Requirement: Kanban/List 视图默认属性 description 展示
+
+在 Kanban 和 List 视图的 IssueProperties 组件中，当属性有 description 且 issue 已设置 type 时，SHALL 在属性控件旁通过 tooltip 展示 description。
+
+#### Scenario: IssueProperties 通过 tooltip 显示 description
+
+- **WHEN** issue.type_id 不为 null
+- **AND** 当前 issue type 的该属性有非空 description
+- **THEN** hover 在该属性控件上时，tooltip SHALL 显示 `description\nvalue`（description 较大字体，value 较小字体）
+
+#### Scenario: 无 description 时显示默认 tooltip
+
+- **WHEN** 某属性没有配置 description
+- **THEN** tooltip SHALL 显示该属性的当前值（如 "High"、"张三" 等）
+
+#### Scenario: type_id 为 null 时显示默认 tooltip
+
+- **WHEN** issue.type_id 为 null
+- **THEN** tooltip SHALL 显示该属性的当前值，不显示 description
+
+#### Scenario: description + value tooltip 格式
+
+- **WHEN** tooltip 需要显示 description
+- **THEN** tooltip 内容 SHALL 为两行：
+  - 第一行：description 文本（`text-caption-sm-regular text-primary`），支持 Markdown 渲染
+  - 第二行：属性当前值（`text-caption-sm-regular text-secondary`）
+- **AND** 不显示属性名称标题
