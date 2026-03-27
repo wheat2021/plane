@@ -21,14 +21,17 @@ export const CONFIGURABLE_DEFAULT_PROPERTIES = [
 
 export type TDefaultPropertyKey = (typeof CONFIGURABLE_DEFAULT_PROPERTIES)[number]["key"];
 
-type TStorageData = Record<string, Record<string, Record<string, { description: string }>>>;
+type TPropertyConfig = { alias?: string; description?: string };
+type TStorageData = Record<string, Record<string, Record<string, TPropertyConfig>>>;
 
 export interface IDefaultPropertyConfigStore {
   // observables
   data: TStorageData;
   // computed
+  getAlias: (workspaceSlug: string, issueTypeId: string, propertyKey: string) => string;
   getDescription: (workspaceSlug: string, issueTypeId: string, propertyKey: string) => string;
   // actions
+  setAlias: (workspaceSlug: string, issueTypeId: string, propertyKey: string, alias: string) => void;
   setDescription: (workspaceSlug: string, issueTypeId: string, propertyKey: string, description: string) => void;
 }
 
@@ -38,6 +41,7 @@ export class DefaultPropertyConfigStore implements IDefaultPropertyConfigStore {
   constructor() {
     makeObservable(this, {
       data: observable,
+      setAlias: action,
       setDescription: action,
     });
     this._loadFromStorage();
@@ -65,12 +69,23 @@ export class DefaultPropertyConfigStore implements IDefaultPropertyConfigStore {
     }
   }
 
+  getAlias = computedFn((workspaceSlug: string, issueTypeId: string, propertyKey: string): string => {
+    return this.data[workspaceSlug]?.[issueTypeId]?.[propertyKey]?.alias ?? "";
+  });
+
   getDescription = computedFn((workspaceSlug: string, issueTypeId: string, propertyKey: string): string => {
     return this.data[workspaceSlug]?.[issueTypeId]?.[propertyKey]?.description ?? "";
   });
 
+  setAlias = (workspaceSlug: string, issueTypeId: string, propertyKey: string, alias: string) => {
+    const existing = this.data[workspaceSlug]?.[issueTypeId]?.[propertyKey] ?? {};
+    set(this.data, [workspaceSlug, issueTypeId, propertyKey], { ...existing, alias });
+    this._saveToStorage();
+  };
+
   setDescription = (workspaceSlug: string, issueTypeId: string, propertyKey: string, description: string) => {
-    set(this.data, [workspaceSlug, issueTypeId, propertyKey], { description });
+    const existing = this.data[workspaceSlug]?.[issueTypeId]?.[propertyKey] ?? {};
+    set(this.data, [workspaceSlug, issueTypeId, propertyKey], { ...existing, description });
     this._saveToStorage();
   };
 }
