@@ -186,21 +186,16 @@ def issue_on_results(
         original_list.remove(FIELD_MAPPER[sub_group_by])
         original_list.append(sub_group_by)
 
-    # Include ep__ annotation fields so the paginator can bucket issues by group
+    # Include ep__ annotation fields so the paginator can bucket issues by group.
+    # These fields are retained in the result dicts so that GroupedOffsetPaginator.process_results
+    # can read them when partitioning issues into groups. They are harmless extra fields on the
+    # final response and the frontend ignores them.
     for gk in [group_by, sub_group_by]:
         if gk and gk.startswith(EP_PREFIX):
             required_fields.append(ep_annotation_name(gk))
 
     required_fields.extend(original_list)
-    results = list(issues.values(*required_fields))
-
-    # Strip internal ep__ annotation fields from the final response
-    for result in results:
-        for key in list(result.keys()):
-            if key.startswith(EP_ANNOTATION_PREFIX):
-                del result[key]
-
-    return results
+    return list(issues.values(*required_fields))
 
 
 def issue_group_values(
