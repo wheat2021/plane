@@ -14,6 +14,7 @@ import type {
   IIssueDisplayProperties,
   IPragmaticDropPayload,
   TExtraPropertyConfig,
+  TExtraPropertyOption,
   TIssue,
   TIssueGroupByOptions,
   IIssueFilterOptions,
@@ -144,7 +145,7 @@ const getExtraPropertySelectColumns = (propKey: string, projectId?: string): IGr
   const config = configs.find((c: TExtraPropertyConfig) => c.key === propKey && c.type === "select");
   if (!config) return undefined;
 
-  const options: Array<{ value: string; label?: string }> = (config.config as { options?: Array<{ value: string; label?: string }> })?.options ?? [];
+  const options: TExtraPropertyOption[] = config.options ?? [];
 
   const columns: IGroupByColumn[] = options.map((opt) => ({
     id: opt.value,
