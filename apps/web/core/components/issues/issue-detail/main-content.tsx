@@ -60,7 +60,7 @@ export const IssueMainContent = observer(function IssueMainContent(props: Props)
     peekIssue,
   } = useIssueDetail();
   const { getProjectById } = useProject();
-  const { getDescription } = useDefaultPropertyConfig();
+  const { getAlias, getDescription } = useDefaultPropertyConfig();
   const { setShowAlert } = useReloadConfirmations(isSubmitting === "submitting");
   // derived values
   const projectDetails = getProjectById(projectId);
@@ -90,12 +90,18 @@ export const IssueMainContent = observer(function IssueMainContent(props: Props)
 
   const isPeekModeActive = Boolean(peekIssue);
 
-  // helper: return info popover for a main-content default property
-  const mainPropAppend = (propertyKey: string, align?: "left" | "right") => {
+  // helper: return label row for a main-content default property (shown when alias or description is set)
+  const mainPropLabelRow = (propertyKey: string, fallback: string, align?: "left" | "right") => {
     if (!issue.type_id) return null;
+    const alias = getAlias(workspaceSlug, issue.type_id, propertyKey);
     const desc = getDescription(workspaceSlug, issue.type_id, propertyKey);
-    if (!desc) return null;
-    return <DefaultPropertyTooltip description={desc} align={align} />;
+    if (!alias && !desc) return null;
+    return (
+      <div className="flex items-center gap-1 mb-1">
+        <span className="text-body-xs-medium text-secondary">{alias || fallback}</span>
+        {desc && <DefaultPropertyTooltip description={desc} align={align} />}
+      </div>
+    );
   };
 
   return (
@@ -128,6 +134,7 @@ export const IssueMainContent = observer(function IssueMainContent(props: Props)
           </div>
         </div>
 
+        {mainPropLabelRow("title", "Title", "right")}
         <div className="flex items-start gap-1">
           <div className="flex-1 min-w-0">
             <IssueTitleInput
@@ -142,9 +149,9 @@ export const IssueMainContent = observer(function IssueMainContent(props: Props)
               containerClassName="-ml-3"
             />
           </div>
-          <div className="mt-1 flex-shrink-0">{mainPropAppend("title", "right")}</div>
         </div>
 
+        {mainPropLabelRow("description", "Description")}
         <DescriptionInput
           issueSequenceId={issue.sequence_id}
           containerClassName="p-0 border-none"
@@ -177,7 +184,6 @@ export const IssueMainContent = observer(function IssueMainContent(props: Props)
                 disabled={isArchived}
               />
             )}
-            <div className="mt-4">{mainPropAppend("description")}</div>
           </div>
           {isEditable && (
             <DescriptionVersionsRoot
