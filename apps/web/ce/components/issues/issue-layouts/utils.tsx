@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { type FC, useEffect } from "react";
 import { CalendarDays, LayersIcon, Paperclip } from "lucide-react";
 // types
 import { ISSUE_GROUP_BY_OPTIONS } from "@plane/constants";
@@ -112,6 +112,26 @@ export const SPREADSHEET_COLUMNS: { [key in keyof IIssueDisplayProperties]: TSpr
  */
 export const useProjectSelectExtraProperties = (projectId?: string): TExtraPropertyConfig[] => {
   const workspaceSlug = store.workspaceRoot.currentWorkspace?.slug;
+
+  // Fetch workspace extra property configs if not already loaded
+  useEffect(() => {
+    if (!workspaceSlug) return;
+    if (store.extraPropertyConfig.fetchedMap[workspaceSlug]) return;
+    void store.extraPropertyConfig.fetchWorkspaceConfigs(workspaceSlug);
+  }, [workspaceSlug]);
+
+  // Fetch bindings for all project issue types if not already loaded
+  useEffect(() => {
+    if (!workspaceSlug || !projectId) return;
+    const projectIssueTypes = store.issueType.getProjectIssueTypes(projectId) ?? [];
+    for (const issueType of projectIssueTypes) {
+      const issueTypeId = issueType.issue_type;
+      if (!issueTypeId) continue;
+      if (store.issueTypeExtraProperty.fetchedMap[projectId]?.[issueTypeId]) continue;
+      void store.issueTypeExtraProperty.fetchBindings(workspaceSlug, projectId, issueTypeId);
+    }
+  }, [workspaceSlug, projectId]);
+
   if (!workspaceSlug || !projectId) return [];
 
   const allConfigs = store.extraPropertyConfig.getConfigsByWorkspace(workspaceSlug);
@@ -119,10 +139,13 @@ export const useProjectSelectExtraProperties = (projectId?: string): TExtraPrope
   if (selectConfigs.length === 0) return [];
 
   // Collect all config IDs bound to any issue type in this project
+  // Note: TProjectIssueType.issue_type is the actual IssueType UUID; .id is the join record ID
   const projectIssueTypes = store.issueType.getProjectIssueTypes(projectId) ?? [];
   const boundConfigIds = new Set<string>();
   for (const issueType of projectIssueTypes) {
-    const configIds = store.issueTypeExtraProperty.getConfigIdsByIssueType(projectId, issueType.id);
+    const issueTypeId = issueType.issue_type;
+    if (!issueTypeId) continue;
+    const configIds = store.issueTypeExtraProperty.getConfigIdsByIssueType(projectId, issueTypeId);
     for (const id of configIds) boundConfigIds.add(id);
   }
 
