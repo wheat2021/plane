@@ -6,6 +6,7 @@ import type { TStateGroups } from "./state";
 import type { IUserLite } from "./users";
 import type {
   IIssueDisplayProperties,
+  TExtraPropertyGroupBy,
   TIssueExtraOptions,
   TIssueGroupByOptions,
   TIssueGroupingFilters,
@@ -120,7 +121,8 @@ export type GroupByColumnTypes =
   | "labels"
   | "assignees"
   | "created_by"
-  | "team_project";
+  | "team_project"
+  | TExtraPropertyGroupBy;
 
 export type TGetColumns = {
   isWorkspaceLevel?: boolean;

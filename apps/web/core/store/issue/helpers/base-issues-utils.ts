@@ -11,7 +11,7 @@ import type {
 } from "@plane/types";
 import { checkDateCriteria, convertToISODateString, parseDateFilter } from "@plane/utils";
 import { store } from "@/lib/store-context";
-import { EIssueGroupedAction, ISSUE_GROUP_BY_KEY } from "./base-issues.store";
+import { EIssueGroupedAction, getGroupByIssueKey } from "./base-issues.store";
 
 /**
  * returns,
@@ -319,7 +319,7 @@ export const getGroupedWorkItemIds = (
       case null:
         return null;
       default:
-        return ISSUE_GROUP_BY_KEY[groupByKey];
+        return getGroupByIssueKey(groupByKey);
     }
   };
 

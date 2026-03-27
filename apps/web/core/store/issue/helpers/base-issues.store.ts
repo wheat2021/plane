@@ -5,6 +5,7 @@ import { computedFn } from "mobx-utils";
 import { ALL_ISSUES, ISSUE_PRIORITIES } from "@plane/constants";
 // types
 import type {
+  TExtraPropertyGroupBy,
   TIssue,
   TIssueGroupByOptions,
   TIssueOrderByOptions,
@@ -41,7 +42,10 @@ import {
 } from "./base-issues-utils";
 import type { IBaseIssueFilterStore } from "./issue-filter-helper.store";
 
-export type TIssueDisplayFilterOptions = Exclude<TIssueGroupByOptions, null> | "target_date";
+// Static group-by options (excludes dynamic extra_property:* template literal keys)
+export type TIssueDisplayFilterOptionsStatic = Exclude<TIssueGroupByOptions, null | TExtraPropertyGroupBy> | "target_date";
+// All possible display filter options (includes extra_property:* keys at runtime)
+export type TIssueDisplayFilterOptions = TIssueDisplayFilterOptionsStatic | TExtraPropertyGroupBy;
 
 export enum EIssueGroupedAction {
   ADD = "ADD",
@@ -107,7 +111,7 @@ export interface IBaseIssuesStore {
 }
 
 // This constant maps the group by keys to the respective issue property that the key relies on
-export const ISSUE_GROUP_BY_KEY: Record<TIssueDisplayFilterOptions, keyof TIssue> = {
+export const ISSUE_GROUP_BY_KEY: Record<TIssueDisplayFilterOptionsStatic, keyof TIssue> = {
   project: "project_id",
   state: "state_id",
   "state_detail.group": "state_id", // state_detail.group is only being used for state_group display,
@@ -121,7 +125,7 @@ export const ISSUE_GROUP_BY_KEY: Record<TIssueDisplayFilterOptions, keyof TIssue
   team_project: "project_id",
 };
 
-export const ISSUE_FILTER_DEFAULT_DATA: Record<TIssueDisplayFilterOptions, keyof TIssue> = {
+export const ISSUE_FILTER_DEFAULT_DATA: Record<TIssueDisplayFilterOptionsStatic, keyof TIssue> = {
   project: "project_id",
   cycle: "cycle_id",
   module: "module_ids",
@@ -133,6 +137,24 @@ export const ISSUE_FILTER_DEFAULT_DATA: Record<TIssueDisplayFilterOptions, keyof
   assignees: "assignee_ids",
   target_date: "target_date",
   team_project: "project_id",
+};
+
+/**
+ * Returns the TIssue field key for a given group-by option.
+ * For extra_property:* keys, always returns "extra_properties".
+ */
+export const getGroupByIssueKey = (groupBy: TIssueDisplayFilterOptions): keyof TIssue => {
+  if (groupBy.startsWith("extra_property:")) return "extra_properties";
+  return ISSUE_GROUP_BY_KEY[groupBy as TIssueDisplayFilterOptionsStatic];
+};
+
+/**
+ * Returns the TIssue filter data key for a given group-by option.
+ * For extra_property:* keys, always returns "extra_properties".
+ */
+export const getFilterDefaultDataKey = (groupBy: TIssueDisplayFilterOptions): keyof TIssue => {
+  if (groupBy.startsWith("extra_property:")) return "extra_properties";
+  return ISSUE_FILTER_DEFAULT_DATA[groupBy as TIssueDisplayFilterOptionsStatic];
 };
 
 // This constant maps the order by keys to the respective issue property that the key relies on
@@ -335,7 +357,7 @@ export abstract class BaseIssuesStore implements IBaseIssuesStore {
 
     if (!groupBy) return;
 
-    return ISSUE_GROUP_BY_KEY[groupBy];
+    return getGroupByIssueKey(groupBy);
   }
 
   // The Issue Property corresponding to the sub group by value
@@ -344,7 +366,7 @@ export abstract class BaseIssuesStore implements IBaseIssuesStore {
 
     if (!subGroupBy) return;
 
-    return ISSUE_GROUP_BY_KEY[subGroupBy];
+    return getGroupByIssueKey(subGroupBy);
   }
 
   /**

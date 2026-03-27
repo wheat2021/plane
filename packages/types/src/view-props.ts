@@ -5,6 +5,8 @@ import type { CompleteOrEmpty } from "./utils";
 
 export type TIssueLayouts = "list" | "kanban" | "calendar" | "spreadsheet" | "gantt_chart";
 
+export type TExtraPropertyGroupBy = `extra_property:${string}`;
+
 export type TIssueGroupByOptions =
   | "state"
   | "priority"
@@ -17,6 +19,7 @@ export type TIssueGroupByOptions =
   | "module"
   | "target_date"
   | "team_project"
+  | TExtraPropertyGroupBy
   | null;
 
 export type TIssueOrderByOptions =
