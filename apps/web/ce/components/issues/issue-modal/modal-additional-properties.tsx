@@ -11,7 +11,7 @@ import { useIssueTypeExtraProperty } from "@/hooks/store/use-issue-type-extra-pr
 import { cn } from "@plane/utils";
 // components
 import { ExtraPropertyControl } from "@/components/issues/extra-properties/extra-property-control";
-import { ExtraPropertyDescriptionPopover } from "@/components/issues/extra-properties/description-popover";
+import { DefaultPropertyTooltip } from "@/components/issues/extra-properties/default-property-tooltip";
 
 export type TWorkItemModalAdditionalPropertiesProps = {
   isDraft?: boolean;
@@ -105,7 +105,7 @@ export const WorkItemModalAdditionalProperties = observer((props: TWorkItemModal
             <div className="flex items-center gap-1">
               <span className="text-body-xs-medium text-secondary">{config.label}</span>
               {binding.is_required && <span className="text-red-500">*</span>}
-              {config.description && <ExtraPropertyDescriptionPopover description={config.description} />}
+              {config.description && <DefaultPropertyTooltip description={config.description} />}
             </div>
             <div
               className={cn(
