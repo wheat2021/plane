@@ -20,6 +20,7 @@ from plane.app.serializers import CycleIssueSerializer
 from plane.bgtasks.issue_activities_task import issue_activity
 from plane.db.models import Cycle, CycleIssue, Issue, FileAsset, IssueLink
 from plane.utils.grouper import (
+    ep_annotation_name,
     issue_group_values,
     issue_on_results,
     issue_queryset_grouper,
@@ -134,7 +135,9 @@ class CycleIssueViewSet(BaseViewSet):
         sub_group_by = request.GET.get("sub_group_by", False)
 
         # issue queryset
-        issue_queryset = issue_queryset_grouper(queryset=issue_queryset, group_by=group_by, sub_group_by=sub_group_by)
+        issue_queryset = issue_queryset_grouper(
+            queryset=issue_queryset, group_by=group_by, sub_group_by=sub_group_by, project_id=project_id
+        )
 
         if group_by:
             # Check group and sub group value paginate
@@ -167,8 +170,8 @@ class CycleIssueViewSet(BaseViewSet):
                             project_id=project_id,
                             filters=filters,
                         ),
-                        group_by_field_name=group_by,
-                        sub_group_by_field_name=sub_group_by,
+                        group_by_field_name=ep_annotation_name(group_by) if group_by and group_by.startswith("extra_property:") else group_by,
+                        sub_group_by_field_name=ep_annotation_name(sub_group_by) if sub_group_by and sub_group_by.startswith("extra_property:") else sub_group_by,
                         count_filter=Q(
                             Q(issue_intake__status=1)
                             | Q(issue_intake__status=-1)
@@ -196,7 +199,7 @@ class CycleIssueViewSet(BaseViewSet):
                         project_id=project_id,
                         filters=filters,
                     ),
-                    group_by_field_name=group_by,
+                    group_by_field_name=ep_annotation_name(group_by) if group_by and group_by.startswith("extra_property:") else group_by,
                     count_filter=Q(
                         Q(issue_intake__status=1)
                         | Q(issue_intake__status=-1)
