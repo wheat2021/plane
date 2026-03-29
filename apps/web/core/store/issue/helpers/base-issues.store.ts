@@ -1643,6 +1643,15 @@ export abstract class BaseIssuesStore implements IBaseIssuesStore {
   ): string[] => {
     // if issue object is undefined return empty array
     if (!issueObject) return [];
+
+    // For extra_property:* group keys, extract the specific property value from extra_properties
+    if (groupByKey?.startsWith("extra_property:")) {
+      const propKey = groupByKey.slice("extra_property:".length);
+      const propValue = (issueObject.extra_properties as Record<string, string | null> | undefined)?.[propKey];
+      if (!propValue) return ["None"];
+      return [propValue];
+    }
+
     // if value is not defined, return None value in array
     if (!value || isEmpty(value)) return ["None"];
     // if array return the array
