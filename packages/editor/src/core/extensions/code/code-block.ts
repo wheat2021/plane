@@ -92,6 +92,12 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       {
         tag: "pre",
         preserveWhitespace: "full",
+        // skip mermaid blocks so they are parsed by MermaidBlockExtension instead
+        getAttrs: (node) => {
+          const el = node;
+          if (el.getAttribute("data-type") === "mermaidBlock") return false;
+          return {};
+        },
       },
     ];
   },
@@ -295,7 +301,9 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
               event.preventDefault();
               const text = event.clipboardData.getData("text/plain");
               const vscode = event.clipboardData.getData("vscode-editor-data");
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               const vscodeData = vscode ? JSON.parse(vscode) : undefined;
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
               const language = vscodeData?.mode;
 
               if (vscodeData && language) {
@@ -323,6 +331,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
                 // Create a new code block node with the pasted content
                 const textNode = view.state.schema.text(text.replace(/\r\n?/g, "\n"));
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const codeBlock = this.type.create({ language }, textNode);
                 if (insertPos <= tr.doc.content.size) {
                   tr.insert(insertPos, codeBlock);

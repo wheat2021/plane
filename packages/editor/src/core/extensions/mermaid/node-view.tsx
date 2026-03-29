@@ -5,12 +5,26 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@plane/utils";
 
 export function MermaidBlockNodeView({ editor, node }: NodeViewProps) {
-  const isEditable = editor.isEditable;
-  const code = node.textContent;
+  // Track isEditable as local state so the component re-renders when the editor
+  // switches between editable and read-only (e.g. same editor instance, setEditable called)
+  const [isEditable, setIsEditable] = useState(editor.isEditable);
   const [svg, setSvg] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const renderIdRef = useRef(0);
+
+  // Sync isEditable when editor switches modes
+  useEffect(() => {
+    const handleTransaction = () => {
+      setIsEditable(editor.isEditable);
+    };
+    editor.on("transaction", handleTransaction);
+    return () => {
+      editor.off("transaction", handleTransaction);
+    };
+  }, [editor]);
+
+  const code = node.textContent;
 
   useEffect(() => {
     if (isEditable || !code.trim()) {

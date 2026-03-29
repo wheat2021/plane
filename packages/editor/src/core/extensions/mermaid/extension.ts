@@ -29,6 +29,7 @@ export const MermaidBlockExtension = Node.create({
     return [
       {
         tag: 'pre[data-type="mermaidBlock"]',
+        priority: 100, // higher than codeBlock default 50, ensures we match before codeBlock's `pre` rule
         preserveWhitespace: "full",
       },
     ];
