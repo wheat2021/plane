@@ -1,7 +1,9 @@
 import type { HocuspocusProvider } from "@hocuspocus/provider";
 import type { Extensions } from "@tiptap/core";
 import { CharacterCount } from "@tiptap/extension-character-count";
+// eslint-disable-next-line import/no-named-as-default
 import TaskItem from "@tiptap/extension-task-item";
+// eslint-disable-next-line import/no-named-as-default
 import TaskList from "@tiptap/extension-task-list";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Underline } from "@tiptap/extension-underline";
@@ -21,6 +23,7 @@ import {
   CustomTypographyExtension,
   ImageExtension,
   ListKeymap,
+  MermaidBlockExtension,
   Table,
   TableCell,
   TableHeader,
@@ -115,6 +118,7 @@ export const CoreEditorExtensions = (args: TArguments): Extensions => {
     CustomColorExtension,
     CustomTextAlignExtension,
     CustomCalloutExtension,
+    MermaidBlockExtension,
     UtilityExtension({
       disabledExtensions,
       flaggedExtensions,

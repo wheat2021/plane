@@ -2,6 +2,7 @@ import {
   ALargeSmall,
   CaseSensitive,
   Code2,
+  GitGraph,
   Heading1,
   Heading2,
   Heading3,
@@ -173,6 +174,15 @@ export const getSlashCommandFilteredSections =
             searchTerms: ["codeblock"],
             icon: <Code2 className="size-3.5" />,
             command: ({ editor, range }) => editor.chain().focus().deleteRange(range).toggleCodeBlock().run(),
+          },
+          {
+            commandKey: "mermaid",
+            key: "mermaid",
+            title: "Mermaid 图表",
+            description: "插入 Mermaid 流程图、时序图等图表",
+            searchTerms: ["mermaid", "diagram", "flowchart", "graph", "图表", "流程图"],
+            icon: <GitGraph className="size-3.5" />,
+            command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setMermaidBlock().run(),
           },
           {
             commandKey: "callout",

@@ -43,6 +43,7 @@ export enum CORE_EXTENSIONS {
   WORK_ITEM_EMBED = "issue-embed-component",
   EMOJI = "emoji",
   UNIQUE_ID = "uniqueID",
+  MERMAID_BLOCK = "mermaidBlock",
 }
 
 export const BLOCK_NODE_TYPES = [
@@ -68,4 +69,5 @@ export const BLOCK_NODE_TYPES = [
   CORE_EXTENSIONS.CUSTOM_IMAGE,
   CORE_EXTENSIONS.CALLOUT,
   CORE_EXTENSIONS.WORK_ITEM_EMBED,
+  CORE_EXTENSIONS.MERMAID_BLOCK,
 ];
