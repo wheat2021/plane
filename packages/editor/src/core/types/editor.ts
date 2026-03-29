@@ -57,9 +57,11 @@ export type TEditorCommands =
   | "background-color"
   | "text-align"
   | "callout"
+  | "mermaid"
   | "attachment"
   | "emoji"
   | "external-embed"
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   | TExtendedEditorCommands;
 
 export type TCommandExtraProps = {
@@ -109,6 +111,7 @@ export type CoreEditorRefApi = {
   getAttributesWithExtendedMark: (
     mark: string | MarkType,
     attribute: string | NodeType | MarkType
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Record<string, any> | undefined;
   getCoordsFromPos: (pos?: number) => ReturnType<EditorView["coordsAtPos"]> | undefined;
   getCurrentCursorPosition: () => number | undefined;
@@ -141,6 +144,7 @@ export type CoreEditorRefApi = {
   undo: () => void;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export type EditorRefApi = CoreEditorRefApi & TExtendedEditorRefApi;
 
 export type EditorTitleRefApi = EditorRefApi;
@@ -168,6 +172,7 @@ export type IEditorProps = {
   onAssetChange?: (assets: TEditorAsset[]) => void;
   onEditorFocus?: () => void;
   onChange?: (json: object, html: string, { isMigrationUpdate }?: { isMigrationUpdate?: boolean }) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onEnterKeyPress?: (e?: any) => void;
   onTransaction?: () => void;
   placeholder?: string | ((isFocused: boolean, value: string) => string);

@@ -1,0 +1,1 @@
+export { MermaidBlockExtension } from "./extension";
