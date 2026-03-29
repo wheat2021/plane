@@ -1,0 +1,1539 @@
+[
+  {
+    "name": "asap-sx",
+    "description_html": "<p>中金所国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "12",
+      "usage_note": "中金所国债期货"
+    }
+  },
+  {
+    "name": "bifptvol",
+    "description_html": "<p>做市策略-国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["刘畅"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "14",
+      "usage_note": "做市策略-国债期货"
+    }
+  },
+  {
+    "name": "bondbasketquote",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘博宇"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "20"
+    }
+  },
+  {
+    "name": "exchbondquote",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈志茹", "张倩颖", "刘皓楠"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "30",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "exchquote",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈志茹"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "31",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "FixedQuote",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "33"
+    }
+  },
+  {
+    "name": "fptvol",
+    "description_html": "<p>做市策略-国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["刘畅"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "35",
+      "usage_note": "做市策略-国债期货"
+    }
+  },
+  {
+    "name": "futurebasis",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "36"
+    }
+  },
+  {
+    "name": "futurehft",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "37"
+    }
+  },
+  {
+    "name": "futuremm",
+    "description_html": "<p>做市策略-国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["刘畅"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "38",
+      "usage_note": "做市策略-国债期货"
+    }
+  },
+  {
+    "name": "futurequote",
+    "description_html": "<p>做市策略-国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["刘畅"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "39",
+      "usage_note": "做市策略-国债期货"
+    }
+  },
+  {
+    "name": "futurevol",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "42"
+    }
+  },
+  {
+    "name": "gpquote",
+    "description_html": "<p>做市策略-国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["刘畅"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "45",
+      "usage_note": "做市策略-国债期货"
+    }
+  },
+  {
+    "name": "hedge-bond",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["汤家红"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "46"
+    }
+  },
+  {
+    "name": "hedge-sse-bond",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘敏"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "48"
+    }
+  },
+  {
+    "name": "LowLiquidity",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "53"
+    }
+  },
+  {
+    "name": "ref-price-mm-adb",
+    "description_html": "<p>非交易</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["汤家红"],
+    "developers": ["殷涛", "冼啟棉"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "62",
+      "usage_note": "非交易"
+    }
+  },
+  {
+    "name": "RefPrice",
+    "description_html": "<p>非交易</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘博宇"],
+    "developers": ["殷涛", "冼啟棉"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "63",
+      "usage_note": "非交易"
+    }
+  },
+  {
+    "name": "rfq-autorespond",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘博宇"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "64"
+    }
+  },
+  {
+    "name": "rfqautorsp",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘博宇", "何诗萌"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "65",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "secubmqxbond",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["汤家红"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "66",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "ssefiquote",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈志茹"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "68"
+    }
+  },
+  {
+    "name": "ssefiquotestatis",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈志茹", "张倩颖"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "69",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "sseratebondquote",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈志茹"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "70",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "syncquotebmq2rfi",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘博宇"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "71",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "tfmmAuction",
+    "description_html": "<p>中金所国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "74",
+      "usage_note": "中金所国债期货"
+    }
+  },
+  {
+    "name": "tfmmFar",
+    "description_html": "<p>中金所国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "75",
+      "usage_note": "中金所国债期货"
+    }
+  },
+  {
+    "name": "tfmmFixed",
+    "description_html": "<p>中金所国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "76",
+      "usage_note": "中金所国债期货"
+    }
+  },
+  {
+    "name": "tfmmTracking",
+    "description_html": "<p>中金所国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "77",
+      "usage_note": "中金所国债期货"
+    }
+  },
+  {
+    "name": "TTF",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["苟植东"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "80"
+    }
+  },
+  {
+    "name": "unibondquote",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘博宇", "汤家红"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "81",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "unipricermark",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘博宇", "汤家红"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "82",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "windexchquote",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈志茹"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "83"
+    }
+  },
+  {
+    "name": "xbond-bestquote",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["汤家红"],
+    "developers": ["黄城"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "84",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "xbond-volume",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘博宇"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "team": "ZSJY",
+      "source": "研发云纳管",
+      "source_id": "85",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "irs-momentum",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘麒轩"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "team": "LYYSP",
+      "source": "研发云纳管",
+      "source_id": "51"
+    }
+  },
+  {
+    "name": "ref-price-irs",
+    "description_html": "<p>非交易-利率互换</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘麒轩"],
+    "developers": ["张驰昱", "冼啟棉"],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "team": "LYYSP",
+      "source": "研发云纳管",
+      "source_id": "61",
+      "usage_note": "非交易-利率互换"
+    }
+  },
+  {
+    "name": "tf-momentum",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘麒轩"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "team": "LYYSP",
+      "source": "研发云纳管",
+      "source_id": "73"
+    }
+  },
+  {
+    "name": "xswap-mm",
+    "description_html": "<p>做市策略-利率互换</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘麒轩"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "team": "LYYSP",
+      "source": "研发云纳管",
+      "source_id": "86",
+      "usage_note": "做市策略-利率互换"
+    }
+  },
+  {
+    "name": "xswap-mm-inactive",
+    "description_html": "<p>做市策略-利率互换</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘麒轩"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "team": "LYYSP",
+      "source": "研发云纳管",
+      "source_id": "87",
+      "usage_note": "做市策略-利率互换"
+    }
+  },
+  {
+    "name": "xswap-sbf-mm",
+    "description_html": "<p>做市策略-标债远期</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘麒轩"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "team": "LYYSP",
+      "source": "研发云纳管",
+      "source_id": "88",
+      "usage_note": "做市策略-标债远期"
+    }
+  },
+  {
+    "name": "xswap-sirs-mm",
+    "description_html": "<p>张驰昱</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["刘麒轩"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "team": "LYYSP",
+      "source": "研发云纳管",
+      "source_id": "89",
+      "usage_note": "张驰昱"
+    }
+  },
+  {
+    "name": "BondCTA",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陆雯炳"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易一台",
+      "team": "LHJY1",
+      "source": "研发云纳管",
+      "source_id": "21"
+    }
+  },
+  {
+    "name": "DynamicHedge2y",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈鹏"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易一台",
+      "team": "LHJY1",
+      "source": "研发云纳管",
+      "source_id": "28"
+    }
+  },
+  {
+    "name": "DynamicHedge5y",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈鹏"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易一台",
+      "team": "LHJY1",
+      "source": "研发云纳管",
+      "source_id": "29"
+    }
+  },
+  {
+    "name": "futures-calendar",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["肖泽鹏"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易一台",
+      "team": "LHJY1",
+      "source": "研发云纳管",
+      "source_id": "40"
+    }
+  },
+  {
+    "name": "systematic-trend",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陆雯炳"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易一台",
+      "team": "LHJY1",
+      "source": "研发云纳管",
+      "source_id": "72"
+    }
+  },
+  {
+    "name": "TFSwapRV",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈鹏"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易一台",
+      "team": "LHJY1",
+      "source": "研发云纳管",
+      "source_id": "78"
+    }
+  },
+  {
+    "name": "abm",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈泽波"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "1"
+    }
+  },
+  {
+    "name": "abm-boost",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈泽波"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "2"
+    }
+  },
+  {
+    "name": "basis-signals",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈泽波"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "13"
+    }
+  },
+  {
+    "name": "bmm-catherine",
+    "description_html": "<p>利率债做市-xbond</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张馨元"],
+    "developers": ["张馨元", "王一松", "左鸿绪"],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "15",
+      "usage_note": "利率债做市-xbond"
+    }
+  },
+  {
+    "name": "bmm-ideal",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["左鸿绪"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "16"
+    }
+  },
+  {
+    "name": "bmm-sales",
+    "description_html": "<p>利率债做市-展业报价</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张馨元"],
+    "developers": ["左鸿绪"],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "17",
+      "usage_note": "利率债做市-展业报价"
+    }
+  },
+  {
+    "name": "bmm-signals",
+    "description_html": "<p>非交易-信号策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张馨元", "陈泽波"],
+    "developers": ["左鸿绪"],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "18",
+      "usage_note": "非交易-信号策略"
+    }
+  },
+  {
+    "name": "bmm-spreader",
+    "description_html": "<p>多腿执行策略，xbond，国债期货</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张馨元"],
+    "developers": ["左鸿绪"],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "19",
+      "usage_note": "多腿执行策略，xbond，国债期货"
+    }
+  },
+  {
+    "name": "flip-tool",
+    "description_html": "<p>非交易-移仓工具</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张馨元"],
+    "developers": ["左鸿绪"],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "34",
+      "usage_note": "非交易-移仓工具"
+    }
+  },
+  {
+    "name": "hedge-engine",
+    "description_html": "<p>非交易-对冲策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张馨元"],
+    "developers": ["左鸿绪"],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "47",
+      "usage_note": "非交易-对冲策略"
+    }
+  },
+  {
+    "name": "midengine",
+    "description_html": "<p>非交易-中值定价</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张馨元"],
+    "developers": ["张馨元", "左鸿绪"],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "54",
+      "usage_note": "非交易-中值定价"
+    }
+  },
+  {
+    "name": "mm-metrics",
+    "description_html": "<p>非交易-损益计算</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张馨元"],
+    "developers": ["左鸿绪"],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "55",
+      "usage_note": "非交易-损益计算"
+    }
+  },
+  {
+    "name": "orderbookarbitrage",
+    "description_html": "<p>做市策略-利率债xbond</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张馨元"],
+    "developers": ["刘畅"],
+    "extra_properties": {
+      "desk": "交易二台",
+      "team": "LHJY2",
+      "source": "研发云纳管",
+      "source_id": "57",
+      "usage_note": "做市策略-利率债xbond"
+    }
+  },
+  {
+    "name": "futurespd",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["滕颖照"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易三台",
+      "team": "LHJY3",
+      "source": "研发云纳管",
+      "source_id": "41"
+    }
+  },
+  {
+    "name": "hft",
+    "description_html": "<p>做市策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["梁斯婷"],
+    "developers": ["刘建桥"],
+    "extra_properties": {
+      "desk": "交易三台",
+      "team": "LHJY1",
+      "source": "研发云纳管",
+      "source_id": "49",
+      "usage_note": "做市策略"
+    }
+  },
+  {
+    "name": "pairs-trading-b2b",
+    "description_html": "<p>利率债xbond、bmq</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["梅一伦"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "交易三台",
+      "team": "LHJY3",
+      "source": "研发云纳管",
+      "source_id": "58",
+      "usage_note": "利率债xbond、bmq"
+    }
+  },
+  {
+    "name": "creditAlgoMid",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈晨"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易四台",
+      "team": "LHJY4",
+      "source": "研发云纳管",
+      "source_id": "24"
+    }
+  },
+  {
+    "name": "creditMmStreaming",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["陈晨"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易四台",
+      "team": "LHJY4",
+      "source": "研发云纳管",
+      "source_id": "26"
+    }
+  },
+  {
+    "name": "primaryMarketCalc",
+    "description_html": "<p>非交易-一级利率债</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["田天驰"],
+    "developers": ["梁云龙"],
+    "extra_properties": {
+      "desk": "交易四台",
+      "team": "LHJY4",
+      "source": "研发云纳管",
+      "source_id": "59",
+      "usage_note": "非交易-一级利率债"
+    }
+  },
+  {
+    "name": "creditarbitrage",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["李仕达"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易八台",
+      "team": "LHJY6",
+      "source": "研发云纳管",
+      "source_id": "25"
+    }
+  },
+  {
+    "name": "credittimingstrategy",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["朱峰"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易八台",
+      "team": "CAMS",
+      "source": "研发云纳管",
+      "source_id": "27"
+    }
+  },
+  {
+    "name": "fin-bond-timing-strategy",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["李仕达"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易八台",
+      "team": "LHJY6",
+      "source": "研发云纳管",
+      "source_id": "32"
+    }
+  },
+  {
+    "name": "municipal-lowvolatility",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["李仕达"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易八台",
+      "team": "LHJY6",
+      "source": "研发云纳管",
+      "source_id": "56"
+    }
+  },
+  {
+    "name": "amm-object004",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["王一松"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易九台",
+      "team": "ZSJYLH",
+      "source": "研发云纳管",
+      "source_id": "5"
+    }
+  },
+  {
+    "name": "amm-object105",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["王一松"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易九台",
+      "team": "ZSJYLH",
+      "source": "研发云纳管",
+      "source_id": "6"
+    }
+  },
+  {
+    "name": "amm-object105",
+    "description_html": "<p></p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["王一松"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易九台",
+      "team": "ZSJYLH",
+      "source": "研发云纳管",
+      "source_id": "7"
+    }
+  },
+  {
+    "name": "amm-object106",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["王一松"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易九台",
+      "team": "ZSJYLH",
+      "source": "研发云纳管",
+      "source_id": "8"
+    }
+  },
+  {
+    "name": "amm-object203",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["王一松"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易九台",
+      "team": "ZSJYLH",
+      "source": "研发云纳管",
+      "source_id": "9"
+    }
+  },
+  {
+    "name": "amm-object204",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["王一松"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易九台",
+      "team": "ZSJYLH",
+      "source": "研发云纳管",
+      "source_id": "10"
+    }
+  },
+  {
+    "name": "amm-object502",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["王一松"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "交易九台",
+      "team": "ZSJYLH",
+      "source": "研发云纳管",
+      "source_id": "11"
+    }
+  },
+  {
+    "name": "algo-plugin-condition",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张峻铭"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "大宗商品交易台及产品台",
+      "team": "DZSP",
+      "source": "研发云纳管",
+      "source_id": "3"
+    }
+  },
+  {
+    "name": "algo-plugin-pre-order",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["张峻铭"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "大宗商品交易台及产品台",
+      "team": "DZSP",
+      "source": "研发云纳管",
+      "source_id": "4"
+    }
+  },
+  {
+    "name": "commodity-spread-strategy",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["赵翰卿"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "大宗商品交易台及产品台",
+      "team": "DZSP",
+      "source": "研发云纳管",
+      "source_id": "22"
+    }
+  },
+  {
+    "name": "commodity-twap-strategy",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["赵翰卿"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "大宗商品交易台及产品台",
+      "team": "DZSP",
+      "source": "研发云纳管",
+      "source_id": "23"
+    }
+  },
+  {
+    "name": "SpotFuturesSpread",
+    "description_html": "<p></p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["奚业雷"],
+    "developers": [],
+    "extra_properties": {
+      "desk": "大宗商品交易台及产品台",
+      "team": "DZSP",
+      "source": "研发云纳管",
+      "source_id": "67"
+    }
+  },
+  {
+    "name": "GCdual-factor",
+    "description_html": "<p>上交所逆回购</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["马冰清"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "融资台",
+      "team": "RZT资金台",
+      "source": "研发云纳管",
+      "source_id": "43",
+      "usage_note": "上交所逆回购"
+    }
+  },
+  {
+    "name": "gcplus",
+    "description_html": "<p>上交所逆回购</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["马冰清"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "融资台",
+      "team": "RZT资金台",
+      "source": "研发云纳管",
+      "source_id": "44",
+      "usage_note": "上交所逆回购"
+    }
+  },
+  {
+    "name": "stg_ts_csd",
+    "description_html": "<p>做市策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["常诚"],
+    "developers": ["刘畅"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "source": "手工执行",
+      "source_id": "M1",
+      "venue": ["中金所"],
+      "product": ["国债期货"],
+      "channel": ["Femas"]
+    }
+  },
+  {
+    "name": "quote-and-hedge",
+    "description_html": "<p>证金债xbond报价和对冲</p>",
+    "state": "In Progress",
+    "state_id": "574bc100-2eb8-4c6d-bc91-1f0715b180fe",
+    "assignees": ["刘博宇"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "做市交易台",
+      "source": "手工执行",
+      "source_id": "M7",
+      "venue": ["外汇交易中心"],
+      "product": ["利率债"],
+      "channel": ["X-Bond"]
+    }
+  },
+  {
+    "name": "hedge-sbf",
+    "description_html": "<p>做市策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["刘麒轩"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "source": "手工执行",
+      "source_id": "M8",
+      "venue": ["外汇交易中心"],
+      "product": ["标债远期"],
+      "channel": ["X-Swap"]
+    }
+  },
+  {
+    "name": "quote-spread",
+    "description_html": "<p>自营策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["刘麒轩"],
+    "developers": ["张驰昱"],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "source": "手工执行",
+      "source_id": "M9",
+      "venue": ["外汇交易中心"],
+      "product": ["利率债"],
+      "channel": ["X-Bond"]
+    }
+  },
+  {
+    "name": "hfmm01",
+    "description_html": "<p>做市策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["王婉婷"],
+    "developers": ["朱道敏"],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "source": "手工执行",
+      "source_id": "M10",
+      "venue": ["中金所"],
+      "product": ["国债期权"],
+      "channel": ["Femas"]
+    }
+  },
+  {
+    "name": "hfmm03",
+    "description_html": "<p>定价策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["王婉婷"],
+    "developers": ["朱道敏"],
+    "extra_properties": {
+      "desk": "利率衍生品交易台",
+      "source": "手工执行",
+      "source_id": "M11",
+      "venue": ["中金所"],
+      "product": ["国债期权"],
+      "channel": ["Femas"]
+    }
+  },
+  {
+    "name": "spreadQuoteMonitor",
+    "description_html": "<p>自营策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["刘雨垚"],
+    "developers": ["梁云龙"],
+    "extra_properties": {
+      "desk": "交易四台",
+      "source": "手工执行",
+      "source_id": "M12",
+      "venue": ["中金所", "外汇交易中心"],
+      "product": ["利率债", "国债期货"],
+      "channel": ["X-Bond", "Femas"]
+    }
+  },
+  {
+    "name": "irrLiveQuoteMonitor",
+    "description_html": "<p>自营策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["刘雨垚"],
+    "developers": ["梁云龙"],
+    "extra_properties": {
+      "desk": "交易四台",
+      "source": "手工执行",
+      "source_id": "M13",
+      "venue": ["中金所", "外汇交易中心"],
+      "product": ["利率债", "国债期货"],
+      "channel": ["X-Bond", "Femas"]
+    }
+  },
+  {
+    "name": "guaranteebond",
+    "description_html": "<p>信用债量化选债</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["沈宵"],
+    "developers": ["宋强"],
+    "extra_properties": {
+      "desk": "交易五台",
+      "source": "手工执行",
+      "source_id": "M2",
+      "product": ["信用债"]
+    }
+  },
+  {
+    "name": "strat305",
+    "description_html": "<p>自营策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["孙铭辰"],
+    "developers": ["孟启飞"],
+    "extra_properties": {
+      "desk": "交易九台",
+      "source": "手工执行",
+      "source_id": "M3",
+      "venue": ["外汇交易中心"],
+      "product": ["利率债"],
+      "channel": ["X-Bond"]
+    }
+  },
+  {
+    "name": "strat503",
+    "description_html": "<p>自营策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["孙铭辰"],
+    "developers": ["孟启飞"],
+    "extra_properties": {
+      "desk": "交易九台",
+      "source": "手工执行",
+      "source_id": "M4",
+      "venue": ["外汇交易中心"],
+      "product": ["利率债"],
+      "channel": ["X-Bond"]
+    }
+  },
+  {
+    "name": "strat405",
+    "description_html": "<p>自营策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["李彦杰"],
+    "developers": ["孟启飞"],
+    "extra_properties": {
+      "desk": "交易九台",
+      "source": "手工执行",
+      "source_id": "M5",
+      "venue": ["外汇交易中心"],
+      "product": ["利率债"],
+      "channel": ["X-Bond"]
+    }
+  },
+  {
+    "name": "strat406",
+    "description_html": "<p>自营策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["李彦杰"],
+    "developers": ["孟启飞"],
+    "extra_properties": {
+      "desk": "交易九台",
+      "source": "手工执行",
+      "source_id": "M6",
+      "venue": ["外汇交易中心"],
+      "product": ["利率债"],
+      "channel": ["X-Bond"]
+    }
+  },
+  {
+    "name": "407_CTA",
+    "description_html": "<p>自营策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["李彦杰"],
+    "developers": ["朱思维"],
+    "extra_properties": {
+      "desk": "交易九台",
+      "source": "手工执行",
+      "source_id": "M14",
+      "venue": ["外汇交易中心", "中金所"],
+      "product": ["利率债", "国债期货"]
+    }
+  },
+  {
+    "name": "407_FICTS",
+    "description_html": "<p>自营策略</p>",
+    "state": "Done",
+    "state_id": "ecca640d-654d-4704-811b-8d73a62bf891",
+    "assignees": ["李彦杰"],
+    "developers": ["朱思维"],
+    "extra_properties": {
+      "desk": "交易九台",
+      "source": "手工执行",
+      "source_id": "M15",
+      "venue": ["外汇交易中心", "中金所"],
+      "product": ["利率债", "国债期货"]
+    }
+  },
+  {
+    "name": "USDCNH_CTA",
+    "description_html": "<p>自营策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["李彦杰"],
+    "developers": ["朱思维"],
+    "extra_properties": {
+      "desk": "交易九台",
+      "source": "手工执行",
+      "source_id": "M16",
+      "product": ["外汇"]
+    }
+  },
+  {
+    "name": "NFCTS",
+    "description_html": "<p>信号策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["李彦杰"],
+    "developers": ["朱思维"],
+    "extra_properties": {
+      "desk": "交易九台",
+      "source": "手工执行",
+      "source_id": "M17",
+      "product": ["利率债", "利率互换", "地方债"]
+    }
+  },
+  {
+    "name": "interest-bond-sta",
+    "description_html": "<p>信号策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["刘杨"],
+    "developers": ["冼啟棉"],
+    "extra_properties": {
+      "desk": "客需交易台",
+      "source": "手工执行",
+      "source_id": "M18",
+      "product": ["利率债"]
+    }
+  },
+  {
+    "name": "credit-bond-sta",
+    "description_html": "<p>信号策略</p>",
+    "state": "Todo",
+    "state_id": "50f81953-4996-4b53-a884-061152169cf6",
+    "assignees": ["刘杨"],
+    "developers": ["冼啟棉"],
+    "extra_properties": {
+      "desk": "客需交易台",
+      "source": "手工执行",
+      "source_id": "M19",
+      "product": ["信用债"]
+    }
+  },
+  {
+    "name": "neu-sta",
+    "description_html": "<p>信号策略</p>",
+    "state": "Backlog",
+    "state_id": "4657dc96-1572-41e3-becd-0ba3d4ff8e22",
+    "assignees": ["刘杨"],
+    "developers": ["冼啟棉"],
+    "extra_properties": {
+      "desk": "客需交易台",
+      "source": "手工执行",
+      "source_id": "M20"
+    }
+  }
+]
