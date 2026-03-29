@@ -93,6 +93,9 @@ export const DRAG_ALLOWED_GROUPS: TIssueGroupByOptions[] = [
   "cycle",
 ];
 
+export const isDragAllowedForGroupBy = (groupBy: TIssueGroupByOptions | null | undefined): boolean =>
+  !groupBy || DRAG_ALLOWED_GROUPS.includes(groupBy) || groupBy.startsWith("extra_property:");
+
 export type TCreateModalStoreTypes =
   | EIssuesStoreType.TEAM
   | EIssuesStoreType.PROJECT
