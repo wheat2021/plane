@@ -24,6 +24,7 @@ const generalSelectors = [
   ".editor-callout-component",
   ".editor-embed-component",
   ".editor-drawio-component",
+  ".mermaid-block",
 ].join(", ");
 
 const maxScrollSpeed = 20;
@@ -70,6 +71,7 @@ const isScrollable = (node: HTMLElement | SVGElement) => {
 
 export const getScrollParent = (node: HTMLElement | SVGElement) => {
   if (scrollParentCache.has(node)) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return scrollParentCache.get(node);
   }
 
@@ -153,6 +155,7 @@ export const DragHandlePlugin = (options: SideMenuPluginProps): SideMenuHandleOp
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const scrollableParent = getScrollParent(dragHandleElement!);
     if (!scrollableParent) return;
 
@@ -176,6 +179,7 @@ export const DragHandlePlugin = (options: SideMenuPluginProps): SideMenuHandleOp
     currentScrollSpeed += (targetScrollAmount - currentScrollSpeed) * acceleration;
 
     if (Math.abs(currentScrollSpeed) > 0.1) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       scrollableParent.scrollBy({ top: currentScrollSpeed });
     }
 
@@ -308,6 +312,7 @@ export const DragHandlePlugin = (options: SideMenuPluginProps): SideMenuHandleOp
 
       // Traverse up the document tree to find if we're inside a list item
       for (let i = resolvedPos.depth; i > 0; i--) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
         if (resolvedPos.node(i).type.name === CORE_EXTENSIONS.LIST_ITEM) {
           isDroppedInsideList = true;
           dropDepth = i;
@@ -316,6 +321,7 @@ export const DragHandlePlugin = (options: SideMenuPluginProps): SideMenuHandleOp
       }
 
       // Handle nested list items and task items
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
       if (droppedNode.type.name === CORE_EXTENSIONS.LIST_ITEM) {
         let slice = view.state.selection.content();
         let newFragment = slice.content;

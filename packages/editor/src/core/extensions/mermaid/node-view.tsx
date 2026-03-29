@@ -39,9 +39,12 @@ export function MermaidBlockNodeView({ node }: NodeViewProps) {
 
         if (renderId !== renderIdRef.current) return;
         setSvg(renderedSvg);
-      } catch {
+      } catch (e) {
         if (renderId !== renderIdRef.current) return;
-        setError("Mermaid 图表语法错误，请检查代码");
+        const msg = e instanceof Error ? e.message : String(e);
+        // mermaid error messages can be verbose HTML — strip tags and truncate
+        const plain = msg.replace(/<[^>]*>/g, "").trim();
+        setError(plain ? `语法错误：${plain.slice(0, 300)}` : "Mermaid 图表语法错误，请检查代码");
       } finally {
         if (renderId === renderIdRef.current) setLoading(false);
       }
