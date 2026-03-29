@@ -238,16 +238,19 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       textblockTypeInputRule({
         find: backtickInputRegex,
         type: this.type,
-        getAttributes: (match) => ({
-          language: match[1],
-        }),
+        getAttributes: (match) => {
+          // skip "mermaid" — handled by MermaidBlockExtension
+          if (match[1] === "mermaid") return false;
+          return { language: match[1] };
+        },
       }),
       textblockTypeInputRule({
         find: tildeInputRegex,
         type: this.type,
-        getAttributes: (match) => ({
-          language: match[1],
-        }),
+        getAttributes: (match) => {
+          if (match[1] === "mermaid") return false;
+          return { language: match[1] };
+        },
       }),
     ];
   },

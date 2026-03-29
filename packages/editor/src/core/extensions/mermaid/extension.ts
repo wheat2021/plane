@@ -48,7 +48,7 @@ export const MermaidBlockExtension = Node.create({
       setMermaidBlock:
         () =>
         ({ commands }) =>
-          commands.setNode(this.name),
+          commands.insertContent({ type: this.name, content: [] }),
     };
   },
 
