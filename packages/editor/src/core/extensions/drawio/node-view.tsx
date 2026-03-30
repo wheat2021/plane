@@ -207,5 +207,12 @@ export function DrawioBlockNodeView({ node }: NodeViewProps) {
 function DrawioPreview({ xml }: { xml: string }) {
   const src = `/drawio/?lightbox=1&highlight=0000ff&nav=1#R${encodeURIComponent(xml)}`;
 
-  return <iframe title="Draw.io Preview" className="w-full border-0 rounded" style={{ height: "400px" }} src={src} />;
+  return (
+    <iframe
+      title="Draw.io Preview"
+      className="w-full border-0 rounded pointer-events-none"
+      style={{ height: "400px" }}
+      src={src}
+    />
+  );
 }
