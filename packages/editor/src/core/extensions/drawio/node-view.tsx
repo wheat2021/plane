@@ -185,7 +185,7 @@ export function DrawioBlockNodeView({ node }: NodeViewProps) {
             {!code.trim() ? (
               <div className="text-sm text-tertiary py-2">空的 Draw.io 图表</div>
             ) : (
-              <DrawioPreview xml={code} />
+              <DrawioPreview key={code} xml={code} />
             )}
           </div>
         )}
@@ -198,17 +198,15 @@ export function DrawioBlockNodeView({ node }: NodeViewProps) {
 }
 
 function DrawioPreview({ xml }: { xml: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [svg, setSvg] = useState<string>("");
-  const [loading, setLoading] = useState(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const handler = (event: MessageEvent) => {
       const iframe = iframeRef.current;
       if (!iframe || event.source !== iframe.contentWindow) return;
 
-      let data: { event?: string; data?: string; xml?: string } = {};
+      let data: { event?: string } = {};
       try {
         data = typeof event.data === "string" ? (JSON.parse(event.data) as typeof data) : (event.data as typeof data);
       } catch {
@@ -216,20 +214,8 @@ function DrawioPreview({ xml }: { xml: string }) {
       }
 
       if (data.event === "init") {
-        iframe.contentWindow?.postMessage(
-          JSON.stringify({
-            action: "export",
-            format: "svg",
-            xml,
-            spinKey: "preview",
-          }),
-          "*"
-        );
-      } else if (data.event === "export") {
-        if (data.data) {
-          setSvg(data.data);
-        }
-        setLoading(false);
+        iframe.contentWindow?.postMessage(JSON.stringify({ action: "load", xml, autosave: 0 }), "*");
+        setLoaded(true);
       }
     };
 
@@ -238,20 +224,14 @@ function DrawioPreview({ xml }: { xml: string }) {
   }, [xml]);
 
   return (
-    <div ref={containerRef}>
-      {loading && <div className="text-sm text-tertiary py-2">正在渲染图表...</div>}
-      {svg && (
-        <div className="flex justify-center">
-          <img src={svg} alt="Draw.io diagram" className="max-w-full" />
-        </div>
-      )}
+    <div>
+      {!loaded && <div className="text-sm text-tertiary py-2">正在渲染图表...</div>}
       <iframe
         ref={iframeRef}
-        title="Draw.io Preview Renderer"
-        className="hidden"
-        src="/drawio/?embed=1&spin=1&proto=json&chrome=0"
-        width="0"
-        height="0"
+        title="Draw.io Preview"
+        className="w-full border-0"
+        style={{ height: loaded ? "400px" : "0px", overflow: "hidden" }}
+        src="/drawio/?embed=1&proto=json&chrome=0&editable=0"
       />
     </div>
   );
