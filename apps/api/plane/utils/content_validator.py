@@ -106,6 +106,8 @@ ATTRIBUTES = {
         "data-emoji-url",
         "data-logo-in-use",
         "data-block-type",
+        # drawio block base64 content
+        "data-content",
     },
     "a": {"href", "target"},
     # editor node/tag attributes

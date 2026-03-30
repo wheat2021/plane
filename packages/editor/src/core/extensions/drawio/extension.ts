@@ -1,4 +1,5 @@
 import { Node, mergeAttributes, textblockTypeInputRule } from "@tiptap/core";
+import { Fragment } from "@tiptap/pm/model";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 // constants
 import { CORE_EXTENSIONS } from "@/constants/extension";
@@ -31,14 +32,33 @@ export const DrawioBlockExtension = Node.create({
         tag: 'pre[data-type="drawioBlock"]',
         priority: 100,
         preserveWhitespace: "full",
+        getContent: (node, schema) => {
+          const el = node as HTMLElement;
+          const b64 = el.getAttribute("data-content");
+          if (b64) {
+            try {
+              const xml = decodeURIComponent(escape(atob(b64)));
+              if (xml) return Fragment.from(schema.text(xml));
+            } catch {
+              // fall through to text content
+            }
+          }
+          const text = el.textContent ?? "";
+          return text ? Fragment.from(schema.text(text)) : Fragment.empty;
+        },
       },
     ];
   },
 
-  renderHTML({ HTMLAttributes }) {
+  renderHTML({ node, HTMLAttributes }) {
+    const xml = node.textContent;
+    const b64 = xml ? btoa(unescape(encodeURIComponent(xml))) : "";
     return [
       "pre",
-      mergeAttributes(HTMLAttributes, { "data-type": "drawioBlock" }),
+      mergeAttributes(HTMLAttributes, {
+        "data-type": "drawioBlock",
+        "data-content": b64,
+      }),
       ["code", { class: "language-drawio" }, 0],
     ];
   },
