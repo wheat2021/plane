@@ -15,6 +15,7 @@ import {
   ListTodo,
   MessageSquareText,
   MinusSquare,
+  PenTool,
   Smile,
   Table,
   TextQuote,
@@ -183,6 +184,15 @@ export const getSlashCommandFilteredSections =
             searchTerms: ["mermaid", "diagram", "flowchart", "graph", "图表", "流程图"],
             icon: <GitGraph className="size-3.5" />,
             command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setMermaidBlock().run(),
+          },
+          {
+            commandKey: "drawio",
+            key: "drawio",
+            title: "Draw.io 图表",
+            description: "插入 Draw.io 图形编辑器",
+            searchTerms: ["drawio", "draw.io", "diagram", "图表", "流程图", "架构图"],
+            icon: <PenTool className="size-3.5" />,
+            command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setDrawioBlock().run(),
           },
           {
             commandKey: "callout",

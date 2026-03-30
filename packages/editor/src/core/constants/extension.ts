@@ -44,6 +44,7 @@ export enum CORE_EXTENSIONS {
   EMOJI = "emoji",
   UNIQUE_ID = "uniqueID",
   MERMAID_BLOCK = "mermaidBlock",
+  DRAWIO_BLOCK = "drawioBlock",
 }
 
 export const BLOCK_NODE_TYPES = [
@@ -70,4 +71,5 @@ export const BLOCK_NODE_TYPES = [
   CORE_EXTENSIONS.CALLOUT,
   CORE_EXTENSIONS.WORK_ITEM_EMBED,
   CORE_EXTENSIONS.MERMAID_BLOCK,
+  CORE_EXTENSIONS.DRAWIO_BLOCK,
 ];

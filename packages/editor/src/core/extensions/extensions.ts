@@ -21,6 +21,7 @@ import {
   CustomQuoteExtension,
   CustomTextAlignExtension,
   CustomTypographyExtension,
+  DrawioBlockExtension,
   ImageExtension,
   ListKeymap,
   MermaidBlockExtension,
@@ -119,6 +120,7 @@ export const CoreEditorExtensions = (args: TArguments): Extensions => {
     CustomTextAlignExtension,
     CustomCalloutExtension,
     MermaidBlockExtension,
+    DrawioBlockExtension,
     UtilityExtension({
       disabledExtensions,
       flaggedExtensions,

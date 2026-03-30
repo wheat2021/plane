@@ -58,6 +58,7 @@ export type TEditorCommands =
   | "text-align"
   | "callout"
   | "mermaid"
+  | "drawio"
   | "attachment"
   | "emoji"
   | "external-embed"

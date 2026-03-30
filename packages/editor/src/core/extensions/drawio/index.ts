@@ -1,0 +1,1 @@
+export { DrawioBlockExtension } from "./extension";

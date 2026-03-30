@@ -92,10 +92,11 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       {
         tag: "pre",
         preserveWhitespace: "full",
-        // skip mermaid blocks so they are parsed by MermaidBlockExtension instead
+        // skip mermaid/drawio blocks so they are parsed by their own extensions
         getAttrs: (node) => {
           const el = node;
-          if (el.getAttribute("data-type") === "mermaidBlock") return false;
+          const dataType = el.getAttribute("data-type");
+          if (dataType === "mermaidBlock" || dataType === "drawioBlock") return false;
           return {};
         },
       },
@@ -239,8 +240,8 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         find: backtickInputRegex,
         type: this.type,
         getAttributes: (match) => {
-          // skip "mermaid" — handled by MermaidBlockExtension
-          if (match[1] === "mermaid") return false;
+          // skip "mermaid"/"drawio" — handled by their own extensions
+          if (match[1] === "mermaid" || match[1] === "drawio") return false;
           return { language: match[1] };
         },
       }),
@@ -248,7 +249,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         find: tildeInputRegex,
         type: this.type,
         getAttributes: (match) => {
-          if (match[1] === "mermaid") return false;
+          if (match[1] === "mermaid" || match[1] === "drawio") return false;
           return { language: match[1] };
         },
       }),

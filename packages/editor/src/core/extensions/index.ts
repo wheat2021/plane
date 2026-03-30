@@ -1,4 +1,5 @@
 export * from "./callout";
+export * from "./drawio";
 export * from "./mermaid";
 export * from "./code";
 export * from "./code-inline";

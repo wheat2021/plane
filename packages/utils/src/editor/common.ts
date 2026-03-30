@@ -39,9 +39,12 @@ export const getEditorAssetDownloadSrc = (args: TEditorSrcArgs): string | undefi
 
 export const getTextContent = (jsx: React.ReactNode | null | undefined): string => {
   if (!jsx) return "";
+  if (typeof jsx === "string") return jsx.trim();
+  if (typeof jsx === "number" || typeof jsx === "boolean") return String(jsx);
 
   const div = document.createElement("div");
-  div.innerHTML = jsx.toString();
+  // eslint-disable-next-line @typescript-eslint/no-base-to-string
+  div.innerHTML = String(jsx);
   return div.textContent?.trim() ?? "";
 };
 
@@ -95,6 +98,8 @@ export enum CORE_EXTENSIONS {
   UTILITY = "utility",
   WORK_ITEM_EMBED = "issue-embed-component",
   EMOJI = "emoji",
+  MERMAID_BLOCK = "mermaidBlock",
+  DRAWIO_BLOCK = "drawioBlock",
 }
 
 export enum ADDITIONAL_EXTENSIONS {}
