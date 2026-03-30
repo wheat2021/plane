@@ -11,6 +11,7 @@ import type { TEditorAsset } from "@/types";
 
 export type TAssetMetaDataRecord = (attrs: ProseMirrorNode["attrs"]) => TEditorAsset | undefined;
 
+/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment */
 export const CORE_ASSETS_META_DATA_RECORD: Partial<
   Record<CORE_EXTENSIONS | ADDITIONAL_EXTENSIONS, TAssetMetaDataRecord>
 > = {
@@ -36,5 +37,17 @@ export const CORE_ASSETS_META_DATA_RECORD: Partial<
       type: CORE_EXTENSIONS.CUSTOM_IMAGE,
     };
   },
+  [CORE_EXTENSIONS.DRAWIO_BLOCK]: (attrs) => {
+    if (!attrs?.src) return;
+    return {
+      href: "",
+      id: attrs?.id ?? "",
+      name: `drawio-${attrs?.id ?? ""}`,
+      size: 0,
+      src: attrs?.src,
+      type: CORE_EXTENSIONS.DRAWIO_BLOCK,
+    };
+  },
   ...ADDITIONAL_ASSETS_META_DATA_RECORD,
 };
+/* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment */

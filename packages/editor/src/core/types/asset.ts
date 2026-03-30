@@ -11,4 +11,13 @@ export type TEditorImageAsset = {
   type: CORE_EXTENSIONS.IMAGE | CORE_EXTENSIONS.CUSTOM_IMAGE;
 };
 
-export type TEditorAsset = TEditorImageAsset | TAdditionalEditorAsset;
+export type TEditorDrawioAsset = {
+  href: string;
+  id: string;
+  name: string;
+  src: string;
+  type: CORE_EXTENSIONS.DRAWIO_BLOCK;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+export type TEditorAsset = TEditorImageAsset | TEditorDrawioAsset | TAdditionalEditorAsset;

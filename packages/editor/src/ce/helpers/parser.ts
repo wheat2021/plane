@@ -3,7 +3,18 @@
  * @param htmlContent
  * @returns {string[]} array of additional asset sources
  */
-export const extractAdditionalAssetsFromHTMLContent = (_htmlContent: string): string[] => [];
+export const extractAdditionalAssetsFromHTMLContent = (htmlContent: string): string[] => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, "text/html");
+  const assetSources: string[] = [];
+  // Extract drawio block asset references (src attribute on pre[data-type="drawioBlock"])
+  const drawioBlocks = doc.querySelectorAll('pre[data-type="drawioBlock"]');
+  drawioBlocks.forEach((block) => {
+    const src = block.getAttribute("data-src");
+    if (src) assetSources.push(src);
+  });
+  return assetSources;
+};
 
 /**
  * @description function to replace additional assets in HTML content with new IDs
@@ -14,6 +25,16 @@ export const replaceAdditionalAssetsInHTMLContent = (props: {
   htmlContent: string;
   assetMap: Record<string, string>;
 }): string => {
-  const { htmlContent } = props;
-  return htmlContent;
+  const { htmlContent, assetMap } = props;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, "text/html");
+  // Replace drawio block asset references
+  const drawioBlocks = doc.querySelectorAll('pre[data-type="drawioBlock"]');
+  drawioBlocks.forEach((block) => {
+    const oldSrc = block.getAttribute("data-src");
+    if (oldSrc && assetMap[oldSrc]) {
+      block.setAttribute("data-src", assetMap[oldSrc]);
+    }
+  });
+  return doc.body.innerHTML;
 };
