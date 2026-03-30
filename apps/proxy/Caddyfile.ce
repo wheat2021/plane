@@ -19,7 +19,9 @@
 
 	reverse_proxy /static/* api:8000
 
-	reverse_proxy /drawio/* plane-drawio:8080
+	handle_path /drawio/* {
+		reverse_proxy plane-drawio:8080
+	}
 
 	reverse_proxy /{$BUCKET_NAME}/* plane-minio:9000
 	reverse_proxy /{$BUCKET_NAME} plane-minio:9000
