@@ -329,6 +329,15 @@ class WorkspaceFileAssetEndpoint(BaseAPIView):
             "image/jpg",
             "image/gif",
         ]
+        # Allow XML types for description entity types (e.g. drawio diagrams)
+        description_entity_types = [
+            FileAsset.EntityTypeContext.PAGE_DESCRIPTION,
+            FileAsset.EntityTypeContext.ISSUE_DESCRIPTION,
+            FileAsset.EntityTypeContext.COMMENT_DESCRIPTION,
+            FileAsset.EntityTypeContext.DRAFT_ISSUE_DESCRIPTION,
+        ]
+        if entity_type in description_entity_types:
+            allowed_types.extend(["text/xml", "application/xml"])
         if type not in allowed_types:
             return Response(
                 {
@@ -528,6 +537,15 @@ class ProjectAssetEndpoint(BaseAPIView):
             "image/jpg",
             "image/gif",
         ]
+        # Allow XML types for description entity types (e.g. drawio diagrams)
+        description_entity_types = [
+            FileAsset.EntityTypeContext.PAGE_DESCRIPTION,
+            FileAsset.EntityTypeContext.ISSUE_DESCRIPTION,
+            FileAsset.EntityTypeContext.COMMENT_DESCRIPTION,
+            FileAsset.EntityTypeContext.DRAFT_ISSUE_DESCRIPTION,
+        ]
+        if entity_type in description_entity_types:
+            allowed_types.extend(["text/xml", "application/xml"])
         if type not in allowed_types:
             return Response(
                 {
@@ -829,3 +847,51 @@ class ProjectAssetDownloadEndpoint(BaseAPIView):
         )
 
         return HttpResponseRedirect(signed_url)
+
+
+class ProjectAssetRawTextEndpoint(BaseAPIView):
+    """Endpoint to read an XML/text asset and return its raw content."""
+
+    @allow_permission([ROLE.ADMIN, ROLE.MEMBER, ROLE.GUEST], level="PROJECT")
+    def get(self, request, slug, project_id, asset_id):
+        try:
+            asset = FileAsset.objects.get(
+                id=asset_id,
+                workspace__slug=slug,
+                project_id=project_id,
+                is_uploaded=True,
+            )
+        except FileAsset.DoesNotExist:
+            return Response(
+                {"error": "The requested asset could not be found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        asset_type = asset.attributes.get("type", "")
+        if asset_type not in ("text/xml", "application/xml"):
+            return Response(
+                {"error": "Only XML assets can be read as raw text."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        storage = S3Storage(request=request)
+        try:
+            response = storage.s3_client.get_object(
+                Bucket=storage.aws_storage_bucket_name,
+                Key=str(asset.asset.name),
+            )
+            content = response["Body"].read().decode("utf-8")
+        except Exception:
+            return Response(
+                {"error": "Failed to read asset content."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # Validate mxfile structure
+        if not content.strip().startswith("<mxfile"):
+            return Response(
+                {"error": "Asset content is not a valid mxfile."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response({"content": content}, status=status.HTTP_200_OK)

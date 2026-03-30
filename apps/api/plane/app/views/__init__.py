@@ -130,6 +130,7 @@ from .asset.v2 import (
     DuplicateAssetEndpoint,
     WorkspaceAssetDownloadEndpoint,
     ProjectAssetDownloadEndpoint,
+    ProjectAssetRawTextEndpoint,
 )
 from .issue.base import (
     IssueListEndpoint,
