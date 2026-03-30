@@ -198,41 +198,7 @@ export function DrawioBlockNodeView({ node }: NodeViewProps) {
 }
 
 function DrawioPreview({ xml }: { xml: string }) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [loaded, setLoaded] = useState(false);
+  const src = `/drawio/?lightbox=1&highlight=0000ff&nav=1#R${encodeURIComponent(xml)}`;
 
-  useEffect(() => {
-    const handler = (event: MessageEvent) => {
-      const iframe = iframeRef.current;
-      if (!iframe || event.source !== iframe.contentWindow) return;
-
-      let data: { event?: string } = {};
-      try {
-        data = typeof event.data === "string" ? (JSON.parse(event.data) as typeof data) : (event.data as typeof data);
-      } catch {
-        return;
-      }
-
-      if (data.event === "init") {
-        iframe.contentWindow?.postMessage(JSON.stringify({ action: "load", xml, autosave: 0 }), "*");
-        setLoaded(true);
-      }
-    };
-
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, [xml]);
-
-  return (
-    <div>
-      {!loaded && <div className="text-sm text-tertiary py-2">正在渲染图表...</div>}
-      <iframe
-        ref={iframeRef}
-        title="Draw.io Preview"
-        className="w-full border-0"
-        style={{ height: loaded ? "400px" : "0px", overflow: "hidden" }}
-        src="/drawio/?embed=1&proto=json&chrome=0&editable=0"
-      />
-    </div>
-  );
+  return <iframe title="Draw.io Preview" className="w-full border-0 rounded" style={{ height: "400px" }} src={src} />;
 }
