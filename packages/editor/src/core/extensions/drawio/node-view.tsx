@@ -82,11 +82,11 @@ function DrawioEditorModal({
 }
 
 export function DrawioBlockNodeView({ node }: NodeViewProps) {
-  const [mode, setMode] = useState<TDrawioMode>("source");
+  const code = node.textContent;
+  const hasContent = code.trim().length > 0 && isValidMxfile(code);
+  const [mode, setMode] = useState<TDrawioMode>(hasContent ? "preview" : "source");
   const [error, setError] = useState("");
   const [showEditor, setShowEditor] = useState(false);
-
-  const code = node.textContent;
 
   const handleSwitchToPreview = useCallback(() => {
     if (!code.trim()) {
@@ -123,73 +123,80 @@ export function DrawioBlockNodeView({ node }: NodeViewProps) {
     setShowEditor(false);
   }, []);
 
+  const toolbar = (
+    <div className="flex items-center gap-1">
+      <button
+        type="button"
+        onClick={handleOpenEditor}
+        className={cn(
+          "flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors",
+          "text-tertiary hover:text-primary hover:bg-layer-3"
+        )}
+      >
+        <Pencil className="size-3" />
+        编辑
+      </button>
+      <button
+        type="button"
+        onClick={handleSwitchToPreview}
+        className={cn(
+          "flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors",
+          mode === "preview" ? "text-primary bg-layer-3" : "text-tertiary hover:text-primary hover:bg-layer-3"
+        )}
+      >
+        <Eye className="size-3" />
+        预览
+      </button>
+      <button
+        type="button"
+        onClick={handleSwitchToSource}
+        className={cn(
+          "flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors",
+          mode === "source" ? "text-primary bg-layer-3" : "text-tertiary hover:text-primary hover:bg-layer-3"
+        )}
+      >
+        <Code2 className="size-3" />
+        源代码
+      </button>
+    </div>
+  );
+
   return (
     <NodeViewWrapper className="drawio-block my-2">
-      <div className="border border-subtle rounded-lg overflow-hidden bg-layer-3">
-        {/* Header toolbar */}
-        <div className="flex items-center justify-between px-3 py-1.5 border-b border-subtle bg-layer-2">
-          <span className="text-xs font-medium text-tertiary">Draw.io 图表</span>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={handleOpenEditor}
-              className={cn(
-                "flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors",
-                mode === "edit" ? "text-primary bg-layer-3" : "text-tertiary hover:text-primary hover:bg-layer-3"
-              )}
-            >
-              <Pencil className="size-3" />
-              编辑
-            </button>
-            <button
-              type="button"
-              onClick={handleSwitchToPreview}
-              className={cn(
-                "flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors",
-                mode === "preview" ? "text-primary bg-layer-3" : "text-tertiary hover:text-primary hover:bg-layer-3"
-              )}
-            >
-              <Eye className="size-3" />
-              预览
-            </button>
-            <button
-              type="button"
-              onClick={handleSwitchToSource}
-              className={cn(
-                "flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors",
-                mode === "source" ? "text-primary bg-layer-3" : "text-tertiary hover:text-primary hover:bg-layer-3"
-              )}
-            >
-              <Code2 className="size-3" />
-              源代码
-            </button>
-          </div>
-        </div>
-
-        {/* Error message */}
-        {error && (
-          <div className="px-3 py-1.5 text-xs text-error-primary bg-error-subtle border-b border-subtle">{error}</div>
-        )}
-
-        {/* Source code editor */}
-        {mode === "source" && (
-          <NodeViewContent
-            as="code"
-            className="block whitespace-pre-wrap font-mono text-sm text-primary p-4 outline-none min-h-[3rem]"
-          />
-        )}
-
-        {/* Preview mode */}
-        {mode === "preview" && (
-          <div className="p-4">
+      {mode === "preview" ? (
+        <>
+          {/* Floating toolbar on hover */}
+          <div className="group relative">
+            <div className="absolute top-1 right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-layer-2 border border-subtle rounded-md shadow-sm px-1 py-0.5">
+              {toolbar}
+            </div>
             {!code.trim() ? (
-              <div className="text-sm text-tertiary py-2">空的 Draw.io 图表</div>
+              <div className="text-sm text-tertiary py-4 px-3">空的 Draw.io 图表</div>
             ) : (
               <DrawioPreview key={code} xml={code} />
             )}
           </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <div className="border border-subtle rounded-lg overflow-hidden bg-layer-3">
+          {/* Header toolbar */}
+          <div className="flex items-center justify-between px-3 py-1.5 border-b border-subtle bg-layer-2">
+            <span className="text-xs font-medium text-tertiary">Draw.io 图表</span>
+            {toolbar}
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <div className="px-3 py-1.5 text-xs text-error-primary bg-error-subtle border-b border-subtle">{error}</div>
+          )}
+
+          {/* Source code editor */}
+          <NodeViewContent
+            as="code"
+            className="block whitespace-pre-wrap font-mono text-sm text-primary p-4 outline-none min-h-[3rem]"
+          />
+        </div>
+      )}
 
       {/* Full-screen modal editor */}
       {showEditor && <DrawioEditorModal xml={code} onSave={handleEditorSave} onClose={handleEditorClose} />}
