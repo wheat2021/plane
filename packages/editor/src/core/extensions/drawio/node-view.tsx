@@ -81,7 +81,7 @@ function DrawioEditorModal({
   );
 }
 
-export function DrawioBlockNodeView({ node }: NodeViewProps) {
+export function DrawioBlockNodeView({ node, editor, getPos }: NodeViewProps) {
   const code = node.textContent;
   const hasContent = code.trim().length > 0 && isValidMxfile(code);
   const [mode, setMode] = useState<TDrawioMode>(hasContent ? "preview" : "source");
@@ -115,9 +115,27 @@ export function DrawioBlockNodeView({ node }: NodeViewProps) {
     setShowEditor(true);
   }, [code]);
 
-  const handleEditorSave = useCallback((_xml: string) => {
-    setShowEditor(false);
-  }, []);
+  const handleEditorSave = useCallback(
+    (xml: string) => {
+      const pos = getPos();
+      if (typeof pos === "number" && editor && !editor.isDestroyed) {
+        const { tr, schema } = editor.state;
+        const from = pos + 1;
+        const to = pos + node.nodeSize - 1;
+        if (xml.trim()) {
+          tr.replaceWith(from, to, schema.text(xml));
+        } else {
+          tr.delete(from, to);
+        }
+        editor.view.dispatch(tr);
+      }
+      setShowEditor(false);
+      if (xml.trim() && isValidMxfile(xml)) {
+        setMode("preview");
+      }
+    },
+    [editor, getPos, node.nodeSize]
+  );
 
   const handleEditorClose = useCallback(() => {
     setShowEditor(false);
