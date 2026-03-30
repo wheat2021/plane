@@ -1,4 +1,15 @@
 services:
+  plane-drawio:
+    image: jgraph/drawio:latest
+    restart: unless-stopped
+    networks:
+      - dev_env
+    environment:
+      DRAWIO_SELF_CONTAINED: 1
+      DRAWIO_BASE_URL: /drawio
+    ports:
+      - "8765:8080"
+
   plane-redis:
     image: valkey/valkey:7.2.11-alpine
     restart: unless-stopped

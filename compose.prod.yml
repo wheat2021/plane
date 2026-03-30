@@ -184,6 +184,14 @@ services:
       - api
       - plane-redis
 
+  plane-drawio:
+    container_name: plane-drawio
+    image: jgraph/drawio:latest
+    restart: always
+    environment:
+      DRAWIO_SELF_CONTAINED: 1
+      DRAWIO_BASE_URL: /drawio
+
   plane-db:
     container_name: plane-db
     image: postgres:15.7-alpine

@@ -50,6 +50,7 @@ export default defineConfig(() => ({
       "/auth": { target: "http://localhost:8000", changeOrigin: true },
       "/uploads": { target: "http://localhost:8000", changeOrigin: true },
       "/media": { target: "http://localhost:8000", changeOrigin: true },
+      "/drawio": { target: "http://localhost:8765", changeOrigin: true },
     },
   },
   // No SSR-specific overrides needed; alias resolves to ESM build
