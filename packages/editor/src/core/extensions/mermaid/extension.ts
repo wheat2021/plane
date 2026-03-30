@@ -1,4 +1,5 @@
 import { Node, mergeAttributes, textblockTypeInputRule } from "@tiptap/core";
+import { Fragment } from "@tiptap/pm/model";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 // constants
 import { CORE_EXTENSIONS } from "@/constants/extension";
@@ -31,14 +32,33 @@ export const MermaidBlockExtension = Node.create({
         tag: 'pre[data-type="mermaidBlock"]',
         priority: 100, // higher than codeBlock default 50, ensures we match before codeBlock's `pre` rule
         preserveWhitespace: "full",
+        getContent: (node, schema) => {
+          const el = node as HTMLElement;
+          const b64 = el.getAttribute("data-content");
+          if (b64) {
+            try {
+              const text = decodeURIComponent(escape(atob(b64)));
+              if (text) return Fragment.from(schema.text(text));
+            } catch {
+              // fall through to text content
+            }
+          }
+          const text = el.textContent ?? "";
+          return text ? Fragment.from(schema.text(text)) : Fragment.empty;
+        },
       },
     ];
   },
 
-  renderHTML({ HTMLAttributes }) {
+  renderHTML({ node, HTMLAttributes }) {
+    const text = node.textContent;
+    const b64 = text ? btoa(unescape(encodeURIComponent(text))) : "";
     return [
       "pre",
-      mergeAttributes(HTMLAttributes, { "data-type": "mermaidBlock" }),
+      mergeAttributes(HTMLAttributes, {
+        "data-type": "mermaidBlock",
+        "data-content": b64,
+      }),
       ["code", { class: "language-mermaid" }, 0],
     ];
   },
