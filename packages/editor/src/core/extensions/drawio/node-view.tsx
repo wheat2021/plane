@@ -196,7 +196,7 @@ export function DrawioBlockNodeView({ node, editor, getPos }: NodeViewProps) {
           </div>
         </>
       ) : (
-        <div className="border border-subtle rounded-lg overflow-hidden bg-layer-3">
+        <div className="border border-subtle rounded-lg overflow-hidden">
           {/* Header toolbar */}
           <div className="flex items-center justify-between px-3 py-1.5 border-b border-subtle bg-layer-2">
             <span className="text-xs font-medium text-tertiary">Draw.io 图表</span>
@@ -223,7 +223,7 @@ export function DrawioBlockNodeView({ node, editor, getPos }: NodeViewProps) {
 }
 
 function DrawioPreview({ xml }: { xml: string }) {
-  const src = `/drawio/?lightbox=1&highlight=0000ff&nav=1#R${encodeURIComponent(xml)}`;
+  const src = `/drawio/?lightbox=1&highlight=0000ff&nav=1&bg=none#R${encodeURIComponent(xml)}`;
 
   return (
     <iframe
