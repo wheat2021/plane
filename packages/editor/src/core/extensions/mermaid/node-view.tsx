@@ -1,7 +1,7 @@
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import type { NodeViewProps } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
-import { Eye, Pencil } from "lucide-react";
+import { Code2, Eye } from "lucide-react";
 // plane utils
 import { cn } from "@plane/utils";
 
@@ -59,23 +59,30 @@ export function MermaidBlockNodeView({ node }: NodeViewProps) {
         {/* Header toolbar */}
         <div className="flex items-center justify-between px-3 py-1.5 border-b border-subtle bg-layer-2">
           <span className="text-xs font-medium text-tertiary">Mermaid 图表</span>
-          <button
-            type="button"
-            onClick={() => setShowPreview((v) => !v)}
-            className="flex items-center gap-1 text-xs text-tertiary hover:text-primary transition-colors px-2 py-0.5 rounded hover:bg-layer-3"
-          >
-            {showPreview ? (
-              <>
-                <Pencil className="size-3" />
-                编辑
-              </>
-            ) : (
-              <>
-                <Eye className="size-3" />
-                预览
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setShowPreview(true)}
+              className={cn(
+                "flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors",
+                showPreview ? "text-primary bg-layer-3" : "text-tertiary hover:text-primary hover:bg-layer-3"
+              )}
+            >
+              <Eye className="size-3" />
+              预览
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowPreview(false)}
+              className={cn(
+                "flex items-center gap-1 text-xs px-2 py-0.5 rounded transition-colors",
+                !showPreview ? "text-primary bg-layer-3" : "text-tertiary hover:text-primary hover:bg-layer-3"
+              )}
+            >
+              <Code2 className="size-3" />
+              代码
+            </button>
+          </div>
         </div>
 
         {/* Code editor */}
