@@ -1,5 +1,5 @@
 import type { TAnalyticsTabsBase } from "@plane/types";
-import { ChartXAxisProperty, ChartYAxisMetric } from "@plane/types";
+import { ChartXAxisProperty } from "@plane/types";
 
 export interface IInsightField {
   key: string;
@@ -163,21 +163,6 @@ export const ANALYTICS_X_AXIS_VALUES: { value: ChartXAxisProperty; label: string
   {
     value: ChartXAxisProperty.CREATED_AT,
     label: "Created date",
-  },
-];
-
-export const ANALYTICS_Y_AXIS_VALUES: { value: ChartYAxisMetric; label: string }[] = [
-  {
-    value: ChartYAxisMetric.WORK_ITEM_COUNT,
-    label: "Work item",
-  },
-  {
-    value: ChartYAxisMetric.ESTIMATE_POINT_COUNT,
-    label: "Estimate",
-  },
-  {
-    value: ChartYAxisMetric.EPIC_WORK_ITEM_COUNT,
-    label: "Epic",
   },
 ];
 

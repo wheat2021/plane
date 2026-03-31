@@ -43,11 +43,17 @@ export type TAnalyticsFilterParams = {
   project_ids?: string;
   cycle_id?: string;
   module_id?: string;
+  x_axis?: TAnalyticsXAxisProperty;
+  group_by?: TAnalyticsXAxisProperty;
+  issue_type_id?: string;
+  issue_type_name?: string;
+  epic?: boolean;
 };
 
 // service types
 
 export interface IAnalyticsResponse {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -83,8 +89,14 @@ export type AnalyticsTableDataMap = {
   "work-items": WorkItemInsightColumns;
 };
 
+// Union type for analytics axis: static properties or extra property (e.g. "extra_property:color")
+export type TAnalyticsXAxisProperty = ChartXAxisProperty | `extra_property:${string}`;
+
 export interface IAnalyticsParams {
-  x_axis: ChartXAxisProperty;
-  y_axis: ChartYAxisMetric;
-  group_by?: ChartXAxisProperty;
+  x_axis: TAnalyticsXAxisProperty;
+  /** Project-context issue type filter: UUID of the IssueType */
+  issue_type_id?: string;
+  /** Workspace-context issue type filter: name of the IssueType (merged across projects) */
+  issue_type_name?: string;
+  group_by?: TAnalyticsXAxisProperty;
 }
