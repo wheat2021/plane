@@ -13,6 +13,8 @@ from plane.db.models import Issue
 from rest_framework.exceptions import ValidationError
 
 
+EXTRA_PROPERTY_PREFIX = "extra_property:"
+
 x_axis_mapper = {
     "STATES": "STATES",
     "STATE_GROUPS": "STATE_GROUPS",
@@ -28,6 +30,16 @@ x_axis_mapper = {
     "COMPLETED_AT": "COMPLETED_AT",
     "CREATED_BY": "CREATED_BY",
 }
+
+
+def is_extra_property_axis(value: Optional[str]) -> bool:
+    """Check if an axis value refers to an extra property."""
+    return bool(value and value.startswith(EXTRA_PROPERTY_PREFIX))
+
+
+def get_extra_property_config_key(value: str) -> str:
+    """Extract the config_key from an extra_property axis value."""
+    return value[len(EXTRA_PROPERTY_PREFIX):]
 
 
 def get_y_axis_filter(y_axis: str) -> Dict[str, Any]:
@@ -69,6 +81,12 @@ def get_x_axis_field() -> Dict[str, Tuple[str, str, Optional[Dict[str, Any]]]]:
         "COMPLETED_AT": ("completed_at__date", "completed_at__date", None),
         "CREATED_BY": ("created_by_id", "created_by__display_name", None),
     }
+
+
+def get_extra_property_field(config_key: str) -> Tuple[str, str, None]:
+    """Return ORM field path for an extra property config_key (select/member types)."""
+    json_path = f"extra_properties__{config_key}"
+    return (json_path, json_path, None)
 
 
 def process_grouped_data(
@@ -151,19 +169,41 @@ def build_analytics_chart(
     x_axis: str,
     group_by: Optional[str] = None,
     date_filter: Optional[str] = None,
+    issue_type_id: Optional[str] = None,
+    issue_type_name: Optional[str] = None,
 ) -> Dict[str, Union[List[Dict[str, Any]], Dict[str, str]]]:
-    # Validate x_axis
-    if x_axis not in x_axis_mapper:
+    # Validate x_axis: must be a known field or an extra_property prefix
+    if not is_extra_property_axis(x_axis) and x_axis not in x_axis_mapper:
         raise ValidationError(f"Invalid x_axis field: {x_axis}")
 
-    # Validate group_by
-    if group_by and group_by not in x_axis_mapper:
+    # Validate group_by: must be a known field, extra_property prefix, or None
+    if group_by and not is_extra_property_axis(group_by) and group_by not in x_axis_mapper:
         raise ValidationError(f"Invalid group_by field: {group_by}")
+
+    # Apply issue type filter
+    if issue_type_id:
+        queryset = queryset.filter(type_id=issue_type_id)
+    elif issue_type_name:
+        queryset = queryset.filter(type__name=issue_type_name)
 
     field_mapping = get_x_axis_field()
 
-    id_field, name_field, additional_filter = field_mapping.get(x_axis, (None, None, {}))
-    group_field, group_name_field, group_additional_filter = field_mapping.get(group_by, (None, None, {}))
+    # Resolve x_axis fields
+    if is_extra_property_axis(x_axis):
+        id_field, name_field, additional_filter = get_extra_property_field(get_extra_property_config_key(x_axis))
+    else:
+        id_field, name_field, additional_filter = field_mapping.get(x_axis, (None, None, {}))
+
+    # Resolve group_by fields
+    if group_by:
+        if is_extra_property_axis(group_by):
+            group_field, group_name_field, group_additional_filter = get_extra_property_field(
+                get_extra_property_config_key(group_by)
+            )
+        else:
+            group_field, group_name_field, group_additional_filter = field_mapping.get(group_by, (None, None, {}))
+    else:
+        group_field = group_name_field = group_additional_filter = None
 
     # Apply additional filters if they exist
     if additional_filter or {}:

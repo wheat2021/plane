@@ -300,8 +300,12 @@ class AdvanceAnalyticsChartEndpoint(AdvanceAnalyticsBaseView):
                 start_date, end_date = self.filters["chart_period_range"]
                 queryset = queryset.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
 
+            # Apply issue type filter (project context: by id; workspace context: by name)
+            issue_type_id = request.GET.get("issue_type_id", None)
+            issue_type_name = request.GET.get("issue_type_name", None)
+
             return Response(
-                build_analytics_chart(queryset, x_axis, group_by),
+                build_analytics_chart(queryset, x_axis, group_by, issue_type_id=issue_type_id, issue_type_name=issue_type_name),
                 status=status.HTTP_200_OK,
             )
 
