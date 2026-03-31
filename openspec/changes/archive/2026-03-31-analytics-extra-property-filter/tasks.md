@@ -57,9 +57,9 @@
 
 ## 11. 用户验证
 
-- [ ] 11.1 **项目分析**：在侧边栏/全屏分析中，Issue Type 下拉框应显示该项目的所有 issue types + "全部类型"；选择特定类型后图表数据应过滤
-- [ ] 11.2 **项目分析**：X 轴和分组下拉框中，应在静态选项（Priority/State/...）之后出现该项目的 select/member extra properties
-- [ ] 11.3 **工作区分析**：Issue Type 下拉框应显示所有有权限项目 issue types 的合并列表（按名字去重）
-- [ ] 11.4 **工作区分析**：X 轴和分组下拉框中，应出现所有有权限项目的 select/member extra properties（按 config_key 去重）
-- [ ] 11.5 **图表渲染**：选择 extra property 作为分组时，图例应显示 option label 而非 UUID；未设置属性的工作项归入"无"分组
-- [ ] 11.6 **互斥检查**：当 extra property 选为 X 轴时，同一属性不应出现在分组下拉框中（反之亦然）
+- [x] 11.1 **项目分析**：在侧边栏/全屏分析中，Issue Type 下拉框应显示该项目的所有 issue types + "全部类型"；选择特定类型后图表数据应过滤
+- [x] 11.2 **项目分析**：X 轴和分组下拉框中，应在静态选项（Priority/State/...）之后出现该项目的 select/member extra properties
+- [x] 11.3 **工作区分析**：Issue Type 下拉框应显示所有有权限项目 issue types 的合并列表（按名字去重）
+- [x] 11.4 **工作区分析**：X 轴和分组下拉框中，应出现所有有权限项目的 select/member extra properties（按 config_key 去重）
+- [x] 11.5 **图表渲染**：选择 extra property 作为分组时，图例应显示 option label 而非 UUID；未设置属性的工作项归入"无"分组
+- [x] 11.6 **互斥检查**：当 extra property 选为 X 轴时，同一属性不应出现在分组下拉框中（反之亦然）
