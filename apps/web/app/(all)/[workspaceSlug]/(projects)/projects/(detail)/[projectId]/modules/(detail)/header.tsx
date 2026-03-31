@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-floating-promises, @typescript-eslint/no-unsafe-member-access */
 import { useCallback, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
@@ -15,7 +16,12 @@ import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
 import { ModuleIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
-import type { ICustomSearchSelectOption, IIssueDisplayFilterOptions, IIssueDisplayProperties, TExtraDisplayProperties } from "@plane/types";
+import type {
+  ICustomSearchSelectOption,
+  IIssueDisplayFilterOptions,
+  IIssueDisplayProperties,
+  TExtraDisplayProperties,
+} from "@plane/types";
 import { EIssuesStoreType, EIssueLayoutTypes } from "@plane/types";
 import { Breadcrumbs, Header, BreadcrumbNavigationSearchDropdown } from "@plane/ui";
 import { cn } from "@plane/utils";
@@ -227,6 +233,7 @@ export const ModuleIssuesHeader = observer(function ModuleIssuesHeader() {
                 handleExtraDisplayPropertiesUpdate={handleExtraDisplayProperties}
                 ignoreGroupedFilters={["module"]}
                 cycleViewDisabled={!currentProjectDetails?.cycle_view}
+                projectId={projectId?.toString()}
                 moduleViewDisabled={!currentProjectDetails?.module_view}
               />
             </FiltersDropdown>

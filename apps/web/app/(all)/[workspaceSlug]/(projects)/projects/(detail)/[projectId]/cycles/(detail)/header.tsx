@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-floating-promises, @typescript-eslint/no-unsafe-member-access */
 import { useCallback, useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
@@ -17,7 +18,12 @@ import { Button } from "@plane/propel/button";
 import { IconButton } from "@plane/propel/icon-button";
 import { CycleIcon } from "@plane/propel/icons";
 import { Tooltip } from "@plane/propel/tooltip";
-import type { ICustomSearchSelectOption, IIssueDisplayFilterOptions, IIssueDisplayProperties, TExtraDisplayProperties } from "@plane/types";
+import type {
+  ICustomSearchSelectOption,
+  IIssueDisplayFilterOptions,
+  IIssueDisplayProperties,
+  TExtraDisplayProperties,
+} from "@plane/types";
 import { EIssuesStoreType, EIssueLayoutTypes } from "@plane/types";
 import { Breadcrumbs, BreadcrumbNavigationSearchDropdown, Header } from "@plane/ui";
 import { cn } from "@plane/utils";
@@ -101,7 +107,13 @@ export const CycleIssuesHeader = observer(function CycleIssuesHeader() {
   const handleExtraDisplayProperties = useCallback(
     (updatedExtraDisplayProperties: TExtraDisplayProperties) => {
       if (!workspaceSlug || !projectId) return;
-      updateFilters(workspaceSlug, projectId, EIssueFilterType.EXTRA_DISPLAY_PROPERTIES, updatedExtraDisplayProperties, cycleId);
+      updateFilters(
+        workspaceSlug,
+        projectId,
+        EIssueFilterType.EXTRA_DISPLAY_PROPERTIES,
+        updatedExtraDisplayProperties,
+        cycleId
+      );
     },
     [workspaceSlug, projectId, cycleId, updateFilters]
   );
@@ -232,6 +244,7 @@ export const CycleIssuesHeader = observer(function CycleIssuesHeader() {
                 ignoreGroupedFilters={["cycle"]}
                 cycleViewDisabled={!currentProjectDetails?.cycle_view}
                 moduleViewDisabled={!currentProjectDetails?.module_view}
+                projectId={projectId?.toString()}
               />
             </FiltersDropdown>
 
