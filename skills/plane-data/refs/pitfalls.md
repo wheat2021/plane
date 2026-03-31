@@ -2,10 +2,10 @@
 
 ## Django Shell 执行
 
-| 坑                | 说明                                                                 | 正确做法                                                                  |
-| ----------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| 中文 unicode 转义 | heredoc 内嵌中文 JSON 时，`display_name` 被存为 `\u82df\u690d\u4e1c` | 用 `subprocess.run(input=script)` 传递 Python 脚本，不要用 heredoc 嵌中文 |
-| Python 3.7 兼容性 | 生产服务器不支持 `list[dict]`、`dict[str,str]`                       | 用 `list`、`dict` 替代                                                    |
+| 坑                | 说明                                                                 | 正确做法                                                                 |
+| ----------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| 中文 unicode 转义 | heredoc 内嵌中文 JSON 时，`display_name` 被存为 `\u82df\u690d\u4e1c` | 将脚本写入 .py 文件，用 `cat script.py \| docker exec -i ... shell` 执行 |
+| stdin 冲突        | 脚本通过 stdin 传入时，无法再用 `sys.stdin` 读数据                   | 数据文件用 `docker cp` 放入容器，脚本中 `open('/tmp/data.json')` 读取    |
 
 ## Issue 操作
 
@@ -29,6 +29,7 @@
 | ----------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
 | IssueTypeExtraProperty 无 workspace | 继承 BaseModel 不是 ProjectBaseModel           | get_or_create 时不传 workspace                    |
 | EP key workspace 级唯一             | `ExtraPropertyConfig(workspace, key)` 唯一约束 | 不同 IssueType 共享同一 config，通过 binding 区分 |
+| EP binding 是 project 级            | 同一 IssueType 在不同项目需分别绑定 EP         | 每个目标项目都要创建 IssueTypeExtraProperty       |
 
 ## REST API 限制
 

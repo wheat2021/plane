@@ -75,6 +75,9 @@ binding, b = IssueTypeExtraProperty.objects.get_or_create(
 )
 ```
 
+> ⚠️ IssueType 和 ExtraPropertyConfig 是 **workspace 级别**，但 binding 是 **project 级别**。
+> 同一 IssueType 要在多个项目中使用时，必须在每个项目中分别创建 binding。
+
 ## 创建 State
 
 ```python

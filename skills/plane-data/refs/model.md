@@ -100,6 +100,9 @@ IssueAssignee (ProjectBaseModel)
 IssueRelation (ProjectBaseModel)
   issue_id, related_issue_id
   relation_type    # relates_to | blocked_by | duplicate
+  # 方向: issue → related_issue
+  # relates_to: 双向对称（A relates B = B relates A）
+  # blocked_by: issue 被 related_issue 阻塞
 
 IssueLabel (ProjectBaseModel)
   issue_id, label_id(FK→Label)

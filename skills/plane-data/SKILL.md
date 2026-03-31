@@ -27,6 +27,7 @@ metadata:
 | 创建 IssueType / EP / State / Label | `ops-schema.md`     | Schema 操作模板           |
 | 批量导入/更新/删除 Issue            | `ops-issue.md`      | Issue CRUD + 关联模板     |
 | 创建用户 / 成员管理                 | `ops-user.md`       | 用户 + Member 操作        |
+| Dev→Prod 跨环境迁移                 | `migrate-plane.md`  | State/User/EP UUID 映射   |
 | Jira CSV/XLSX 迁移                  | `migrate-jira.md`   | 5 阶段标准流程            |
 | 自定义数据源导入                    | `migrate-custom.md` | 迭代式导入流程            |
 | 查数据模型字段                      | `model.md`          | 模型字段速查              |
@@ -44,7 +45,6 @@ metadata:
 BASE_URL    = http://localhost:8000
 API_TOKEN   = plane_api_7ad39eb392a542f59bcc59e8fcb92b9d
 WORKSPACE   = ficc
-PROJECT_ID  = 18b7ccc8-4b96-4af0-8c6f-76550cba28a7
 CONTAINER   = plane-api-1
 ```
 
@@ -54,10 +54,18 @@ CONTAINER   = plane-api-1
 BASE_URL    = http://10.102.21.231:8080
 API_TOKEN   = plane_api_592e30b2a377449db5a6238eb6f54f3b
 WORKSPACE   = ficc
-PROJECT_ID  = f5a45eb3-66a3-48cb-8c96-d09f80791645
 CONTAINER   = api
 SERVER      = appadmin@10.102.21.231
 ```
+
+### 项目 ID
+
+| 项目   | Dev                                    | 生产                                   |
+| ------ | -------------------------------------- | -------------------------------------- |
+| FICC   | `18b7ccc8-4b96-4af0-8c6f-76550cba28a7` | `f5a45eb3-66a3-48cb-8c96-d09f80791645` |
+| AURORA | —                                      | `61326292-8542-4bc2-8041-145e294d41d7` |
+
+> ⚠️ 用户未指定项目时**必须询问**，不要默认使用任何项目 ID。
 
 ### 认证
 
@@ -84,26 +92,24 @@ Django Shell: docker exec -i <CONTAINER> python manage.py shell
 ### Django Shell 执行模式
 
 ```bash
-# Dev — heredoc（简单操作，无中文数据）
+# Dev — 简单操作
 docker exec -i plane-api-1 python manage.py shell << 'EOF'
 ...
 EOF
 
-# Dev — subprocess（推荐，支持中文，避免编码问题）
-python3 -c "
-import subprocess
-script = '''...'''
-subprocess.run(['docker','exec','-i','plane-api-1','python','manage.py','shell'],
-               input=script, capture_output=True, text=True)
-"
-
-# 生产
+# 生产 — 简单操作（无中文、无外部数据）
 ssh appadmin@10.102.21.231 "docker exec -i api python manage.py shell << 'EOF'
 ...
 EOF"
+
+# 生产 — 推荐方式（中文安全、支持外部数据文件）
+# 1. 写脚本到本地 /tmp/xxx.py
+# 2. scp 到服务器 + docker cp 数据文件到容器
+# 3. cat script.py | ssh ... "docker exec -i api python manage.py shell"
 ```
 
-> ⚠️ 涉及中文 display_name 等数据时，**必须用 subprocess + input=** 传递脚本，不要用 heredoc 内嵌中文 JSON，否则 unicode 会被转义。详见 `refs/pitfalls.md`。
+> ⚠️ 生产脚本需要读取外部数据时，**不能用 stdin**（已被脚本本身占用）。
+> 必须先 `docker cp` 数据文件到容器内，脚本中用 `open('/tmp/data.json')` 读取。
 
 ---
 
@@ -131,8 +137,6 @@ rsync -av data/<任务名>/ appadmin@10.102.21.231:/home/appadmin/plane-data/<�
 ssh appadmin@10.102.21.231 "cd /home/appadmin/plane-data/<任务名> && python3 import_users.py --env prod"
 ssh appadmin@10.102.21.231 "cd /home/appadmin/plane-data/<任务名> && python3 import_issues.py --env prod"
 ```
-
-> ⚠️ 生产 Python 3.7，不支持 `list[dict]` 等 3.9+ 类型注解。
 
 ---
 
