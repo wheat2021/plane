@@ -7,16 +7,18 @@ import useSWR from "swr";
 // plane package imports
 import { Download } from "lucide-react";
 import type { ChartXAxisDateGrouping } from "@plane/constants";
-import { ANALYTICS_X_AXIS_VALUES, ANALYTICS_Y_AXIS_VALUES, CHART_COLOR_PALETTES, EChartModels } from "@plane/constants";
+import { ANALYTICS_X_AXIS_VALUES, CHART_COLOR_PALETTES, EChartModels } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
 import { BarChart } from "@plane/propel/charts/bar-chart";
 import { EmptyStateCompact } from "@plane/propel/empty-state";
-import type { TBarItem, TChart, TChartDatum, ChartXAxisProperty, ChartYAxisMetric } from "@plane/types";
+import type { TBarItem, TChart, TChartDatum, TAnalyticsXAxisProperty, TExtraPropertyConfig } from "@plane/types";
 // plane web components
 import { generateExtendedColors, parseChartData } from "@/components/chart/utils";
 // hooks
 import { useAnalytics } from "@/hooks/store/use-analytics";
+import { useExtraPropertyConfig } from "@/hooks/store/use-extra-property-config";
+import { useMember } from "@/hooks/store/use-member";
 import { useProjectState } from "@/hooks/store/use-project-state";
 import { AnalyticsService } from "@/services/analytics.service";
 import { exportCSV } from "../export";
@@ -25,6 +27,7 @@ import { ChartLoader } from "../loaders";
 import { generateBarColor } from "./utils";
 
 declare module "@tanstack/react-table" {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData extends RowData, TValue> {
     export: {
       key: string;
@@ -34,49 +37,106 @@ declare module "@tanstack/react-table" {
   }
 }
 
+const EXTRA_PROPERTY_PREFIX = "extra_property:";
+
 interface Props {
-  x_axis: ChartXAxisProperty;
-  y_axis: ChartYAxisMetric;
-  group_by?: ChartXAxisProperty;
+  x_axis: TAnalyticsXAxisProperty;
+  issue_type_id?: string;
+  issue_type_name?: string;
+  group_by?: TAnalyticsXAxisProperty;
   x_axis_date_grouping?: ChartXAxisDateGrouping;
+  projectId?: string;
+  workspaceSlug: string;
 }
 
 const analyticsService = new AnalyticsService();
+
 const PriorityChart = observer(function PriorityChart(props: Props) {
-  const { x_axis, y_axis, group_by } = props;
+  const { x_axis, issue_type_id, issue_type_name, group_by, workspaceSlug: workspaceSlugProp } = props;
   const { t } = useTranslation();
   // store hooks
-  const { selectedDuration, selectedProjects, selectedCycle, selectedModule, isPeekView, isEpic } = useAnalytics();
+  const { selectedDuration, selectedProjects, selectedCycle, selectedModule, isPeekView } = useAnalytics();
   const { workspaceStates } = useProjectState();
   const { resolvedTheme } = useTheme();
-  // router
-  const params = useParams();
-  const workspaceSlug = params.workspaceSlug.toString();
+  const { getConfigsByWorkspace } = useExtraPropertyConfig();
+  const { getUserDetails } = useMember();
+  // router — use prop first (for modal context), fall back to URL param
+  const routeParams = useParams();
+  const workspaceSlug = (routeParams.workspaceSlug ?? workspaceSlugProp).toString();
 
   const { data: priorityChartData, isLoading: priorityChartLoading } = useSWR(
-    `customized-insights-chart-${workspaceSlug}-${selectedDuration}-
-    ${selectedProjects}-${selectedCycle}-${selectedModule}-${props.x_axis}-${props.y_axis}-${props.group_by}-${isPeekView}-${isEpic}`,
+    `customized-insights-chart-${workspaceSlug}-${selectedDuration}-${selectedProjects?.join(",")}-${selectedCycle}-${selectedModule}-${x_axis}-${issue_type_id}-${issue_type_name}-${group_by}-${isPeekView}`,
     () =>
       analyticsService.getAdvanceAnalyticsCharts<TChart>(
         workspaceSlug,
         "custom-work-items",
         {
-          // date_filter: selectedDuration,
           ...(selectedProjects?.length > 0 && { project_ids: selectedProjects?.join(",") }),
           ...(selectedCycle ? { cycle_id: selectedCycle } : {}),
           ...(selectedModule ? { module_id: selectedModule } : {}),
-          ...(isEpic ? { epic: true } : {}),
-          ...props,
+          ...(issue_type_id ? { issue_type_id } : {}),
+          ...(issue_type_name ? { issue_type_name } : {}),
+          x_axis,
+          ...(group_by ? { group_by } : {}),
         },
         isPeekView
       )
   );
-  const parsedData = useMemo(
-    () =>
-      priorityChartData && parseChartData(priorityChartData, props.x_axis, props.group_by, props.x_axis_date_grouping),
-    [priorityChartData, props.x_axis, props.group_by, props.x_axis_date_grouping]
+
+  const extraPropertyConfigs = useMemo<TExtraPropertyConfig[]>(
+    () => getConfigsByWorkspace(workspaceSlug) ?? [],
+     
+    [workspaceSlug, getConfigsByWorkspace]
   );
-  const chart_model = props.group_by ? EChartModels.STACKED : EChartModels.BASIC;
+
+  /** Map a raw backend key (option_id / user_id / "None") to a human-readable label. */
+  const resolveExtraPropertyLabel = useMemo(
+    () =>
+      (axisValue: TAnalyticsXAxisProperty | undefined, rawKey: string): string => {
+        if (!axisValue?.startsWith(EXTRA_PROPERTY_PREFIX)) return rawKey;
+        const configKey = axisValue.slice(EXTRA_PROPERTY_PREFIX.length);
+        const config = extraPropertyConfigs.find((c) => c.key === configKey);
+        if (!config) return rawKey;
+        if (!rawKey || rawKey === "none" || rawKey === "None" || rawKey === "null") return "无";
+        if (config.type === "select") {
+          const option = config.options?.find((o: { value: string; label?: string }) => o.value === rawKey);
+          return option?.label ?? rawKey;
+        }
+        if (config.type === "member") {
+          const user = getUserDetails(rawKey);
+          return user?.display_name ?? rawKey;
+        }
+        return rawKey;
+      },
+    [extraPropertyConfigs, getUserDetails]
+  );
+
+  const rawParsedData = useMemo(
+    () => priorityChartData && parseChartData(priorityChartData, x_axis, group_by, props.x_axis_date_grouping),
+    [priorityChartData, x_axis, group_by, props.x_axis_date_grouping]
+  );
+
+  // Remap extra property raw keys (option IDs / user IDs) to human-readable labels
+  const parsedData = useMemo(() => {
+    if (!rawParsedData) return undefined;
+    const isExtraX = x_axis?.startsWith(EXTRA_PROPERTY_PREFIX);
+    const isExtraGroup = group_by?.startsWith(EXTRA_PROPERTY_PREFIX);
+    if (!isExtraX && !isExtraGroup) return rawParsedData;
+
+    const remappedData = rawParsedData.data.map((datum) => ({
+      ...datum,
+      name: isExtraX ? resolveExtraPropertyLabel(x_axis, datum.name) : datum.name,
+    })) as TChartDatum[];
+
+    const remappedSchema: Record<string, string> = {};
+    for (const key of Object.keys(rawParsedData.schema)) {
+      remappedSchema[key] = isExtraGroup ? resolveExtraPropertyLabel(group_by, key) : rawParsedData.schema[key];
+    }
+
+    return { data: remappedData, schema: remappedSchema };
+  }, [rawParsedData, x_axis, group_by, resolveExtraPropertyLabel]);
+
+  const chart_model = group_by ? EChartModels.STACKED : EChartModels.BASIC;
 
   const bars: TBarItem<string>[] = useMemo(() => {
     if (!parsedData) return [];
@@ -84,13 +144,15 @@ const PriorityChart = observer(function PriorityChart(props: Props) {
     const schemaKeys = Object.keys(parsedData.schema);
     const baseColors = CHART_COLOR_PALETTES[0]?.[resolvedTheme === "dark" ? "dark" : "light"];
     const extendedColors = generateExtendedColors(baseColors ?? [], schemaKeys.length);
+
     if (chart_model === EChartModels.BASIC) {
       parsedBars = [
         {
           key: "count",
           label: "Count",
           stackId: "bar-one",
-          fill: (payload) => generateBarColor(payload.key, { x_axis, y_axis, group_by }, baseColors, workspaceStates),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+          fill: (payload) => generateBarColor(payload.key, { x_axis, group_by }, baseColors, workspaceStates),
           textClassName: "",
           showPercentage: false,
           showTopBorderRadius: () => true,
@@ -98,18 +160,12 @@ const PriorityChart = observer(function PriorityChart(props: Props) {
         },
       ];
     } else if (chart_model === EChartModels.STACKED && parsedData.schema) {
-      const parsedExtremes: {
-        [key: string]: {
-          top: string | null;
-          bottom: string | null;
-        };
-      } = {};
+      const parsedExtremes: Record<string, { top: string | null; bottom: string | null }> = {};
       parsedData.data.forEach((datum) => {
         let top = null;
         let bottom = null;
-        for (let i = 0; i < schemaKeys.length; i++) {
-          const key = schemaKeys[i];
-          if (datum[key] === 0) continue;
+        for (const key of schemaKeys) {
+          if ((datum as Record<string, number>)[key] === 0) continue;
           if (!bottom) bottom = key;
           top = key;
         }
@@ -123,23 +179,22 @@ const PriorityChart = observer(function PriorityChart(props: Props) {
         fill: extendedColors[index],
         textClassName: "",
         showPercentage: false,
-        showTopBorderRadius: (value, payload: TChartDatum) => parsedExtremes[payload.key].top === value,
-        showBottomBorderRadius: (value, payload: TChartDatum) => parsedExtremes[payload.key].bottom === value,
+        showTopBorderRadius: (value, payload: TChartDatum) => parsedExtremes[payload.key]?.top === value,
+        showBottomBorderRadius: (value, payload: TChartDatum) => parsedExtremes[payload.key]?.bottom === value,
       }));
     } else {
       parsedBars = [];
     }
     return parsedBars;
-  }, [chart_model, group_by, parsedData, resolvedTheme, workspaceStates, x_axis, y_axis]);
+  }, [chart_model, group_by, parsedData, resolvedTheme, workspaceStates, x_axis]);
 
-  const yAxisLabel = useMemo(
-    () => ANALYTICS_Y_AXIS_VALUES.find((item) => item.value === props.y_axis)?.label ?? props.y_axis,
-    [props.y_axis]
-  );
-  const xAxisLabel = useMemo(
-    () => ANALYTICS_X_AXIS_VALUES.find((item) => item.value === props.x_axis)?.label ?? props.x_axis,
-    [props.x_axis]
-  );
+  const xAxisLabel = useMemo(() => {
+    if (x_axis?.startsWith(EXTRA_PROPERTY_PREFIX)) {
+      const configKey = x_axis.slice(EXTRA_PROPERTY_PREFIX.length);
+      return extraPropertyConfigs.find((c) => c.key === configKey)?.label ?? configKey;
+    }
+    return ANALYTICS_X_AXIS_VALUES.find((item) => item.value === x_axis)?.label ?? x_axis;
+  }, [x_axis, extraPropertyConfigs]);
 
   const defaultColumns: ColumnDef<TChartDatum>[] = useMemo(
     () => [
@@ -176,11 +231,13 @@ const PriorityChart = observer(function PriorityChart(props: Props) {
         ? Object.keys(parsedData?.schema ?? {}).map((key) => ({
             accessorKey: key,
             header: () => <div className="text-right">{parsedData.schema[key]}</div>,
-            cell: ({ row }) => <div className="text-right">{row.original[key]}</div>,
+            cell: ({ row }) => (
+              <div className="text-right">{(row.original as Record<string, unknown>)[key] as number}</div>
+            ),
             meta: {
               export: {
                 key,
-                value: (row) => row.original[key],
+                value: (row) => (row.original as Record<string, unknown>)[key] as number,
                 label: parsedData.schema[key],
               },
             },
@@ -190,7 +247,7 @@ const PriorityChart = observer(function PriorityChart(props: Props) {
   );
 
   return (
-    <div className="flex flex-col gap-12 ">
+    <div className="flex flex-col gap-12">
       {priorityChartLoading ? (
         <ChartLoader />
       ) : parsedData?.data && parsedData.data.length > 0 ? (
@@ -199,9 +256,7 @@ const PriorityChart = observer(function PriorityChart(props: Props) {
             className="h-[370px] w-full"
             data={parsedData.data}
             bars={bars}
-            margin={{
-              bottom: 30,
-            }}
+            margin={{ bottom: 30 }}
             xAxis={{
               key: "name",
               label: xAxisLabel.replace("_", " "),
@@ -209,7 +264,7 @@ const PriorityChart = observer(function PriorityChart(props: Props) {
             }}
             yAxis={{
               key: "count",
-              label: t("common.no_of", { entity: yAxisLabel.replace("_", " ") }),
+              label: t("common.no_of", { entity: "Work item" }),
               offset: -60,
               dx: -26,
             }}

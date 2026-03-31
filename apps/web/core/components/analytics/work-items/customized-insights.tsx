@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 // plane package imports
 import { useTranslation } from "@plane/i18n";
 import type { IAnalyticsParams } from "@plane/types";
-import { ChartXAxisProperty, ChartYAxisMetric } from "@plane/types";
+import { ChartXAxisProperty } from "@plane/types";
 import { cn } from "@plane/utils";
 // plane web components
 import AnalyticsSectionWrapper from "../analytics-section-wrapper";
@@ -13,23 +13,23 @@ import PriorityChart from "./priority-chart";
 
 const CustomizedInsights = observer(function CustomizedInsights({
   peekView,
-  isEpic,
+  projectId,
 }: {
   peekView?: boolean;
-  isEpic?: boolean;
+  projectId?: string;
 }) {
   const { t } = useTranslation();
   const { workspaceSlug } = useParams();
   const { control, watch, setValue } = useForm<IAnalyticsParams>({
     defaultValues: {
       x_axis: ChartXAxisProperty.PRIORITY,
-      y_axis: isEpic ? ChartYAxisMetric.EPIC_WORK_ITEM_COUNT : ChartYAxisMetric.WORK_ITEM_COUNT,
     },
   });
 
   const params = {
     x_axis: watch("x_axis"),
-    y_axis: watch("y_axis"),
+    issue_type_id: watch("issue_type_id"),
+    issue_type_name: watch("issue_type_name"),
     group_by: watch("group_by"),
   };
 
@@ -44,11 +44,18 @@ const CustomizedInsights = observer(function CustomizedInsights({
           setValue={setValue}
           params={params}
           workspaceSlug={workspaceSlug.toString()}
-          isEpic={isEpic}
+          projectId={projectId}
         />
       }
     >
-      <PriorityChart x_axis={params.x_axis} y_axis={params.y_axis} group_by={params.group_by} />
+      <PriorityChart
+        x_axis={params.x_axis}
+        issue_type_id={params.issue_type_id}
+        issue_type_name={params.issue_type_name}
+        group_by={params.group_by}
+        projectId={projectId}
+        workspaceSlug={workspaceSlug.toString()}
+      />
     </AnalyticsSectionWrapper>
   );
 });

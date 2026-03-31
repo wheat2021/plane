@@ -1,11 +1,10 @@
 // plane package imports
-import type { ChartYAxisMetric, IState } from "@plane/types";
+import type { IState, TAnalyticsXAxisProperty } from "@plane/types";
 import { ChartXAxisProperty } from "@plane/types";
 
 interface ParamsProps {
-  x_axis: ChartXAxisProperty;
-  y_axis: ChartYAxisMetric;
-  group_by?: ChartXAxisProperty;
+  x_axis: TAnalyticsXAxisProperty;
+  group_by?: TAnalyticsXAxisProperty;
 }
 
 export const generateBarColor = (

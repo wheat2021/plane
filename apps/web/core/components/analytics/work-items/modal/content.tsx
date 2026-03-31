@@ -21,7 +21,7 @@ type Props = {
 };
 
 export const WorkItemsModalMainContent = observer(function WorkItemsModalMainContent(props: Props) {
-  const { projectDetails, cycleDetails, moduleDetails, fullScreen, isEpic } = props;
+  const { projectDetails, cycleDetails, moduleDetails, fullScreen } = props;
   const { updateSelectedProjects, updateSelectedCycle, updateSelectedModule, updateIsPeekView } = useAnalytics();
   const [isModalConfigured, setIsModalConfigured] = useState(false);
 
@@ -73,7 +73,7 @@ export const WorkItemsModalMainContent = observer(function WorkItemsModalMainCon
       <div className="flex flex-col gap-14 overflow-y-auto p-6">
         <TotalInsights analyticsType="work-items" peekView={!fullScreen} />
         <CreatedVsResolved />
-        <CustomizedInsights peekView={!fullScreen} isEpic={isEpic} />
+        <CustomizedInsights peekView={!fullScreen} projectId={projectDetails?.id} />
         <WorkItemsInsightTable />
       </div>
     </Tab.Group>

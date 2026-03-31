@@ -1,13 +1,13 @@
 // plane package imports
-import type { ChartXAxisProperty } from "@plane/types";
+import type { TAnalyticsXAxisProperty } from "@plane/types";
 import { CustomSelect } from "@plane/ui";
 
 type Props = {
-  value?: ChartXAxisProperty;
-  onChange: (val: ChartXAxisProperty | null) => void;
-  options: { value: ChartXAxisProperty; label: string }[];
+  value?: TAnalyticsXAxisProperty;
+  onChange: (val: TAnalyticsXAxisProperty | null) => void;
+  options: { value: TAnalyticsXAxisProperty; label: string }[];
   placeholder?: string;
-  hiddenOptions?: ChartXAxisProperty[];
+  hiddenOptions?: TAnalyticsXAxisProperty[];
   allowNoValue?: boolean;
   label?: string | React.ReactNode;
 };

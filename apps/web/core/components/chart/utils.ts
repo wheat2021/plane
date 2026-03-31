@@ -1,6 +1,6 @@
 import { getWeekOfMonth, isValid } from "date-fns";
 import { CHART_X_AXIS_DATE_PROPERTIES, ChartXAxisDateGrouping, TO_CAPITALIZE_PROPERTIES } from "@plane/constants";
-import type { ChartXAxisProperty, TChart, TChartDatum } from "@plane/types";
+import type { ChartXAxisProperty, TAnalyticsXAxisProperty, TChart, TChartDatum } from "@plane/types";
 import {
   capitalizeFirstLetter,
   hexToHsl,
@@ -51,8 +51,8 @@ const getDateGroupingName = (date: string, dateGrouping: ChartXAxisDateGrouping)
 
 export const parseChartData = (
   data: TChart | null | undefined,
-  xAxisProperty: ChartXAxisProperty | null | undefined,
-  groupByProperty: ChartXAxisProperty | null | undefined,
+  xAxisProperty: TAnalyticsXAxisProperty | ChartXAxisProperty | null | undefined,
+  groupByProperty: TAnalyticsXAxisProperty | ChartXAxisProperty | null | undefined,
   xAxisDateGrouping: ChartXAxisDateGrouping | null | undefined
 ): TChart => {
   if (!data) {
@@ -71,12 +71,12 @@ export const parseChartData = (
 
     if (xAxisProperty) {
       // capitalize first letter if xAxisProperty is in TO_CAPITALIZE_PROPERTIES and no groupByProperty is set
-      if (TO_CAPITALIZE_PROPERTIES.includes(xAxisProperty)) {
+      if (TO_CAPITALIZE_PROPERTIES.includes(xAxisProperty as ChartXAxisProperty)) {
         datum.name = capitalizeFirstLetter(datum.name);
       }
 
       // parse timestamp to visual date if xAxisProperty is in WIDGET_X_AXIS_DATE_PROPERTIES
-      if (CHART_X_AXIS_DATE_PROPERTIES.includes(xAxisProperty)) {
+      if (CHART_X_AXIS_DATE_PROPERTIES.includes(xAxisProperty as ChartXAxisProperty)) {
         datum.name = getDateGroupingName(datum.name, xAxisDateGrouping ?? ChartXAxisDateGrouping.DAY);
       }
     }
@@ -90,13 +90,13 @@ export const parseChartData = (
   // capitalize first letter if groupByProperty is in TO_CAPITALIZE_PROPERTIES
   const updatedSchema = schema;
   if (groupByProperty) {
-    if (TO_CAPITALIZE_PROPERTIES.includes(groupByProperty)) {
+    if (TO_CAPITALIZE_PROPERTIES.includes(groupByProperty as ChartXAxisProperty)) {
       Object.keys(updatedSchema).forEach((key) => {
         updatedSchema[key] = capitalizeFirstLetter(updatedSchema[key]);
       });
     }
 
-    if (CHART_X_AXIS_DATE_PROPERTIES.includes(groupByProperty)) {
+    if (CHART_X_AXIS_DATE_PROPERTIES.includes(groupByProperty as ChartXAxisProperty)) {
       Object.keys(updatedSchema).forEach((key) => {
         updatedSchema[key] = getDateGroupingName(updatedSchema[key], xAxisDateGrouping ?? ChartXAxisDateGrouping.DAY);
       });
