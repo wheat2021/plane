@@ -256,6 +256,7 @@ export const ProjectViewForm = observer(function ProjectViewForm(props: Props) {
                               }}
                               cycleViewDisabled={!projectDetails?.cycle_view}
                               moduleViewDisabled={!projectDetails?.module_view}
+                              projectId={projectId}
                             />
                           </FiltersDropdown>
                         )}
