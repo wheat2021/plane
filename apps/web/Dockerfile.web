@@ -78,8 +78,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV TURBO_TELEMETRY_DISABLED=1
 
 # Build the web application
+# Mount turbo cache so dependency packages (editor, propel, ui, etc.) are
+# only rebuilt when their own source changes, not when web/ code changes.
 ENV NODE_OPTIONS="--max-old-space-size=4096"
-RUN pnpm turbo run build --filter=web
+RUN --mount=type=cache,id=turbo-web,target=/app/.turbo \
+    pnpm turbo run build --filter=web
 
 # *****************************************************************************
 # STAGE 3: Serve with nginx
