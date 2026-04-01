@@ -4,7 +4,7 @@ description: FICC 专用 Plane 生产部署助手。将本地 itemtype 分支代
 license: MIT
 metadata:
   author: ficc-local
-  version: "1.1"
+  version: "1.2"
 ---
 
 # Plane 生产部署助手（FICC 专用）
@@ -66,6 +66,52 @@ TARBALL_DEPLOY = /home/appadmin/plane-ficc.tar.gz  # 部署服务器路径
 IMAGE_TAG      = ficc-latest
 SERVICE_URL    = http://10.102.21.231:8080    # 生产服务访问地址
 ```
+
+---
+
+## 变更感知的镜像选择（`--images` 省略时的自动推断）
+
+当用户未指定 `--images` 时，通过 deploy tag 自动推断需要构建的镜像范围。
+
+### 步骤
+
+1. 查找上次部署 tag：
+   ```bash
+   LAST_TAG=$(git describe --tags --match 'deploy-*' --abbrev=0 2>/dev/null)
+   ```
+2. 如果找到 tag，获取变更文件列表：
+   ```bash
+   git diff --name-only $LAST_TAG..HEAD
+   ```
+3. 按路径映射到镜像：
+
+| 变更路径前缀 | 需要构建的镜像 |
+|-------------|---------------|
+| `apps/api/` | `api` |
+| `apps/web/` | `web` |
+| `apps/admin/` | `admin` |
+| `apps/space/` | `space` |
+| `apps/live/` | `live` |
+| `apps/proxy/` | `proxy` |
+| `packages/` | `web` `admin` `space` `live`（所有前端镜像） |
+
+4. 如果没有找到 deploy tag（首次部署），构建所有镜像。
+5. 向用户展示推断结果并确认：
+   ```
+   📋 上次部署: deploy-20260401-1411 (3 commits ago)
+   📁 变更文件: apps/web/core/components/views/form.tsx, apps/web/Dockerfile.web
+   🎯 推断镜像: web
+   确认构建 web？[Y/n/自定义]
+   ```
+
+### Deploy Tag 规范
+
+- 格式：`deploy-YYYYMMDD-HHmm`（如 `deploy-20260401-1411`）
+- 在 Phase 6 VERIFY 成功后自动打 tag 并推送
+- tag 命令：
+  ```bash
+  git tag deploy-$(date +%Y%m%d-%H%M) && git push origin deploy-$(date +%Y%m%d-%H%M)
+  ```
 
 ---
 
@@ -246,7 +292,9 @@ ssh appadmin@10.102.21.231 "
   cd /home/appadmin/plane
   if docker-compose -f docker-compose-prod.yml ps -q 2>/dev/null | grep -q .; then
     echo '检测到服务已运行 → 增量更新（--force-recreate，数据 volume 不受影响）'
-    docker-compose -f docker-compose-prod.yml up -d --force-recreate
+    # ⚠️ 仅前端镜像（web/admin/space）时加 --no-deps 避免级联重启 db/redis/api
+    # 含后端镜像（api/live）或全量时不加 --no-deps
+    docker-compose -f docker-compose-prod.yml up -d --no-deps --force-recreate {{DEPLOY_SERVICES}}
   else
     echo '未检测到运行中的服务 → 首次启动'
     docker-compose -f docker-compose-prod.yml up -d
@@ -267,6 +315,10 @@ ssh appadmin@10.102.21.231 "
   timeout 360 bash -c 'until [ \$(docker inspect plane-migrator --format=\"{{.State.Status}}\") = \"exited\" ] 2>/dev/null; do sleep 5; printf \".\"; done'
   docker inspect plane-migrator --format='迁移状态: ExitCode={{.State.ExitCode}}'
 
+  echo '=== 等待 API 就绪 ==='
+  timeout 90 bash -c 'until curl -sf -o /dev/null http://localhost:8080/auth/sign-in/ -X POST -H \"Content-Type: application/json\" -d \"{}\"; do sleep 5; printf \".\"; done'
+  echo ''
+
   echo '=== HTTP 验证 ==='
   for path in '/' '/god-mode/' '/spaces/'; do
     code=\$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080\$path)
@@ -280,6 +332,17 @@ ssh appadmin@10.102.21.231 "
     -d '{\"email\":\"test@example.com\",\"password\":\"test\"}'
 "
 ```
+
+### 验证成功后打 Deploy Tag
+
+验证全部通过后，在本地 itemtype 分支打 tag：
+
+```bash
+git tag deploy-$(date +%Y%m%d-%H%M)
+git push origin deploy-$(date +%Y%m%d-%H%M)
+```
+
+此 tag 用于下次部署时自动推断变更范围（见「变更感知的镜像选择」章节）。
 
 期望结果：
 
@@ -431,7 +494,7 @@ WEB_URL=http://10.102.21.231:8080
 | 构建 API                 | ~30 秒         | ~10 秒                | 3 秒        |
 | 构建 proxy               | ~20 秒         | ~5 秒                 | 2 秒        |
 | 构建 live                | ~3 分钟        | ~3 分钟（TS编译为主） | 3 秒        |
-| 构建 web                 | ~4 分钟        | ~4 分钟（TS编译为主） | 3 秒        |
+| 构建 web                 | ~4 分钟        | ~2 分30秒（turbo 缓存） | 3 秒        |
 | 构建 admin               | ~2 分钟        | ~3 分20秒（实测）     | 3 秒        |
 | 构建 space               | ~3 分钟        | ~4 分钟（TS编译为主） | 3 秒        |
 | 打包 tar.gz              | ~60 秒         | ~60 秒                | ~60 秒      |
