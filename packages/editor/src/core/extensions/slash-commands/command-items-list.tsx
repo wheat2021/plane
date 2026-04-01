@@ -1,5 +1,6 @@
 import {
   ALargeSmall,
+  BarChart2,
   CaseSensitive,
   Code2,
   GitGraph,
@@ -193,6 +194,16 @@ export const getSlashCommandFilteredSections =
             searchTerms: ["drawio", "draw.io", "diagram", "图表", "流程图", "架构图"],
             icon: <PenTool className="size-3.5" />,
             command: ({ editor, range }) => editor.chain().focus().deleteRange(range).setDrawioBlock().run(),
+          },
+          {
+            commandKey: "analytics",
+            key: "analytics",
+            title: "Analytics 图表",
+            description: "插入实时分析图表",
+            searchTerms: ["analytics", "chart", "图表", "分析", "柱状图", "折线图", "饼图"],
+            icon: <BarChart2 className="size-3.5" />,
+            command: ({ editor, range }: CommandProps) =>
+              editor.chain().focus().deleteRange(range).setAnalyticsChart().run(),
           },
           {
             commandKey: "callout",

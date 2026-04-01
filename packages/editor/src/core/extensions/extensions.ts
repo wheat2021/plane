@@ -10,6 +10,7 @@ import { Underline } from "@tiptap/extension-underline";
 import { Markdown } from "tiptap-markdown";
 // extensions
 import {
+  AnalyticsChartExtension,
   CustomCalloutExtension,
   CustomCodeBlockExtension,
   CustomCodeInlineExtension,
@@ -121,6 +122,7 @@ export const CoreEditorExtensions = (args: TArguments): Extensions => {
     CustomCalloutExtension,
     MermaidBlockExtension,
     DrawioBlockExtension,
+    AnalyticsChartExtension,
     UtilityExtension({
       disabledExtensions,
       flaggedExtensions,

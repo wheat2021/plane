@@ -1,3 +1,4 @@
+export * from "./analytics-chart";
 export * from "./callout";
 export * from "./drawio";
 export * from "./mermaid";
