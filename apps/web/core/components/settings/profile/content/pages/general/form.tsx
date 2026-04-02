@@ -264,7 +264,7 @@ export const GeneralProfileSettingsForm = observer(function GeneralProfileSettin
                       onChange={onChange}
                       ref={ref}
                       hasError={Boolean(errors.first_name)}
-                      placeholder="Enter your first name"
+                      placeholder={t("enter_first_name")}
                       className={`w-full rounded-md ${errors.first_name ? "border-danger-strong" : ""}`}
                       maxLength={24}
                       autoComplete="on"
@@ -287,7 +287,7 @@ export const GeneralProfileSettingsForm = observer(function GeneralProfileSettin
                       onChange={onChange}
                       ref={ref}
                       hasError={Boolean(errors.last_name)}
-                      placeholder="Enter your last name"
+                      placeholder={t("enter_last_name")}
                       className="w-full rounded-md"
                       maxLength={24}
                       autoComplete="on"
@@ -323,7 +323,7 @@ export const GeneralProfileSettingsForm = observer(function GeneralProfileSettin
                       onChange={onChange}
                       ref={ref}
                       hasError={Boolean(errors?.display_name)}
-                      placeholder="Enter your display name"
+                      placeholder={t("enter_display_name")}
                       className={`w-full ${errors?.display_name ? "border-danger-strong" : ""}`}
                       maxLength={24}
                     />
@@ -352,7 +352,7 @@ export const GeneralProfileSettingsForm = observer(function GeneralProfileSettin
                       value={value}
                       ref={ref}
                       hasError={Boolean(errors.email)}
-                      placeholder="Enter your email"
+                      placeholder={t("enter_email")}
                       className={`w-full cursor-not-allowed rounded-md !bg-surface-2 ${
                         errors.email ? "border-danger-strong" : ""
                       }`}
