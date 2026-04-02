@@ -113,6 +113,7 @@ build/
 temp/
 scripts/
 jira_data/
+data/
 
 # coding tools
 .kiro/

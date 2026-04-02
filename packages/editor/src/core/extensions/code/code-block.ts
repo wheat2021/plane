@@ -1,4 +1,5 @@
 import { mergeAttributes, Node, textblockTypeInputRule } from "@tiptap/core";
+import { Fragment } from "@tiptap/pm/model";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 // constants
 import { CORE_EXTENSIONS } from "@/constants/extension";
@@ -99,14 +100,30 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           if (dataType === "mermaidBlock" || dataType === "drawioBlock") return false;
           return {};
         },
+        getContent: (node, schema) => {
+          const el = node as HTMLElement;
+          const b64 = el.getAttribute("data-content");
+          if (b64) {
+            try {
+              const text = decodeURIComponent(escape(atob(b64)));
+              if (text) return Fragment.from(schema.text(text));
+            } catch {
+              // fall through to text content
+            }
+          }
+          const text = el.textContent ?? "";
+          return text ? Fragment.from(schema.text(text)) : Fragment.empty;
+        },
       },
     ];
   },
 
   renderHTML({ node, HTMLAttributes }) {
+    const text = node.textContent;
+    const b64 = text ? btoa(unescape(encodeURIComponent(text))) : "";
     return [
       "pre",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, { "data-content": b64 }),
       [
         "code",
         {

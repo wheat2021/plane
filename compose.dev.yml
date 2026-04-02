@@ -149,7 +149,7 @@ services:
     environment:
       TZ: Asia/Shanghai
       DEBUG: 1
-      CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3100"
+      CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3100,http://127.0.0.1:3000,http://127.0.0.1:3001,http://127.0.0.1:3002,http://127.0.0.1:3100"
       POSTGRES_HOST: plane-db
       POSTGRES_PORT: 5432
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@plane-db:5432/${POSTGRES_DB}"
@@ -165,14 +165,14 @@ services:
       HARD_DELETE_AFTER_DAYS: 60
       FILE_SIZE_LIMIT: 5242880
       API_KEY_RATE_LIMIT: "60/minute"
-      WEB_URL: "http://localhost:3000"
-      APP_BASE_URL: "http://localhost:3000"
+      WEB_URL: "http://127.0.0.1:3000"
+      APP_BASE_URL: "http://127.0.0.1:3000"
       APP_BASE_PATH: ""
-      ADMIN_BASE_URL: "http://localhost:3001"
+      ADMIN_BASE_URL: "http://127.0.0.1:3001"
       ADMIN_BASE_PATH: "/god-mode"
-      SPACE_BASE_URL: "http://localhost:3002"
+      SPACE_BASE_URL: "http://127.0.0.1:3002"
       SPACE_BASE_PATH: "/spaces"
-      LIVE_BASE_URL: "http://localhost:3100"
+      LIVE_BASE_URL: "http://127.0.0.1:3100"
       LIVE_BASE_PATH: "/live"
       API_BASE_URL: "http://localhost:8000"
       ENABLE_DRF_SPECTACULAR: 1
