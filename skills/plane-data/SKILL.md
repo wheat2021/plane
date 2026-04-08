@@ -64,6 +64,7 @@ SERVER      = appadmin@10.102.21.231
 | ------ | -------------------------------------- | -------------------------------------- |
 | FICC   | `18b7ccc8-4b96-4af0-8c6f-76550cba28a7` | `f5a45eb3-66a3-48cb-8c96-d09f80791645` |
 | AURORA | —                                      | `61326292-8542-4bc2-8041-145e294d41d7` |
+| MANUAL | —                                      | `5e14ad73-fcc2-4ee6-946d-9a8c73c08571` |
 
 > ⚠️ 用户未指定项目时**必须询问**，不要默认使用任何项目 ID。
 
@@ -88,6 +89,8 @@ Django Shell: docker exec -i <CONTAINER> python manage.py shell
 | 创建 Cycle / Module           | Django Shell（REST 有 bug）   |
 | 关联已完成 Cycle              | Django Shell（REST 返回 400） |
 | 需要触发通知/活动日志         | REST API                      |
+
+> **原则**：优先用 ORM 查询获取数据，避免不必要的外部数据文件传输。例如获取 workspace 全部用户，直接在脚本中查 `WorkspaceMember`，无需先 REST API 导出再传文件。
 
 ### Django Shell 执行模式
 

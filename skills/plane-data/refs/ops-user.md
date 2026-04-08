@@ -33,6 +33,30 @@ for u_data in users_data:
     )
 ```
 
+## 批量添加已有 workspace 成员到项目
+
+将 workspace 中所有（或部分）用户添加为某项目的 ProjectMember。无需外部数据文件，直接用 ORM 查询。
+
+```python
+from plane.db.models import Workspace, WorkspaceMember, Project, ProjectMember
+
+ws = Workspace.objects.get(slug='ficc')
+proj = Project.objects.get(id='<PROJECT_ID>')
+admin = ProjectMember.objects.filter(project=proj, role=20).first().member
+
+ws_members = WorkspaceMember.objects.filter(workspace=ws).select_related('member')
+added = 0
+for wm in ws_members:
+    _, created = ProjectMember.objects.get_or_create(
+        project=proj, member=wm.member,
+        defaults={'role': 15, 'workspace': ws, 'created_by': admin, 'updated_by': admin}
+    )
+    if created:
+        added += 1
+
+print(f'Added {added} members to project')
+```
+
 ## 修复 display_name（unicode 转义问题）
 
 如果用 heredoc 创建了用户导致 display_name 是 unicode 转义字符串：
