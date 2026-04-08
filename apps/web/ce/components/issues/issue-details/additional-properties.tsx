@@ -45,9 +45,14 @@ export const WorkItemAdditionalSidebarProperties = observer((props: TWorkItemAdd
     }
   }, [workspaceSlug, projectId, workItemTypeId, bindingFetchedMap, fetchBindings]);
 
+  // Derive fetch-readiness flags so useMemo recomputes after async fetches complete
+  const configsReady = !!configFetchedMap[workspaceSlug];
+  const bindingsReady = !!bindingFetchedMap[projectId]?.[workItemTypeId ?? ""];
+
   // Get configs via bindings, preserving binding sort_order, filtering condition bindings
   const { configs, requiredKeys } = useMemo(() => {
-    if (!workItemTypeId) return { configs: [] as TExtraPropertyConfig[], requiredKeys: new Set<string>() };
+    if (!workItemTypeId || !configsReady || !bindingsReady)
+      return { configs: [] as TExtraPropertyConfig[], requiredKeys: new Set<string>() };
     const bindings = getBindings(projectId, workItemTypeId);
     const configList: TExtraPropertyConfig[] = [];
     const reqKeys = new Set<string>();
@@ -63,7 +68,7 @@ export const WorkItemAdditionalSidebarProperties = observer((props: TWorkItemAdd
       }
     });
     return { configs: configList, requiredKeys: reqKeys };
-  }, [workItemTypeId, projectId, getBindings, getConfigById, isConditionMet, issue?.extra_properties]);
+  }, [workItemTypeId, projectId, configsReady, bindingsReady, getBindings, getConfigById, isConditionMet, issue?.extra_properties]);
 
   // Handler for updating extra properties
   const handleChange = (key: string, value: TExtraPropertyValue) => {
