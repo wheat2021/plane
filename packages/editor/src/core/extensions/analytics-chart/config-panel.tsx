@@ -1,17 +1,20 @@
 import type React from "react";
-import { useState } from "react";
 import { BarChart2, ChartArea, ChartLine, ChartPie, Radar, LayoutGrid } from "lucide-react";
 // plane imports
 import { ANALYTICS_X_AXIS_VALUES, CHART_X_AXIS_DATE_PROPERTIES } from "@plane/constants";
 import type { ChartXAxisProperty } from "@plane/types";
+import { CustomSelect } from "@plane/ui";
 import { cn } from "@plane/utils";
 // local imports
+import type { TAnalyticsChartOption } from "./context";
 import type { TAnalyticsChartConfig } from "./types";
 import { EAnalyticsChartType } from "./types";
 
 type Props = {
   config: TAnalyticsChartConfig;
-  onApply: (config: TAnalyticsChartConfig) => void;
+  onUpdate: (config: TAnalyticsChartConfig) => void;
+  onApply: () => void;
+  xAxisOptions?: TAnalyticsChartOption[];
 };
 
 const CHART_TYPES: { type: EAnalyticsChartType; label: string; icon: React.JSX.Element }[] = [
@@ -24,6 +27,7 @@ const CHART_TYPES: { type: EAnalyticsChartType; label: string; icon: React.JSX.E
 ];
 
 const DURATION_OPTIONS = [
+  { value: "", label: "全部时间" },
   { value: "7d", label: "最近 7 天" },
   { value: "30d", label: "最近 30 天" },
   { value: "90d", label: "最近 3 个月" },
@@ -31,30 +35,30 @@ const DURATION_OPTIONS = [
   { value: "365d", label: "最近 1 年" },
 ];
 
-// Date axis properties for Line/Area chart constraints
-const DATE_AXIS_VALUES = ANALYTICS_X_AXIS_VALUES.filter((o) => CHART_X_AXIS_DATE_PROPERTIES.includes(o.value));
-
-export function ConfigPanel({ config: initialConfig, onApply }: Props) {
-  const [config, setConfig] = useState<TAnalyticsChartConfig>(initialConfig);
-
+export function ConfigPanel({ config, onUpdate, onApply, xAxisOptions: externalOptions }: Props) {
   const isDateOnlyChartType =
     config.chart_type === EAnalyticsChartType.LINE || config.chart_type === EAnalyticsChartType.AREA;
   const showGroupBy = config.chart_type !== EAnalyticsChartType.PIE;
 
-  const xAxisOptions = isDateOnlyChartType ? DATE_AXIS_VALUES : ANALYTICS_X_AXIS_VALUES;
+  const allOptions = externalOptions ?? ANALYTICS_X_AXIS_VALUES;
+  const xAxisOptions = isDateOnlyChartType
+    ? allOptions.filter((o) => CHART_X_AXIS_DATE_PROPERTIES.includes(o.value as ChartXAxisProperty))
+    : allOptions;
+
+  function update(patch: Partial<TAnalyticsChartConfig>) {
+    onUpdate({ ...config, ...patch });
+  }
 
   function handleChartTypeChange(type: EAnalyticsChartType) {
-    const newConfig = { ...config, chart_type: type };
+    const patch: Partial<TAnalyticsChartConfig> = { chart_type: type };
     const isDateOnly = type === EAnalyticsChartType.LINE || type === EAnalyticsChartType.AREA;
-    // If switching to date-only and current x_axis is not date, clear it
     if (isDateOnly && !CHART_X_AXIS_DATE_PROPERTIES.includes(config.x_axis as ChartXAxisProperty)) {
-      newConfig.x_axis = CHART_X_AXIS_DATE_PROPERTIES[0];
+      patch.x_axis = CHART_X_AXIS_DATE_PROPERTIES[0];
     }
-    // Pie: clear group_by
     if (type === EAnalyticsChartType.PIE) {
-      delete newConfig.group_by;
+      patch.group_by = undefined;
     }
-    setConfig(newConfig);
+    update(patch);
   }
 
   return (
@@ -87,54 +91,67 @@ export function ConfigPanel({ config: initialConfig, onApply }: Props) {
         {/* X Axis */}
         <div>
           <p className="mb-1 text-xs font-medium text-secondary">X 轴</p>
-          <select
+          <CustomSelect
             value={config.x_axis ?? ""}
-            onChange={(e) => setConfig({ ...config, x_axis: e.target.value })}
-            className="w-full rounded border border-subtle bg-layer-2 px-2 py-1.5 text-xs text-primary outline-none focus:border-custom-primary-100"
+            label={
+              <span className="text-xs">
+                {xAxisOptions.find((o) => o.value === config.x_axis)?.label ?? "选择属性"}
+              </span>
+            }
+            onChange={(val: string) => update({ x_axis: val })}
+            buttonClassName="w-full text-xs"
           >
-            <option value="">选择属性</option>
             {xAxisOptions.map((o) => (
-              <option key={o.value} value={o.value}>
+              <CustomSelect.Option key={o.value} value={o.value}>
                 {o.label}
-              </option>
+              </CustomSelect.Option>
             ))}
-          </select>
+          </CustomSelect>
         </div>
 
         {/* Group By */}
         {showGroupBy && (
           <div>
             <p className="mb-1 text-xs font-medium text-secondary">分组</p>
-            <select
+            <CustomSelect
               value={config.group_by ?? ""}
-              onChange={(e) => setConfig({ ...config, group_by: e.target.value || undefined })}
-              className="w-full rounded border border-subtle bg-layer-2 px-2 py-1.5 text-xs text-primary outline-none focus:border-custom-primary-100"
+              label={
+                <span className="text-xs">
+                  {allOptions.find((o) => o.value === config.group_by)?.label ?? "无分组"}
+                </span>
+              }
+              onChange={(val: string) => update({ group_by: val || undefined })}
+              buttonClassName="w-full text-xs"
             >
-              <option value="">无分组</option>
-              {ANALYTICS_X_AXIS_VALUES.filter((o) => (o.value as string) !== config.x_axis).map((o) => (
-                <option key={o.value} value={o.value}>
+              <CustomSelect.Option value="">无分组</CustomSelect.Option>
+              {allOptions.filter((o) => (o.value as string) !== config.x_axis).map((o) => (
+                <CustomSelect.Option key={o.value} value={o.value}>
                   {o.label}
-                </option>
+                </CustomSelect.Option>
               ))}
-            </select>
+            </CustomSelect>
           </div>
         )}
 
         {/* Duration */}
         <div>
           <p className="mb-1 text-xs font-medium text-secondary">时间范围</p>
-          <select
+          <CustomSelect
             value={config.duration ?? ""}
-            onChange={(e) => setConfig({ ...config, duration: e.target.value || undefined })}
-            className="w-full rounded border border-subtle bg-layer-2 px-2 py-1.5 text-xs text-primary outline-none focus:border-custom-primary-100"
+            label={
+              <span className="text-xs">
+                {DURATION_OPTIONS.find((o) => o.value === (config.duration ?? ""))?.label ?? "全部时间"}
+              </span>
+            }
+            onChange={(val: string) => update({ duration: val || undefined })}
+            buttonClassName="w-full text-xs"
           >
-            <option value="">全部时间</option>
             {DURATION_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
+              <CustomSelect.Option key={o.value} value={o.value}>
                 {o.label}
-              </option>
+              </CustomSelect.Option>
             ))}
-          </select>
+          </CustomSelect>
         </div>
 
         {/* Issue Type Name */}
@@ -143,7 +160,8 @@ export function ConfigPanel({ config: initialConfig, onApply }: Props) {
           <input
             type="text"
             value={config.issue_type_name ?? ""}
-            onChange={(e) => setConfig({ ...config, issue_type_name: e.target.value || undefined })}
+            onMouseDown={(e) => e.stopPropagation()}
+            onChange={(e) => update({ issue_type_name: e.target.value || undefined })}
             placeholder="全部类型"
             className="w-full rounded border border-subtle bg-layer-2 px-2 py-1.5 text-xs text-primary outline-none focus:border-custom-primary-100 placeholder:text-tertiary"
           />
@@ -156,7 +174,8 @@ export function ConfigPanel({ config: initialConfig, onApply }: Props) {
         <input
           type="text"
           value={config.title ?? ""}
-          onChange={(e) => setConfig({ ...config, title: e.target.value || undefined })}
+          onMouseDown={(e) => e.stopPropagation()}
+          onChange={(e) => update({ title: e.target.value || undefined })}
           placeholder="可选标题"
           className="w-full rounded border border-subtle bg-layer-2 px-2 py-1.5 text-xs text-primary outline-none focus:border-custom-primary-100 placeholder:text-tertiary"
         />
@@ -166,7 +185,7 @@ export function ConfigPanel({ config: initialConfig, onApply }: Props) {
       <div className="flex justify-end gap-2">
         <button
           type="button"
-          onClick={() => onApply(config)}
+          onClick={() => onApply()}
           disabled={!config.x_axis}
           className="rounded bg-custom-primary-100 px-4 py-1.5 text-xs font-medium text-white hover:bg-custom-primary-200 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
         >

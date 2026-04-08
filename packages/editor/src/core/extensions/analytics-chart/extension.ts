@@ -1,4 +1,5 @@
 import { Node, mergeAttributes, nodeInputRule } from "@tiptap/core";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 // constants
 import { CORE_EXTENSIONS } from "@/constants/extension";
@@ -90,5 +91,26 @@ export const AnalyticsChartExtension = Node.create({
 
   addNodeView() {
     return ReactNodeViewRenderer(AnalyticsChartNodeView);
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("analytics-chart-form-events"),
+        props: {
+          handleDOMEvents: {
+            mousedown(_view, event) {
+              const target = event.target as HTMLElement;
+              // Prevent ProseMirror from handling mousedown on form elements,
+              // which would trigger NodeSelection and re-render, closing native dropdowns
+              if (target.closest("select, input, textarea")) {
+                return true;
+              }
+              return false;
+            },
+          },
+        },
+      }),
+    ];
   },
 });

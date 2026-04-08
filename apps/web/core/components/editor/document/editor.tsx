@@ -1,6 +1,6 @@
-import { forwardRef } from "react";
+import { forwardRef, useMemo } from "react";
 // plane imports
-import { DocumentEditorWithRef } from "@plane/editor";
+import { DocumentEditorWithRef, AnalyticsChartProvider } from "@plane/editor";
 import type { IEditorPropsExtended, EditorRefApi, IDocumentEditorProps, TFileHandler } from "@plane/editor";
 import type { MakeOptional, TSearchEntityRequestPayload, TSearchResponse } from "@plane/types";
 import { cn } from "@plane/utils";
@@ -8,6 +8,8 @@ import { cn } from "@plane/utils";
 import { useEditorConfig, useEditorMention } from "@/hooks/editor";
 import { useMember } from "@/hooks/store/use-member";
 import { useParseEditorContent } from "@/hooks/use-parse-editor-content";
+// analytics hooks
+import { useAnalyticsXAxisOptions } from "@/components/analytics/hooks/use-analytics-options";
 // plane web hooks
 import { useEditorFlagging } from "@/plane-web/hooks/use-editor-flagging";
 // local imports
@@ -66,9 +68,13 @@ export const DocumentEditor = forwardRef(function DocumentEditor(
   });
   // editor config
   const { getEditorFileHandlers } = useEditorConfig();
+  // analytics chart options (static + extra properties)
+  const xAxisOptions = useAnalyticsXAxisOptions(workspaceSlug);
+  const analyticsChartCtx = useMemo(() => ({ xAxisOptions }), [xAxisOptions]);
 
   return (
-    <DocumentEditorWithRef
+    <AnalyticsChartProvider value={analyticsChartCtx}>
+      <DocumentEditorWithRef
       ref={ref}
       disabledExtensions={[...documentEditorExtensions.disabled, ...(additionalDisabledExtensions ?? [])]}
       editable={editable}
@@ -94,6 +100,7 @@ export const DocumentEditor = forwardRef(function DocumentEditor(
       {...rest}
       containerClassName={cn("relative pl-3 pb-3", containerClassName)}
     />
+    </AnalyticsChartProvider>
   );
 });
 

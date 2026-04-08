@@ -21,3 +21,5 @@ export * from "@/types";
 
 // additional exports
 export { TrailingNode } from "./core/extensions/trailing-node";
+export { AnalyticsChartProvider } from "./core/extensions/analytics-chart/context";
+export type { TAnalyticsChartContext, TAnalyticsChartOption } from "./core/extensions/analytics-chart/context";

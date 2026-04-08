@@ -7,6 +7,7 @@ import { cn } from "@plane/utils";
 // local imports
 import { ChartRenderer } from "./chart-renderer";
 import { ConfigPanel } from "./config-panel";
+import { useAnalyticsChartContext } from "./context";
 import type { TAnalyticsChartConfig } from "./types";
 import { EAnalyticsChartType } from "./types";
 
@@ -25,12 +26,19 @@ export function AnalyticsChartNodeView({ node, updateAttributes, editor }: NodeV
   const [mode, setMode] = useState<"preview" | "config">(complete ? "preview" : "config");
   const isEditable = editor.isEditable;
 
+  const chartCtx = useAnalyticsChartContext();
+
   // Extract workspaceSlug from URL path (first segment): /{workspaceSlug}/...
   const workspaceSlug =
     typeof window !== "undefined" ? (window.location.pathname.split("/").filter(Boolean)[0] ?? "") : "";
 
-  function handleApply(newConfig: TAnalyticsChartConfig) {
+  // Save config to node attrs immediately
+  function handleUpdate(newConfig: TAnalyticsChartConfig) {
     updateAttributes({ config: newConfig });
+  }
+
+  // Switch to preview
+  function handleApply() {
     setMode("preview");
   }
 
@@ -96,12 +104,12 @@ export function AnalyticsChartNodeView({ node, updateAttributes, editor }: NodeV
           </div>
         </div>
       ) : (
-        <div className="border border-subtle rounded-lg overflow-hidden">
+        <div className="border border-subtle rounded-lg overflow-hidden" contentEditable={false}>
           <div className="flex items-center justify-between px-3 py-1.5 border-b border-subtle bg-layer-2">
             <span className="text-xs font-medium text-tertiary">Analytics 图表</span>
             {toolbar}
           </div>
-          <ConfigPanel config={config ?? DEFAULT_CONFIG} onApply={handleApply} />
+          <ConfigPanel config={config ?? DEFAULT_CONFIG} onUpdate={handleUpdate} onApply={handleApply} xAxisOptions={chartCtx?.xAxisOptions} />
         </div>
       )}
     </NodeViewWrapper>
