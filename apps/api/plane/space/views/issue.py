@@ -767,3 +767,35 @@ class IssueRetrievePublicEndpoint(BaseAPIView):
         ).first()
 
         return Response(issue_queryset, status=status.HTTP_200_OK)
+
+
+class IssueMetaPublicEndpoint(BaseAPIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, anchor, issue_id):
+        deploy_board = DeployBoard.objects.filter(anchor=anchor, entity_name="project").first()
+        if not deploy_board:
+            return Response({"error": "Project is not published"}, status=status.HTTP_404_NOT_FOUND)
+
+        issue = (
+            Issue.issue_objects.filter(
+                pk=issue_id,
+                workspace__slug=deploy_board.workspace.slug,
+                project_id=deploy_board.entity_identifier,
+            )
+            .select_related("project")
+            .values("name", "description_stripped", "sequence_id", "project__identifier")
+            .first()
+        )
+        if not issue:
+            return Response({"error": "Issue not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        identifier = f"{issue['project__identifier']}-{issue['sequence_id']}"
+        return Response(
+            {
+                "name": issue["name"],
+                "description": issue["description_stripped"] or "",
+                "identifier": identifier,
+            },
+            status=status.HTTP_200_OK,
+        )

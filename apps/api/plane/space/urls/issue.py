@@ -3,6 +3,7 @@ from django.urls import path
 
 from plane.space.views import (
     IssueRetrievePublicEndpoint,
+    IssueMetaPublicEndpoint,
     IssueCommentPublicViewSet,
     IssueReactionPublicViewSet,
     CommentReactionPublicViewSet,
@@ -10,6 +11,11 @@ from plane.space.views import (
 )
 
 urlpatterns = [
+    path(
+        "anchor/<str:anchor>/issues/<uuid:issue_id>/meta/",
+        IssueMetaPublicEndpoint.as_view(),
+        name="workspace-project-boards-issue-meta",
+    ),
     path(
         "anchor/<str:anchor>/issues/<uuid:issue_id>/",
         IssueRetrievePublicEndpoint.as_view(),

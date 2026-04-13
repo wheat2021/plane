@@ -11,6 +11,7 @@ from .issue import (
     CommentReactionPublicViewSet,
     IssueVotePublicViewSet,
     IssueRetrievePublicEndpoint,
+    IssueMetaPublicEndpoint,
     ProjectIssuesPublicEndpoint,
 )
 
