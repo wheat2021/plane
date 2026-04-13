@@ -25,7 +25,7 @@ export const SidePeekView = observer(function SidePeekView(props: Props) {
   return (
     <div className="flex size-full flex-col overflow-hidden">
       <div className="w-full p-5">
-        <PeekOverviewHeader handleClose={handleClose} issueDetails={issueDetails} />
+        <PeekOverviewHeader handleClose={handleClose} issueDetails={issueDetails} anchor={anchor} />
       </div>
       {issueDetails ? (
         <div className="size-full overflow-y-auto px-6">

@@ -11,18 +11,19 @@ import { PeekOverviewIssueProperties } from "./issue-properties";
 
 type Props = {
   anchor: string;
-  handleClose: () => void;
+  handleClose?: () => void;
   issueDetails: IIssue | undefined;
+  standalone?: boolean;
 };
 
 export const FullScreenPeekView = observer(function FullScreenPeekView(props: Props) {
-  const { anchor, handleClose, issueDetails } = props;
+  const { anchor, handleClose, issueDetails, standalone = false } = props;
 
   return (
     <div className="grid h-full w-full grid-cols-10 divide-x divide-subtle-1 overflow-hidden">
       <div className="col-span-7 flex h-full w-full flex-col overflow-hidden">
         <div className="w-full p-5">
-          <PeekOverviewHeader handleClose={handleClose} issueDetails={issueDetails} />
+          {!standalone && handleClose && <PeekOverviewHeader handleClose={handleClose} issueDetails={issueDetails} />}
         </div>
         {issueDetails ? (
           <div className="h-full w-full overflow-y-auto px-6">

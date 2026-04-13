@@ -16,11 +16,12 @@ import type { IIssue, IPeekMode } from "@/types/issue";
 type Props = {
   handleClose: () => void;
   issueDetails: IIssue | undefined;
+  anchor?: string;
 };
 
 const PEEK_MODES: {
   key: IPeekMode;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
 }[] = [
   { key: "side", icon: SidePanelIcon, label: "Side Peek" },
@@ -37,20 +38,24 @@ const PEEK_MODES: {
 ];
 
 export const PeekOverviewHeader = observer(function PeekOverviewHeader(props: Props) {
-  const { handleClose } = props;
+  const { handleClose, issueDetails, anchor } = props;
 
   const { peekMode, setPeekMode } = useIssueDetails();
   const isClipboardWriteAllowed = useClipboardWritePermission();
 
   const handleCopyLink = () => {
-    const urlToCopy = window.location.href;
+    // If anchor and issueId are available, copy the standalone detail page link
+    const issueId: string | undefined = issueDetails?.id;
+    const urlToCopy =
+      anchor && issueId ? `${window.location.origin}/issues/${anchor}/issue/${issueId}` : window.location.href;
 
-    copyTextToClipboard(urlToCopy).then(() => {
+    void copyTextToClipboard(urlToCopy).then(() => {
       setToast({
         type: TOAST_TYPE.SUCCESS,
         title: "Link copied!",
         message: "Work item link copied to clipboard.",
       });
+      return undefined;
     });
   };
 
@@ -109,12 +114,12 @@ export const PeekOverviewHeader = observer(function PeekOverviewHeader(props: Pr
             </Transition>
           </Listbox>
         </div>
-        {isClipboardWriteAllowed && (peekMode === "side" || peekMode === "modal") && (
+        {isClipboardWriteAllowed && (
           <button
             type="button"
             onClick={handleCopyLink}
             className="shrink-0 focus:outline-none text-tertiary hover:text-secondary"
-            tabIndex={1}
+            tabIndex={0}
           >
             <LinkIcon className="h-4 w-4 -rotate-45" />
           </button>
