@@ -7,9 +7,13 @@ import { cn } from "@plane/utils";
 // hooks
 import { useEditorConfig, useEditorMention } from "@/hooks/editor";
 import { useMember } from "@/hooks/store/use-member";
+import { useProject } from "@/hooks/store/use-project";
 import { useParseEditorContent } from "@/hooks/use-parse-editor-content";
 // analytics hooks
-import { useAnalyticsXAxisOptions } from "@/components/analytics/hooks/use-analytics-options";
+import {
+  useAnalyticsXAxisOptions,
+  useAnalyticsIssueTypeOptions,
+} from "@/components/analytics/hooks/use-analytics-options";
 // plane web hooks
 import { useEditorFlagging } from "@/plane-web/hooks/use-editor-flagging";
 // local imports
@@ -51,6 +55,7 @@ export const DocumentEditor = forwardRef(function DocumentEditor(
   } = props;
   // store hooks
   const { getUserDetails } = useMember();
+  const { workspaceProjectIds, getProjectById } = useProject();
   // parse content
   const { getEditorMetaData } = useParseEditorContent({
     projectId,
@@ -64,42 +69,59 @@ export const DocumentEditor = forwardRef(function DocumentEditor(
   // use editor mention
   const { fetchMentions } = useEditorMention({
     enableAdvancedMentions: true,
-    searchEntity: editable ? async (payload) => await props.searchMentionCallback(payload) : async () => ({}),
+    searchEntity: editable ? async (payload) => props.searchMentionCallback(payload) : () => ({}),
   });
   // editor config
   const { getEditorFileHandlers } = useEditorConfig();
   // analytics chart options (static + extra properties)
   const xAxisOptions = useAnalyticsXAxisOptions(workspaceSlug);
-  const analyticsChartCtx = useMemo(() => ({ xAxisOptions }), [xAxisOptions]);
+  const rawIssueTypeOptions = useAnalyticsIssueTypeOptions(workspaceSlug);
+  const projectOptions = useMemo(
+    () =>
+      (workspaceProjectIds ?? []).map((id) => {
+        const project = getProjectById(id);
+        return { value: id, label: project?.name ?? id };
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [workspaceProjectIds]
+  );
+  const issueTypeOptions = useMemo(
+    () => rawIssueTypeOptions.map((o) => ({ value: o.issueTypeName ?? "", label: o.label })),
+    [rawIssueTypeOptions]
+  );
+  const analyticsChartCtx = useMemo(
+    () => ({ xAxisOptions, projectOptions, issueTypeOptions }),
+    [xAxisOptions, projectOptions, issueTypeOptions]
+  );
 
   return (
     <AnalyticsChartProvider value={analyticsChartCtx}>
       <DocumentEditorWithRef
-      ref={ref}
-      disabledExtensions={[...documentEditorExtensions.disabled, ...(additionalDisabledExtensions ?? [])]}
-      editable={editable}
-      flaggedExtensions={documentEditorExtensions.flagged}
-      fileHandler={getEditorFileHandlers({
-        projectId,
-        uploadFile: editable ? props.uploadFile : async () => "",
-        duplicateFile: editable ? props.duplicateFile : async () => "",
-        workspaceId,
-        workspaceSlug,
-      })}
-      getEditorMetaData={getEditorMetaData}
-      mentionHandler={{
-        searchCallback: async (query) => {
-          const res = await fetchMentions(query);
-          if (!res) throw new Error("Failed in fetching mentions");
-          return res;
-        },
-        renderComponent: EditorMentionsRoot,
-        getMentionedEntityDetails: (id: string) => ({ display_name: getUserDetails(id)?.display_name ?? "" }),
-      }}
-      extendedEditorProps={extendedEditorProps}
-      {...rest}
-      containerClassName={cn("relative pl-3 pb-3", containerClassName)}
-    />
+        ref={ref}
+        disabledExtensions={[...documentEditorExtensions.disabled, ...(additionalDisabledExtensions ?? [])]}
+        editable={editable}
+        flaggedExtensions={documentEditorExtensions.flagged}
+        fileHandler={getEditorFileHandlers({
+          projectId,
+          uploadFile: editable ? props.uploadFile : () => Promise.resolve(""),
+          duplicateFile: editable ? props.duplicateFile : () => Promise.resolve(""),
+          workspaceId,
+          workspaceSlug,
+        })}
+        getEditorMetaData={getEditorMetaData}
+        mentionHandler={{
+          searchCallback: async (query) => {
+            const res = await fetchMentions(query);
+            if (!res) throw new Error("Failed in fetching mentions");
+            return res;
+          },
+          renderComponent: EditorMentionsRoot,
+          getMentionedEntityDetails: (id: string) => ({ display_name: getUserDetails(id)?.display_name ?? "" }),
+        }}
+        extendedEditorProps={extendedEditorProps}
+        {...rest}
+        containerClassName={cn("relative pl-3 pb-3", containerClassName)}
+      />
     </AnalyticsChartProvider>
   );
 });

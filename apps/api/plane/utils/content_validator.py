@@ -108,6 +108,8 @@ ATTRIBUTES = {
         "data-block-type",
         # drawio block base64 content
         "data-content",
+        # analytics chart block base64 config
+        "data-config",
     },
     "a": {"href", "target"},
     # editor node/tag attributes
