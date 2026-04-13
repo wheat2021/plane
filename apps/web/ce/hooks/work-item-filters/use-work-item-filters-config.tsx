@@ -35,6 +35,7 @@ import {
   getCreatedAtFilterConfig,
   getCreatedByFilterConfig,
   getCycleFilterConfig,
+  getExtraPropertyMemberFilterConfig,
   getExtraPropertyOptionFilterConfig,
   getFileURL,
   getIssueTypeFilterConfig,
@@ -417,7 +418,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
     [isFilterEnabled, issueTypes, operatorConfigs]
   );
 
-  // extra property filter configs - collect unique option/multiselect configs across all issue types
+  // extra property filter configs - collect unique option/multiselect/member configs across all issue types
   // NOTE: Avoid useMemo here since the underlying MobX store updates (bindings/configMap) should trigger recomputation.
   const extraPropertyFilterConfigs: TFilterConfig<TWorkItemFilterProperty>[] = (() => {
     if (!projectId || !issueTypes || issueTypes.length === 0) return [];
@@ -431,18 +432,40 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
         if (seen.has(configId)) continue;
         seen.add(configId);
         const config = getConfigById(configId);
-        if (!config || (config.type !== "select" && config.type !== "multiselect")) continue;
-        if (!config.options || config.options.length === 0) continue;
+        if (!config) continue;
 
         const key = `extra_property_${configId}` as TWorkItemFilterProperty;
-        configs.push(
-          getExtraPropertyOptionFilterConfig<TWorkItemFilterProperty>(key)({
-            isEnabled: true,
-            label: config.label,
-            options: config.options,
-            ...operatorConfigs,
-          })
-        );
+
+        if (config.type === "member") {
+          if (!members || members.length === 0) continue;
+          configs.push(
+            getExtraPropertyMemberFilterConfig<TWorkItemFilterProperty>(key)({
+              isEnabled: true,
+              label: config.label,
+              members,
+              filterIcon: MembersPropertyIcon,
+              getOptionIcon: (memberDetails) => (
+                <Avatar
+                  name={memberDetails.display_name}
+                  src={getFileURL(memberDetails.avatar_url)}
+                  showTooltip={false}
+                  size="sm"
+                />
+              ),
+              ...operatorConfigs,
+            })
+          );
+        } else if (config.type === "select" || config.type === "multiselect") {
+          if (!config.options || config.options.length === 0) continue;
+          configs.push(
+            getExtraPropertyOptionFilterConfig<TWorkItemFilterProperty>(key)({
+              isEnabled: true,
+              label: config.label,
+              options: config.options,
+              ...operatorConfigs,
+            })
+          );
+        }
       }
     }
 

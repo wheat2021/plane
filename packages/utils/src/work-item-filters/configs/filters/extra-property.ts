@@ -1,9 +1,14 @@
 // plane imports
-import type { TExtraPropertyOption, TFilterProperty, TSupportedOperators } from "@plane/types";
+import type { IUserLite, TExtraPropertyOption, TFilterProperty, TSupportedOperators } from "@plane/types";
 import { EQUALITY_OPERATOR, COLLECTION_OPERATOR } from "@plane/types";
 // local imports
 import type { TCreateFilterConfigParams, IFilterIconConfig, TCreateFilterConfig } from "../../../rich-filters";
-import { createFilterConfig, getMultiSelectConfig, createOperatorConfigEntry } from "../../../rich-filters";
+import {
+  createFilterConfig,
+  getMultiSelectConfig,
+  createOperatorConfigEntry,
+  getMemberMultiSelectConfig,
+} from "../../../rich-filters";
 
 /**
  * Extra property option filter specific params
@@ -54,6 +59,35 @@ export const getExtraPropertyOptionFilterConfig =
       supportedOperatorConfigsMap: new Map([
         createOperatorConfigEntry(COLLECTION_OPERATOR.IN, params, (updatedParams) =>
           getExtraPropertyOptionMultiSelectConfig(updatedParams, EQUALITY_OPERATOR.EXACT)
+        ),
+      ]),
+    });
+
+/**
+ * Extra property member filter specific params
+ */
+export type TCreateExtraPropertyMemberFilterParams = TCreateFilterConfigParams &
+  IFilterIconConfig<IUserLite> & {
+    label: string;
+    members: IUserLite[];
+  };
+
+/**
+ * Get the extra property member filter config
+ * @template K - The filter key
+ * @param key - The filter key to use (format: extra_property_<configId>)
+ * @returns A function that takes parameters and returns the extra property member filter config
+ */
+export const getExtraPropertyMemberFilterConfig =
+  <P extends TFilterProperty>(key: P): TCreateFilterConfig<P, TCreateExtraPropertyMemberFilterParams> =>
+  (params: TCreateExtraPropertyMemberFilterParams) =>
+    createFilterConfig<P>({
+      ...params,
+      id: key,
+      icon: params.filterIcon,
+      supportedOperatorConfigsMap: new Map([
+        createOperatorConfigEntry(COLLECTION_OPERATOR.IN, params, (updatedParams) =>
+          getMemberMultiSelectConfig(updatedParams, EQUALITY_OPERATOR.EXACT)
         ),
       ]),
     });
