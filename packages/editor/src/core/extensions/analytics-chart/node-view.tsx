@@ -7,7 +7,7 @@ import { cn } from "@plane/utils";
 // local imports
 import { ChartRenderer } from "./chart-renderer";
 import { ConfigPanel } from "./config-panel";
-import { useAnalyticsChartContext } from "./use-analytics-chart-context";
+import { useAnalyticsChartContext } from "./context";
 import type { TAnalyticsChartConfig } from "./types";
 import { EAnalyticsChartType } from "./types";
 

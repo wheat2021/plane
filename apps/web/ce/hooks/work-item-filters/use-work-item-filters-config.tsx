@@ -127,13 +127,15 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
   const operatorConfigs = useFiltersOperatorConfigs({ workspaceSlug });
   const filtersToShow = useMemo(() => new Set(allowedFilters), [allowedFilters]);
   const project = useMemo(() => getProjectById(projectId), [projectId, getProjectById]);
-  const members: IUserLite[] | undefined = useMemo(
-    () =>
-      memberIds
-        ? (memberIds.map((memberId) => getUserDetails(memberId)).filter((member) => member) as IUserLite[])
-        : undefined,
-    [memberIds, getUserDetails]
-  );
+  // NOTE: Intentionally NOT wrapped in useMemo.
+  // getUserDetails reads from memberMap (workspace-member store), while memberIds comes from
+  // projectMemberMap (project-member store) — two separate fetches. If wrapped in useMemo with
+  // [memberIds, getUserDetails] deps, MobX stops tracking memberMap after the first render where
+  // useMemo returns the cached empty result, so the component never re-renders when workspace
+  // members load. Direct reads ensure the MobX observer tracks memberMap on every render.
+  const members: IUserLite[] | undefined = memberIds
+    ? (memberIds.map((memberId) => getUserDetails(memberId)).filter((member) => member) as IUserLite[])
+    : undefined;
   const workItemStates: IState[] | undefined = useMemo(
     () =>
       stateIds ? (stateIds.map((stateId) => getStateById(stateId)).filter((state) => state) as IState[]) : undefined,
