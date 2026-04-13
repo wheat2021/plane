@@ -1,15 +1,17 @@
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 
 export type TAnalyticsChartOption = { value: string; label: string };
 
 export type TAnalyticsChartContext = {
   xAxisOptions: TAnalyticsChartOption[];
+  projectOptions?: TAnalyticsChartOption[];
+  issueTypeOptions?: TAnalyticsChartOption[];
 };
 
-const AnalyticsChartContext = createContext<TAnalyticsChartContext | null>(null);
+const AnalyticsChartContext = createContext<{
+  xAxisOptions: TAnalyticsChartOption[];
+  projectOptions?: TAnalyticsChartOption[];
+  issueTypeOptions?: TAnalyticsChartOption[];
+} | null>(null);
 
 export const AnalyticsChartProvider = AnalyticsChartContext.Provider;
-
-export function useAnalyticsChartContext(): TAnalyticsChartContext | null {
-  return useContext(AnalyticsChartContext);
-}

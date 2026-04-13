@@ -34,25 +34,6 @@ export const AnalyticsChartExtension = Node.create({
     return {
       config: {
         default: {},
-        parseHTML: (element) => {
-          const b64 = element.getAttribute("data-config");
-          if (!b64) return {};
-          try {
-            return JSON.parse(decodeURIComponent(escape(atob(b64)))) as TAnalyticsChartConfig;
-          } catch {
-            return {};
-          }
-        },
-        renderHTML: (attributes) => {
-          const config = attributes.config as TAnalyticsChartConfig | undefined;
-          if (!config || Object.keys(config).length === 0) return {};
-          try {
-            const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(config))));
-            return { "data-config": b64 };
-          } catch {
-            return {};
-          }
-        },
       },
     };
   },
@@ -62,12 +43,28 @@ export const AnalyticsChartExtension = Node.create({
       {
         tag: 'div[data-type="analyticsChart"]',
         priority: 100,
+        getAttrs: (element) => {
+          const el = element;
+          const b64 = el.getAttribute("data-config");
+          if (!b64) return {};
+          try {
+            const config = JSON.parse(decodeURIComponent(escape(atob(b64)))) as TAnalyticsChartConfig;
+            return { config };
+          } catch {
+            return {};
+          }
+        },
       },
     ];
   },
 
-  renderHTML({ HTMLAttributes }) {
-    return ["div", mergeAttributes(HTMLAttributes, { "data-type": "analyticsChart" })];
+  renderHTML({ HTMLAttributes, node }) {
+    const config = node.attrs.config as TAnalyticsChartConfig | undefined;
+    const configAttr =
+      config && Object.keys(config).length > 0
+        ? { "data-config": btoa(unescape(encodeURIComponent(JSON.stringify(config)))) }
+        : {};
+    return ["div", mergeAttributes(HTMLAttributes, { "data-type": "analyticsChart", ...configAttr })];
   },
 
   addCommands() {
@@ -104,6 +101,16 @@ export const AnalyticsChartExtension = Node.create({
               // Prevent ProseMirror from handling mousedown on form elements,
               // which would trigger NodeSelection and re-render, closing native dropdowns
               if (target.closest("select, input, textarea")) {
+                return true;
+              }
+              return false;
+            },
+            keydown(_view, event) {
+              const target = event.target as HTMLElement;
+              // Prevent ProseMirror from handling keyboard events from form inputs.
+              // Without this, ProseMirror intercepts keys (Backspace, Enter, arrow keys)
+              // and the user cannot type in input/textarea fields inside the NodeView.
+              if (target.closest("input, textarea")) {
                 return true;
               }
               return false;

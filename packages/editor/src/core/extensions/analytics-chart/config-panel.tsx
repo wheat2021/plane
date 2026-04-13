@@ -1,9 +1,10 @@
 import type React from "react";
+import { useEffect, useRef } from "react";
 import { BarChart2, ChartArea, ChartLine, ChartPie, Radar, LayoutGrid } from "lucide-react";
 // plane imports
 import { ANALYTICS_X_AXIS_VALUES, CHART_X_AXIS_DATE_PROPERTIES } from "@plane/constants";
 import type { ChartXAxisProperty } from "@plane/types";
-import { CustomSelect } from "@plane/ui";
+import { CustomSelect, MultiSelectDropdown } from "@plane/ui";
 import { cn } from "@plane/utils";
 // local imports
 import type { TAnalyticsChartOption } from "./context";
@@ -15,6 +16,8 @@ type Props = {
   onUpdate: (config: TAnalyticsChartConfig) => void;
   onApply: () => void;
   xAxisOptions?: TAnalyticsChartOption[];
+  projectOptions?: TAnalyticsChartOption[];
+  issueTypeOptions?: TAnalyticsChartOption[];
 };
 
 const CHART_TYPES: { type: EAnalyticsChartType; label: string; icon: React.JSX.Element }[] = [
@@ -35,7 +38,31 @@ const DURATION_OPTIONS = [
   { value: "365d", label: "最近 1 年" },
 ];
 
-export function ConfigPanel({ config, onUpdate, onApply, xAxisOptions: externalOptions }: Props) {
+// Stops keydown events from bubbling to TipTap's editor-level listener.
+// React's synthetic onKeyDown fires AFTER TipTap (event delegation at React root),
+// so we must use a native addEventListener on the element itself.
+function useStopKeyPropagation() {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const stop = (e: KeyboardEvent) => e.stopPropagation();
+    el.addEventListener("keydown", stop);
+    return () => el.removeEventListener("keydown", stop);
+  }, []);
+  return ref;
+}
+
+export function ConfigPanel({
+  config,
+  onUpdate,
+  onApply,
+  xAxisOptions: externalOptions,
+  projectOptions,
+  issueTypeOptions,
+}: Props) {
+  const titleRef = useStopKeyPropagation();
+
   const isDateOnlyChartType =
     config.chart_type === EAnalyticsChartType.LINE || config.chart_type === EAnalyticsChartType.AREA;
   const showGroupBy = config.chart_type !== EAnalyticsChartType.PIE;
@@ -124,11 +151,13 @@ export function ConfigPanel({ config, onUpdate, onApply, xAxisOptions: externalO
               buttonClassName="w-full text-xs"
             >
               <CustomSelect.Option value="">无分组</CustomSelect.Option>
-              {allOptions.filter((o) => (o.value as string) !== config.x_axis).map((o) => (
-                <CustomSelect.Option key={o.value} value={o.value}>
-                  {o.label}
-                </CustomSelect.Option>
-              ))}
+              {allOptions
+                .filter((o) => (o.value) !== config.x_axis)
+                .map((o) => (
+                  <CustomSelect.Option key={o.value} value={o.value}>
+                    {o.label}
+                  </CustomSelect.Option>
+                ))}
             </CustomSelect>
           </div>
         )}
@@ -154,18 +183,52 @@ export function ConfigPanel({ config, onUpdate, onApply, xAxisOptions: externalO
           </CustomSelect>
         </div>
 
-        {/* Issue Type Name */}
+        {/* Issue Type */}
         <div>
           <p className="mb-1 text-xs font-medium text-secondary">工作项类型</p>
-          <input
-            type="text"
+          <CustomSelect
             value={config.issue_type_name ?? ""}
-            onMouseDown={(e) => e.stopPropagation()}
-            onChange={(e) => update({ issue_type_name: e.target.value || undefined })}
-            placeholder="全部类型"
-            className="w-full rounded border border-subtle bg-layer-2 px-2 py-1.5 text-xs text-primary outline-none focus:border-custom-primary-100 placeholder:text-tertiary"
-          />
+            label={
+              <span className="text-xs">
+                {(issueTypeOptions ?? []).find((o) => o.value === (config.issue_type_name ?? ""))?.label ?? "全部类型"}
+              </span>
+            }
+            onChange={(val: string) => update({ issue_type_name: val || undefined })}
+            buttonClassName="w-full text-xs"
+          >
+            {(issueTypeOptions ?? [{ value: "", label: "全部类型" }]).map((o) => (
+              <CustomSelect.Option key={o.value} value={o.value}>
+                {o.label}
+              </CustomSelect.Option>
+            ))}
+          </CustomSelect>
         </div>
+
+        {/* Project IDs */}
+        {projectOptions !== undefined && (
+          <div className="col-span-2">
+            <p className="mb-1 text-xs font-medium text-secondary">项目范围</p>
+            <MultiSelectDropdown
+              value={config.project_ids ?? []}
+              onChange={(vals: string[]) => update({ project_ids: vals.length > 0 ? vals : undefined })}
+              options={projectOptions.map((o) => ({ value: o.value, data: { label: o.label } }))}
+              keyExtractor={(opt) => opt.value}
+              queryArray={["label"]}
+              sortByKey="label"
+              buttonContent={(_isOpen: boolean, vals: unknown) => {
+                const items = (vals as string[]) ?? [];
+                if (items.length === 0) return <span className="text-xs text-tertiary">全部项目</span>;
+                if (items.length <= 2) {
+                  const labels = items.map((v) => projectOptions.find((o) => o.value === v)?.label ?? v).join(", ");
+                  return <span className="text-xs truncate">{labels}</span>;
+                }
+                return <span className="text-xs truncate">{items.length} 个项目</span>;
+              }}
+              buttonContainerClassName="w-full text-left"
+              buttonClassName="w-full text-xs"
+            />
+          </div>
+        )}
       </div>
 
       {/* Title */}
@@ -173,6 +236,7 @@ export function ConfigPanel({ config, onUpdate, onApply, xAxisOptions: externalO
         <p className="mb-1 text-xs font-medium text-secondary">图表标题</p>
         <input
           type="text"
+          ref={titleRef}
           value={config.title ?? ""}
           onMouseDown={(e) => e.stopPropagation()}
           onChange={(e) => update({ title: e.target.value || undefined })}

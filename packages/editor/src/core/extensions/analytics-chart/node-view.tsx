@@ -7,7 +7,7 @@ import { cn } from "@plane/utils";
 // local imports
 import { ChartRenderer } from "./chart-renderer";
 import { ConfigPanel } from "./config-panel";
-import { useAnalyticsChartContext } from "./context";
+import { useAnalyticsChartContext } from "./use-analytics-chart-context";
 import type { TAnalyticsChartConfig } from "./types";
 import { EAnalyticsChartType } from "./types";
 
@@ -109,7 +109,14 @@ export function AnalyticsChartNodeView({ node, updateAttributes, editor }: NodeV
             <span className="text-xs font-medium text-tertiary">Analytics 图表</span>
             {toolbar}
           </div>
-          <ConfigPanel config={config ?? DEFAULT_CONFIG} onUpdate={handleUpdate} onApply={handleApply} xAxisOptions={chartCtx?.xAxisOptions} />
+          <ConfigPanel
+            config={config ?? DEFAULT_CONFIG}
+            onUpdate={handleUpdate}
+            onApply={handleApply}
+            xAxisOptions={chartCtx?.xAxisOptions}
+            projectOptions={chartCtx?.projectOptions}
+            issueTypeOptions={chartCtx?.issueTypeOptions}
+          />
         </div>
       )}
     </NodeViewWrapper>
