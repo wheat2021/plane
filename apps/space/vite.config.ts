@@ -58,6 +58,11 @@ export default defineConfig(() => ({
         changeOrigin: true,
         rewrite: (p: string) => p.replace(/^\/drawio/, ""),
       },
+      [`${basePath}drawio`]: {
+        target: "http://localhost:8765",
+        changeOrigin: true,
+        rewrite: (p: string) => p.replace(new RegExp(`^${basePath}drawio`), ""),
+      },
     },
   },
 }));
