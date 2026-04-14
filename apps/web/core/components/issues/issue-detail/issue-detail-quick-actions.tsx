@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { observer } from "mobx-react";
+import { Globe } from "lucide-react";
 // plane imports
+import { SPACE_BASE_PATH, SPACE_BASE_URL } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { CopyLinkIcon } from "@plane/propel/icons";
 import { IconButton } from "@plane/propel/icon-button";
@@ -38,7 +40,7 @@ export const IssueDetailQuickActions = observer(function IssueDetailQuickActions
   // hooks
   const { data: currentUser } = useUser();
   const { isMobile } = usePlatformOS();
-  const { getProjectIdentifierById } = useProject();
+  const { getProjectIdentifierById, getProjectById } = useProject();
   const {
     issue: { getIssueById },
     removeIssue,
@@ -80,6 +82,23 @@ export const IssueDetailQuickActions = observer(function IssueDetailQuickActions
         title: t("toast.error"),
         type: TOAST_TYPE.ERROR,
       });
+    }
+  };
+
+  const projectAnchor = getProjectById(projectId)?.anchor;
+  const spaceAppUrl = (SPACE_BASE_URL.trim() === "" ? window.location.origin : SPACE_BASE_URL) + SPACE_BASE_PATH;
+
+  const handleCopyPublicLink = async () => {
+    if (!projectAnchor) return;
+    try {
+      await copyTextToClipboard(`${spaceAppUrl}/issues/${projectAnchor}/issue/${issueId}`);
+      setToast({
+        type: TOAST_TYPE.SUCCESS,
+        title: t("common.link_copied"),
+        message: t("common.copied_to_clipboard"),
+      });
+    } catch (_error) {
+      setToast({ title: t("toast.error"), type: TOAST_TYPE.ERROR });
     }
   };
 
@@ -142,8 +161,13 @@ export const IssueDetailQuickActions = observer(function IssueDetailQuickActions
           )}
           <div className="flex flex-wrap items-center gap-2 text-tertiary">
             <Tooltip tooltipContent={t("common.actions.copy_link")} isMobile={isMobile}>
-              <IconButton variant="secondary" size="lg" onClick={handleCopyText} icon={CopyLinkIcon} />
+              <IconButton variant="secondary" size="lg" onClick={() => void handleCopyText()} icon={CopyLinkIcon} />
             </Tooltip>
+            {projectAnchor && (
+              <Tooltip tooltipContent="复制公共链接" isMobile={isMobile}>
+                <IconButton variant="secondary" size="lg" onClick={() => void handleCopyPublicLink()} icon={Globe} />
+              </Tooltip>
+            )}
             <WorkItemDetailQuickActions
               parentRef={parentRef}
               issue={issue}
