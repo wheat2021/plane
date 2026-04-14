@@ -1,8 +1,10 @@
 import { useRef } from "react";
+import type { ComponentType } from "react";
 import { observer } from "mobx-react";
 import Link from "next/link";
-import { MoveDiagonal, MoveRight } from "lucide-react";
+import { MoveDiagonal, MoveRight, Globe } from "lucide-react";
 // plane imports
+import { SPACE_BASE_PATH, SPACE_BASE_URL } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { CenterPanelIcon, CopyLinkIcon, FullScreenPanelIcon, SidePanelIcon } from "@plane/propel/icons";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
@@ -25,7 +27,7 @@ import { IconButton } from "@plane/propel/icon-button";
 
 export type TPeekModes = "side-peek" | "modal" | "full-screen";
 
-const PEEK_OPTIONS: { key: TPeekModes; icon: any; i18n_title: string }[] = [
+const PEEK_OPTIONS: { key: TPeekModes; icon: ComponentType<{ className?: string }>; i18n_title: string }[] = [
   {
     key: "side-peek",
     icon: SidePanelIcon,
@@ -92,7 +94,7 @@ export const IssuePeekOverviewHeader = observer(function IssuePeekOverviewHeader
     getIsIssuePeeked,
   } = useIssueDetail();
   const { isMobile } = usePlatformOS();
-  const { getProjectIdentifierById } = useProject();
+  const { getProjectIdentifierById, getProjectById } = useProject();
   // derived values
   const issueDetails = getIssueById(issueId);
   const currentMode = PEEK_OPTIONS.find((m) => m.key === peekMode);
@@ -113,12 +115,30 @@ export const IssuePeekOverviewHeader = observer(function IssuePeekOverviewHeader
   const handleCopyText = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();
-    copyUrlToClipboard(workItemLink).then(() => {
+    void copyUrlToClipboard(workItemLink).then(() => {
       setToast({
         type: TOAST_TYPE.SUCCESS,
         title: t("common.link_copied"),
         message: t("common.link_copied_to_clipboard"),
       });
+      return undefined;
+    });
+  };
+
+  const projectAnchor = getProjectById(projectId)?.anchor;
+
+  const handleCopyPublicLink = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!projectAnchor) return;
+    const spaceAppUrl = (SPACE_BASE_URL.trim() === "" ? window.location.origin : SPACE_BASE_URL) + SPACE_BASE_PATH;
+    void copyUrlToClipboard(`${spaceAppUrl}/issues/${projectAnchor}/issue/${issueId}`).then(() => {
+      setToast({
+        type: TOAST_TYPE.SUCCESS,
+        title: t("common.link_copied"),
+        message: t("common.copied_to_clipboard"),
+      });
+      return undefined;
     });
   };
 
@@ -128,6 +148,7 @@ export const IssuePeekOverviewHeader = observer(function IssuePeekOverviewHeader
 
       return deleteIssue(workspaceSlug, projectId, issueId).then(() => {
         setPeekIssue(undefined);
+        return undefined;
       });
     } catch (_error) {
       setToast({
@@ -168,7 +189,7 @@ export const IssuePeekOverviewHeader = observer(function IssuePeekOverviewHeader
           <div className="flex flex-shrink-0 items-center gap-2">
             <CustomSelect
               value={currentMode}
-              onChange={(val: any) => setPeekMode(val)}
+              onChange={(val: TPeekModes) => setPeekMode(val)}
               customButton={
                 <Tooltip tooltipContent={t("common.toggle_peek_view_layout")} isMobile={isMobile}>
                   <button type="button" className="">
@@ -202,6 +223,11 @@ export const IssuePeekOverviewHeader = observer(function IssuePeekOverviewHeader
           <Tooltip tooltipContent={t("common.actions.copy_link")} isMobile={isMobile}>
             <IconButton variant="secondary" size="lg" onClick={handleCopyText} icon={CopyLinkIcon} />
           </Tooltip>
+          {projectAnchor && (
+            <Tooltip tooltipContent="复制公共链接" isMobile={isMobile}>
+              <IconButton variant="secondary" size="lg" onClick={handleCopyPublicLink} icon={Globe} />
+            </Tooltip>
+          )}
           {issueDetails && (
             <WorkItemDetailQuickActions
               parentRef={parentRef}
