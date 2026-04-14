@@ -7,6 +7,9 @@ import { cn } from "@plane/utils";
 
 type TDrawioMode = "source" | "preview" | "edit";
 
+// eslint-disable-next-line turbo/no-undeclared-env-vars
+const drawioBase = `${(import.meta.env.BASE_URL ?? "/").replace(/\/$/, "")}/drawio`;
+
 function isValidMxfile(xml: string): boolean {
   const trimmed = xml.trim();
   return trimmed.startsWith("<mxfile") && trimmed.endsWith("</mxfile>");
@@ -70,7 +73,7 @@ function DrawioEditorModal({
         ref={iframeRef}
         title="Draw.io Editor"
         className="flex-1 w-full border-0"
-        src="/drawio/?embed=1&spin=1&proto=json&saveAndExit=1&noSaveBtn=0&noExitBtn=0"
+        src={`${drawioBase}/?embed=1&spin=1&proto=json&saveAndExit=1&noSaveBtn=0&noExitBtn=0`}
       />
       {!ready && (
         <div className="absolute inset-0 flex items-center justify-center bg-layer-1/80">
@@ -226,7 +229,7 @@ export function DrawioBlockNodeView({ node, editor, getPos }: NodeViewProps) {
 }
 
 function DrawioPreview({ xml }: { xml: string }) {
-  const src = `/drawio/?lightbox=1&highlight=0000ff&nav=1&bg=none#R${encodeURIComponent(xml)}`;
+  const src = `${drawioBase}/?lightbox=1&highlight=0000ff&nav=1&bg=none#R${encodeURIComponent(xml)}`;
 
   return (
     <iframe
