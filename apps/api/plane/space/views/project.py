@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny
 # Module imports
 from .base import BaseAPIView
 from plane.app.serializers import DeployBoardSerializer
-from plane.db.models import Project, DeployBoard, ProjectMember
+from plane.db.models import Project, DeployBoard, ProjectMember, WorkspaceMember
 
 
 class ProjectDeployBoardPublicSettingsEndpoint(BaseAPIView):
@@ -64,8 +64,7 @@ class ProjectMembersEndpoint(BaseAPIView):
     def get(self, request, anchor):
         deploy_board = DeployBoard.objects.filter(anchor=anchor).first()
 
-        members = ProjectMember.objects.filter(
-            project=deploy_board.project,
+        members = WorkspaceMember.objects.filter(
             workspace=deploy_board.workspace,
             is_active=True,
         ).values(
@@ -74,7 +73,10 @@ class ProjectMembersEndpoint(BaseAPIView):
             "member__first_name",
             "member__last_name",
             "member__display_name",
-            "project",
+            "member__avatar",
             "workspace",
         )
-        return Response(members, status=status.HTTP_200_OK)
+        # Add project field for backward compatibility
+        project_id = str(deploy_board.project_id)
+        result = [{**m, "project": project_id} for m in members]
+        return Response(result, status=status.HTTP_200_OK)

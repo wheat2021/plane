@@ -1,6 +1,7 @@
 import { observer } from "mobx-react";
 import { Link2, ArrowLeft } from "lucide-react";
 import { useParams } from "next/navigation";
+import { useHref } from "react-router";
 import useSWR from "swr";
 // plane imports
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
@@ -14,6 +15,7 @@ import { copyTextToClipboard } from "@/helpers/string.helper";
 // hooks
 import { usePublish, usePublishList } from "@/hooks/store/publish";
 import { useIssueDetails } from "@/hooks/store/use-issue-details";
+import { useMember } from "@/hooks/store/use-member";
 import useClipboardWritePermission from "@/hooks/use-clipboard-write-permission";
 // types
 import type { Route } from "./+types/page";
@@ -39,13 +41,13 @@ export async function loader({ params }: Route.LoaderArgs) {
     return { metadata: null };
   }
 
+  const apiBase = process.env.VITE_API_BASE_URL;
+  if (!apiBase) return { metadata: null };
+
   try {
-    const response = await fetch(
-      `${process.env.VITE_API_BASE_URL}/api/public/anchor/${anchor}/issues/${issueId}/meta/`
-    );
+    const response = await fetch(`${apiBase}/api/public/anchor/${anchor}/issues/${issueId}/meta/`);
     if (!response.ok) return { metadata: null };
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const metadata: IssueMeta = await response.json();
+    const metadata = (await response.json()) as IssueMeta;
     return { metadata };
   } catch {
     return { metadata: null };
@@ -72,15 +74,28 @@ export function meta({ loaderData }: Route.MetaArgs) {
   ];
 }
 
+// HydrateFallback prevents hydration mismatch when streaming SSR is active
+// (triggered by the async loader above). Without this, React Router abandons
+// hydration and mounts Scripts fresh, causing useContext(FrameworkContext) to
+// fail with "Cannot read properties of null (reading 'useContext')".
+export function HydrateFallback() {
+  return (
+    <div className="flex h-screen w-full items-center justify-center bg-surface-1">
+      <LogoSpinner />
+    </div>
+  );
+}
+
 const IssueDetailPage = observer(function IssueDetailPage() {
-   
   const params = useParams<{ anchor: string; issueId: string }>();
-   
+
   const { anchor, issueId } = params;
+  const boardHref = useHref(anchor ? `/issues/${anchor}` : "/");
   // store hooks
   const { fetchPublishSettings } = usePublishList();
   const publishSettings = usePublish(anchor);
   const { fetchIssueDetails, getIssueById } = useIssueDetails();
+  const { fetchMembers } = useMember();
   const isClipboardWriteAllowed = useClipboardWritePermission();
 
   // Load publish settings (validates anchor)
@@ -89,6 +104,9 @@ const IssueDetailPage = observer(function IssueDetailPage() {
     anchor ? `PUBLISH_SETTINGS_${anchor}` : null,
     anchor ? () => fetchPublishSettings(anchor) : null
   );
+
+  // Load members
+  useSWR(anchor ? `PUBLIC_MEMBERS_${anchor}` : null, anchor ? () => fetchMembers(anchor) : null);
 
   // Load full issue details
   useSWR(
@@ -125,7 +143,7 @@ const IssueDetailPage = observer(function IssueDetailPage() {
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-surface-1">
       {/* Minimal standalone header */}
       <div className="flex h-[52px] shrink-0 items-center justify-between border-b border-subtle-1 bg-surface-1 px-4">
-        <a href={`/issues/${anchor}`} className="flex items-center gap-2 text-sm text-tertiary hover:text-secondary">
+        <a href={boardHref} className="flex items-center gap-2 text-sm text-tertiary hover:text-secondary">
           <ArrowLeft className="size-4" />
           <span>返回看板</span>
         </a>

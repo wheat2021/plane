@@ -21,6 +21,8 @@ import { usePublish } from "@/hooks/store/publish";
 import { useStates } from "@/hooks/store/use-state";
 // types
 import type { IIssue, IPeekMode } from "@/types/issue";
+// local components
+import { ExtraPropertiesReadOnly } from "./extra-properties";
 
 type Props = {
   issueDetails: IIssue;
@@ -45,12 +47,13 @@ export const PeekOverviewIssueProperties = observer(function PeekOverviewIssuePr
   const handleCopyLink = () => {
     const urlToCopy = window.location.href;
 
-    copyTextToClipboard(urlToCopy).then(() => {
+    void copyTextToClipboard(urlToCopy).then(() => {
       setToast({
         type: TOAST_TYPE.INFO,
         title: "Link copied!",
         message: "Work item link copied to clipboard",
       });
+      return undefined;
     });
   };
 
@@ -125,6 +128,15 @@ export const PeekOverviewIssueProperties = observer(function PeekOverviewIssuePr
             )}
           </div>
         </div>
+
+        {/* Extra (custom) properties */}
+        {issueDetails.type_id && anchor && (
+          <ExtraPropertiesReadOnly
+            anchor={anchor.toString()}
+            typeId={issueDetails.type_id}
+            values={issueDetails.extra_properties}
+          />
+        )}
       </div>
     </div>
   );

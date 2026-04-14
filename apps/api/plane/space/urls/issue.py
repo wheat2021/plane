@@ -4,6 +4,7 @@ from django.urls import path
 from plane.space.views import (
     IssueRetrievePublicEndpoint,
     IssueMetaPublicEndpoint,
+    IssueTypeExtraPropertyPublicEndpoint,
     IssueCommentPublicViewSet,
     IssueReactionPublicViewSet,
     CommentReactionPublicViewSet,
@@ -55,5 +56,10 @@ urlpatterns = [
         "anchor/<str:anchor>/issues/<uuid:issue_id>/votes/",
         IssueVotePublicViewSet.as_view({"get": "list", "post": "create", "delete": "destroy"}),
         name="issue-vote-project-board",
+    ),
+    path(
+        "anchor/<str:anchor>/issue-types/<uuid:type_id>/extra-property-configs/",
+        IssueTypeExtraPropertyPublicEndpoint.as_view(),
+        name="issue-type-extra-property-configs-public",
     ),
 ]

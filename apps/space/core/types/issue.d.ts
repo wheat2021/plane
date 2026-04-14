@@ -1,4 +1,11 @@
-import type { ActorDetail, TIssue, TIssuePriorities, TStateGroups, TIssuePublicComment } from "@plane/types";
+import type {
+  ActorDetail,
+  TIssue,
+  TIssuePriorities,
+  TStateGroups,
+  TIssuePublicComment,
+  TIssueExtraProperties,
+} from "@plane/types";
 
 export type TIssueLayout = "list" | "kanban" | "calendar" | "spreadsheet" | "gantt";
 export type TIssueLayoutOptions = {
@@ -60,6 +67,8 @@ export interface IIssue extends Pick<
   comments: TIssuePublicComment[];
   reaction_items: IIssueReaction[];
   vote_items: IVote[];
+  extra_properties?: TIssueExtraProperties;
+  type_id?: string | null;
 }
 
 export type IPeekMode = "side" | "modal" | "full";

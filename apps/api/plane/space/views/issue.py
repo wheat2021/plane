@@ -61,6 +61,7 @@ from plane.db.models import (
     ProjectPublicMember,
     FileAsset,
     CycleIssue,
+    IssueTypeExtraProperty,
 )
 from plane.bgtasks.issue_activities_task import issue_activity
 from plane.utils.issue_filters import issue_filters
@@ -763,6 +764,8 @@ class IssueRetrievePublicEndpoint(BaseAPIView):
                 "state__group",
                 "vote_items",
                 "reaction_items",
+                "extra_properties",
+                "type_id",
             )
         ).first()
 
@@ -799,3 +802,53 @@ class IssueMetaPublicEndpoint(BaseAPIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class IssueTypeExtraPropertyPublicEndpoint(BaseAPIView):
+    """Returns read-only extra property configs for a given issue type in a published project."""
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, anchor, type_id):
+        deploy_board = DeployBoard.objects.filter(anchor=anchor, entity_name="project").first()
+        if not deploy_board:
+            return Response({"error": "Project is not published"}, status=status.HTTP_404_NOT_FOUND)
+
+        bindings = (
+            IssueTypeExtraProperty.objects.filter(
+                project_id=deploy_board.entity_identifier,
+                issue_type_id=type_id,
+                deleted_at__isnull=True,
+                condition_config__isnull=True,
+            )
+            .select_related("extra_property_config")
+            .order_by("sort_order")
+        )
+
+        result = []
+        for binding in bindings:
+            config = binding.extra_property_config
+            if not config or config.deleted_at:
+                continue
+            item = {
+                "id": str(config.id),
+                "key": config.key,
+                "label": config.label,
+                "type": config.type,
+                "description": config.description,
+                "sort_order": binding.sort_order,
+                "is_required": binding.is_required,
+            }
+            # Flatten type-specific config fields to top level
+            if config.type in ("select", "multiselect"):
+                item["options"] = config.config.get("options", [])
+            elif config.type == "checkbox":
+                item["true_value"] = config.config.get("true_value", "Yes")
+                item["false_value"] = config.config.get("false_value", "No")
+                item["true_icon"] = config.config.get("true_icon")
+                item["true_icon_color"] = config.config.get("true_icon_color")
+                item["false_icon"] = config.config.get("false_icon")
+                item["false_icon_color"] = config.config.get("false_icon_color")
+            result.append(item)
+
+        return Response(result, status=status.HTTP_200_OK)

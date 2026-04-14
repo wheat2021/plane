@@ -12,6 +12,7 @@ from .issue import (
     IssueVotePublicViewSet,
     IssueRetrievePublicEndpoint,
     IssueMetaPublicEndpoint,
+    IssueTypeExtraPropertyPublicEndpoint,
     ProjectIssuesPublicEndpoint,
 )
 

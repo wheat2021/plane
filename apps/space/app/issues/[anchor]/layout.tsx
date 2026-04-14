@@ -32,17 +32,19 @@ export async function loader({ params }: Route.LoaderArgs) {
     return { metadata: null };
   }
 
+  const apiBase = process.env.VITE_API_BASE_URL;
+  if (!apiBase) return { metadata: null };
+
   try {
-    const response = await fetch(`${process.env.VITE_API_BASE_URL}/api/public/anchor/${anchor}/meta/`);
+    const response = await fetch(`${apiBase}/api/public/anchor/${anchor}/meta/`);
 
     if (!response.ok) {
       return { metadata: null };
     }
 
-    const metadata: IssueMetadata = await response.json();
+    const metadata: IssueMetadata = (await response.json()) as IssueMetadata;
     return { metadata };
-  } catch (error) {
-    console.error("Error fetching issue metadata:", error);
+  } catch {
     return { metadata: null };
   }
 }
@@ -83,10 +85,12 @@ export function meta({ loaderData }: Route.MetaArgs) {
 }
 
 // Prevent loader from re-running on anchor param changes
+// eslint-disable-next-line react-refresh/only-export-components
 export function shouldRevalidate({ currentParams, nextParams }: ShouldRevalidateFunctionArgs) {
   return currentParams.anchor !== nextParams.anchor;
 }
 
+ 
 function IssuesLayout(props: Route.ComponentProps) {
   const { anchor } = props.params;
   // store hooks
@@ -94,6 +98,7 @@ function IssuesLayout(props: Route.ComponentProps) {
   const publishSettings = usePublish(anchor);
   const { updateLayoutOptions } = useIssueFilter();
   // fetch publish settings
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { error } = useSWR(
     anchor ? `PUBLISH_SETTINGS_${anchor}` : null,
     anchor
@@ -120,7 +125,7 @@ function IssuesLayout(props: Route.ComponentProps) {
     );
   }
 
-  if (error?.status === 404) return <PageNotFound />;
+  if ((error as { status?: number } | undefined)?.status === 404) return <PageNotFound />;
 
   if (error) return <SomethingWentWrongError />;
 
@@ -139,4 +144,5 @@ function IssuesLayout(props: Route.ComponentProps) {
   );
 }
 
-export default observer(IssuesLayout);
+const IssuesLayoutObserver = observer(IssuesLayout);
+export default IssuesLayoutObserver;

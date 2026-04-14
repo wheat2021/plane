@@ -1,6 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { MoveRight } from "lucide-react";
+import { ExternalLink, MoveRight } from "lucide-react";
+import { useHref } from "react-router";
 import { Listbox, Transition } from "@headlessui/react";
 // ui
 import { LinkIcon, CenterPanelIcon, FullScreenPanelIcon, SidePanelIcon } from "@plane/propel/icons";
@@ -43,11 +44,12 @@ export const PeekOverviewHeader = observer(function PeekOverviewHeader(props: Pr
   const { peekMode, setPeekMode } = useIssueDetails();
   const isClipboardWriteAllowed = useClipboardWritePermission();
 
+  const issueId: string | undefined = issueDetails?.id;
+  // useHref resolves the path with the app's base path (e.g. /spaces/) automatically
+  const standaloneHref = useHref(anchor && issueId ? `/issues/${anchor}/issue/${issueId}` : ".");
+
   const handleCopyLink = () => {
-    // If anchor and issueId are available, copy the standalone detail page link
-    const issueId: string | undefined = issueDetails?.id;
-    const urlToCopy =
-      anchor && issueId ? `${window.location.origin}/issues/${anchor}/issue/${issueId}` : window.location.href;
+    const urlToCopy = anchor && issueId ? `${window.location.origin}${standaloneHref}` : window.location.href;
 
     void copyTextToClipboard(urlToCopy).then(() => {
       setToast({
@@ -114,16 +116,29 @@ export const PeekOverviewHeader = observer(function PeekOverviewHeader(props: Pr
             </Transition>
           </Listbox>
         </div>
-        {isClipboardWriteAllowed && (
-          <button
-            type="button"
-            onClick={handleCopyLink}
-            className="shrink-0 focus:outline-none text-tertiary hover:text-secondary"
-            tabIndex={0}
-          >
-            <LinkIcon className="h-4 w-4 -rotate-45" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {isClipboardWriteAllowed && (
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className="shrink-0 focus:outline-none text-tertiary hover:text-secondary"
+              tabIndex={0}
+            >
+              <LinkIcon className="h-4 w-4 -rotate-45" />
+            </button>
+          )}
+          {anchor && issueId && (
+            <a
+              href={standaloneHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 focus:outline-none text-tertiary hover:text-secondary"
+              tabIndex={0}
+            >
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+        </div>
       </div>
     </>
   );

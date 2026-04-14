@@ -87,6 +87,7 @@ export function DrawioBlockNodeView({ node, editor, getPos }: NodeViewProps) {
   const [mode, setMode] = useState<TDrawioMode>(hasContent ? "preview" : "source");
   const [error, setError] = useState("");
   const [showEditor, setShowEditor] = useState(false);
+  const isEditable = editor?.isEditable ?? false;
 
   const handleSwitchToPreview = useCallback(() => {
     if (!code.trim()) {
@@ -141,7 +142,7 @@ export function DrawioBlockNodeView({ node, editor, getPos }: NodeViewProps) {
     setShowEditor(false);
   }, []);
 
-  const toolbar = (
+  const toolbar = isEditable ? (
     <div className="flex items-center gap-1">
       <button
         type="button"
@@ -177,17 +178,19 @@ export function DrawioBlockNodeView({ node, editor, getPos }: NodeViewProps) {
         源代码
       </button>
     </div>
-  );
+  ) : null;
 
   return (
     <NodeViewWrapper className="drawio-block my-2">
-      {mode === "preview" ? (
+      {mode === "preview" || !isEditable ? (
         <>
           {/* Floating toolbar on hover */}
           <div className="group relative">
-            <div className="absolute top-1 right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-layer-2 border border-subtle rounded-md shadow-sm px-1 py-0.5">
-              {toolbar}
-            </div>
+            {toolbar && (
+              <div className="absolute top-1 right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-layer-2 border border-subtle rounded-md shadow-sm px-1 py-0.5">
+                {toolbar}
+              </div>
+            )}
             {!code.trim() ? (
               <div className="text-sm text-tertiary py-4 px-3">空的 Draw.io 图表</div>
             ) : (
