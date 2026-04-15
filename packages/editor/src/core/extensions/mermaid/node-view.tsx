@@ -80,7 +80,7 @@ export function MermaidBlockNodeView({ node }: NodeViewProps) {
 
   return (
     <NodeViewWrapper className="mermaid-block my-2">
-      {showPreview ? (
+      {showPreview && (
         <div className="group relative">
           <div className="absolute top-1 right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-layer-2 border border-subtle rounded-md shadow-sm px-1 py-0.5">
             {toolbar}
@@ -96,18 +96,22 @@ export function MermaidBlockNodeView({ node }: NodeViewProps) {
             />
           )}
         </div>
-      ) : (
-        <div className="border border-subtle rounded-lg overflow-hidden">
-          <div className="flex items-center justify-between px-3 py-1.5 border-b border-subtle bg-layer-2">
-            <span className="text-xs font-medium text-tertiary">Mermaid 图表</span>
-            {toolbar}
-          </div>
-          <NodeViewContent
-            as="code"
-            className="block whitespace-pre-wrap font-mono text-sm text-primary p-4 outline-none min-h-[3rem]"
-          />
-        </div>
       )}
+      <div
+        className={cn(
+          "border border-subtle rounded-lg overflow-hidden",
+          showPreview && "absolute -left-[9999px] h-0 overflow-hidden"
+        )}
+      >
+        <div className="flex items-center justify-between px-3 py-1.5 border-b border-subtle bg-layer-2">
+          <span className="text-xs font-medium text-tertiary">Mermaid 图表</span>
+          {!showPreview && toolbar}
+        </div>
+        <NodeViewContent
+          as="code"
+          className="block whitespace-pre-wrap font-mono text-sm text-primary p-4 outline-none min-h-[3rem]"
+        />
+      </div>
     </NodeViewWrapper>
   );
 }

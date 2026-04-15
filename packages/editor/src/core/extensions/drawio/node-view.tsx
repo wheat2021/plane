@@ -185,7 +185,7 @@ export function DrawioBlockNodeView({ node, editor, getPos }: NodeViewProps) {
 
   return (
     <NodeViewWrapper className="drawio-block my-2">
-      {mode === "preview" || !isEditable ? (
+      {(mode === "preview" || !isEditable) && (
         <>
           {/* Floating toolbar on hover */}
           <div className="group relative">
@@ -201,26 +201,30 @@ export function DrawioBlockNodeView({ node, editor, getPos }: NodeViewProps) {
             )}
           </div>
         </>
-      ) : (
-        <div className="border border-subtle rounded-lg overflow-hidden">
-          {/* Header toolbar */}
-          <div className="flex items-center justify-between px-3 py-1.5 border-b border-subtle bg-layer-2">
-            <span className="text-xs font-medium text-tertiary">Draw.io 图表</span>
-            {toolbar}
-          </div>
-
-          {/* Error message */}
-          {error && (
-            <div className="px-3 py-1.5 text-xs text-error-primary bg-error-subtle border-b border-subtle">{error}</div>
-          )}
-
-          {/* Source code editor */}
-          <NodeViewContent
-            as="code"
-            className="block whitespace-pre-wrap font-mono text-sm text-primary p-4 outline-none min-h-[3rem]"
-          />
-        </div>
       )}
+      <div
+        className={cn(
+          "border border-subtle rounded-lg overflow-hidden",
+          (mode === "preview" || !isEditable) && "absolute -left-[9999px] h-0 overflow-hidden"
+        )}
+      >
+        {/* Header toolbar */}
+        <div className="flex items-center justify-between px-3 py-1.5 border-b border-subtle bg-layer-2">
+          <span className="text-xs font-medium text-tertiary">Draw.io 图表</span>
+          {mode === "source" && isEditable && toolbar}
+        </div>
+
+        {/* Error message */}
+        {error && (
+          <div className="px-3 py-1.5 text-xs text-error-primary bg-error-subtle border-b border-subtle">{error}</div>
+        )}
+
+        {/* Source code editor - always rendered so ProseMirror contentDOM stays in DOM */}
+        <NodeViewContent
+          as="code"
+          className="block whitespace-pre-wrap font-mono text-sm text-primary p-4 outline-none min-h-[3rem]"
+        />
+      </div>
 
       {/* Full-screen modal editor */}
       {showEditor && <DrawioEditorModal xml={code} onSave={handleEditorSave} onClose={handleEditorClose} />}
