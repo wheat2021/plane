@@ -74,18 +74,6 @@ export function meta({ loaderData }: Route.MetaArgs) {
   ];
 }
 
-// HydrateFallback prevents hydration mismatch when streaming SSR is active
-// (triggered by the async loader above). Without this, React Router abandons
-// hydration and mounts Scripts fresh, causing useContext(FrameworkContext) to
-// fail with "Cannot read properties of null (reading 'useContext')".
-export function HydrateFallback() {
-  return (
-    <div className="flex h-screen w-full items-center justify-center bg-surface-1">
-      <LogoSpinner />
-    </div>
-  );
-}
-
 const IssueDetailPage = observer(function IssueDetailPage() {
   const params = useParams<{ anchor: string; issueId: string }>();
 
