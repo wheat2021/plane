@@ -1,5 +1,6 @@
 import { useEditorState, useEditor as useTiptapEditor } from "@tiptap/react";
-import { useImperativeHandle, useEffect } from "react";
+import { useImperativeHandle, useEffect, useMemo } from "react";
+import { generateJSON } from "@tiptap/html";
 import type { MarkdownStorage } from "tiptap-markdown";
 // extensions
 import { CoreEditorExtensions } from "@/extensions";
@@ -46,6 +47,38 @@ export const useEditor = (props: TEditorHookProps) => {
     value,
   } = props;
 
+  const editorExtensions = useMemo(
+    () => [
+      ...CoreEditorExtensions({
+        disabledExtensions,
+        editable,
+        enableHistory,
+        extendedEditorProps,
+        fileHandler,
+        flaggedExtensions,
+        getEditorMetaData,
+        isTouchDevice,
+        mentionHandler,
+        placeholder,
+        showPlaceholderOnEmpty,
+        tabIndex,
+        provider,
+      }),
+      ...extensions,
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [editable]
+  );
+
+  // Convert HTML content to JSON to bypass tiptap-markdown's onBeforeCreate
+  // which runs markdown-it on string content and corrupts existing HTML
+  const parsedContent = useMemo(() => {
+    if (typeof initialValue === "string" && initialValue.trimStart().startsWith("<")) {
+      return generateJSON(initialValue, editorExtensions);
+    }
+    return initialValue;
+  }, [initialValue, editorExtensions]);
+
   const editor = useTiptapEditor(
     {
       editable,
@@ -59,25 +92,8 @@ export const useEditor = (props: TEditorHookProps) => {
         }),
         ...editorProps,
       },
-      extensions: [
-        ...CoreEditorExtensions({
-          disabledExtensions,
-          editable,
-          enableHistory,
-          extendedEditorProps,
-          fileHandler,
-          flaggedExtensions,
-          getEditorMetaData,
-          isTouchDevice,
-          mentionHandler,
-          placeholder,
-          showPlaceholderOnEmpty,
-          tabIndex,
-          provider,
-        }),
-        ...extensions,
-      ],
-      content: initialValue,
+      extensions: editorExtensions,
+      content: parsedContent,
       onCreate: () => handleEditorReady?.(true),
       onTransaction: () => {
         onTransaction?.();
